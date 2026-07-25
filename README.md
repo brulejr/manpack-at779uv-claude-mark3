@@ -9,7 +9,11 @@ This is a clean-room decomposition of the single-piece reference STL from
 - Radio mounts use stainless M5 bolts or factory thumb screws.
 - Frame base allows additional modules to be connected such as battery frame or compute box.
 
-Source: `cad/manpack_frame.scad` · Meshes: `stl/` · Renders: `img/`
+Key files and directories
+
+- Source: `cad/manpack_frame.scad`
+- Meshes: `stl/`
+- Renders: `img/`
 
 ---
 
