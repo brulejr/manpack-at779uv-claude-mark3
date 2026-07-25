@@ -121,8 +121,12 @@ space above.
 The modular bottom interface. Bolts up into the two bottom crossbeams on four
 M4 bolts. Its **four bosses are simultaneously the frame's feet and the M4
 attachment grid** that future modules (battery, tuner, ATU) bolt up into — one
-feature doing both jobs, so nothing else needs to hang off the frame. Two
-locating lips on the top face position the side panels during assembly.
+feature doing both jobs, so nothing else needs to hang off the frame.
+
+Its top face is deliberately left flat. An earlier revision had two raised
+locating lips for the panel bottom edges; they made the part unprintable (see
+§9), and since the panels are located by their 16 bolts into the crossbeams, the
+lips were redundant.
 
 ---
 
@@ -165,10 +169,9 @@ All bolts stainless, socket cap. All inserts brass M4, 6.0 mm OD × 8.0 mm long
 | **Radio → side panels**         | **M5 × 10–12** | **2**                    | the radio's own threaded side holes |
 |                                 | **M4 total**   | **36 bolts, 40 inserts** |                                     |
 
-M4 × 12 is correct throughout: 4.0 mm counterbore + 5.0 mm of remaining panel
-
-- 7.0 mm of thread engagement, against a 9.0 mm pocket. Do not fit longer bolts
-  — M4 × 16 bottoms out.
+M4 × 12 is correct throughout: 4.0 mm counterbore, plus 5.0 mm of remaining
+panel, plus 7.0 mm of thread engagement, against a 9.0 mm pocket. Do not fit
+longer bolts — M4 × 16 bottoms out.
 
 Check the M5 length against your radio's actual side-hole thread depth. With the
 head seated 5.5 mm down in the recess, an M5 × 12 gives 3.5 mm through the panel
@@ -178,20 +181,19 @@ and 8.5 mm into the radio.
 
 ## 5. Printing
 
-| Part            | Orientation                      | Notes                                                 |
-| --------------- | -------------------------------- | ----------------------------------------------------- |
-| `side_panel`    | flat, outer face down            | all holes vertical; no supports                       |
-| `crossbeam` ×4  | long axis on the bed, 24 mm tall | end **and** front-face inserts both come out in-plane |
-| `handle`        | flat in its own plane            | one bridge over the grip aperture                     |
-| `antenna_mount` | on its back                      | every layer smaller than the one below — no supports  |
-| `base_plate`    | upside down, feet upward         | avoids a Ø16 → full-plate overhang                    |
+| Part            | Orientation                        | Notes                                                                             |
+| --------------- | ---------------------------------- | --------------------------------------------------------------------------------- |
+| `side_panel`    | flat, **inner** face down          | M5 recess and all 8 beam counterbores open upward; only 4 × Ø8.2 bridges          |
+| `crossbeam` ×4  | long axis on the bed, 24 mm tall   | end **and** front-face inserts both come out in-plane                             |
+| `handle`        | flat, mating face down             | one bridge over the grip aperture; flattest face becomes the lap joint            |
+| `antenna_mount` | on its back                        | every layer smaller than the one below — no supports                              |
+| `base_plate`    | upside down, flat top face on bed  | feet and every insert mouth point upward; fully self-supporting                    |
 
 Each `part=` value in the .scad already emits the part in its recommended pose,
-so `stl/*.stl` are ready to slice as-is.
+so `stl/*.stl` are ready to slice as-is. **Do not re-orient them** — the poses
+are not arbitrary, and two of them were chosen to fix specific defects (§9).
 
-Suggested: PETG or ASA (a manpack sees sun and heat; PLA creeps). 0.2 mm layers,
-4 perimeters, 40 % infill minimum — bolted joints and insert bosses want walls,
-not infill. Print all four crossbeams in one orientation batch.
+Material choice and full slicer settings are in **§9**.
 
 **Insert-direction note:** the beam end inserts, the beam front-face inserts and
 the handle inserts are all in-plane in their recommended orientations, so bolt
@@ -234,6 +236,11 @@ Not just rendered — checked:
   clearance hole in one part and lands inside the insert pocket of the other,
   with no material fouling the shank.
 - Antenna bore: Ø17 × 22 mm clear below each pad, Ø20 × 40 mm clear above.
+- **Per-layer cross-sectional area of every shipped STL in its print pose**, to
+  find material laid over voids. This caught two real orientation defects: the
+  base plate printing 98 % in mid-air on two locating lips, and the side panel
+  bridging a Ø26.5 mm ceiling directly under the ligament that carries the
+  radio. Both are fixed; no part now needs supports.
 - Asserts in the model fail the render if the panel exceeds the bed, the beam
   span exceeds the bed, `frame_d` is too small to clear the control panel,
   `bay_h` is too small for the radio, or the M5 recess leaves < 3 mm of panel.
@@ -282,3 +289,137 @@ panel under M5 recess = 3.5 mm of material carrying the radio
    head, so it is almost certainly a seat for the OEM knurled mounting knob. If
    you are using plain M5 socket caps, it can shrink to Ø10 and reclaim 2 mm of
    panel thickness under the bolt.
+
+---
+
+## 9. Print settings
+
+### Overview
+
+Slice `stl/*.stl` as-is. Every part is already in its recommended pose (§5) and
+**no part on this frame needs supports** — the only ceilings anywhere are the
+tops of insert pockets and bolt bores, the largest of which is the Ø12.468 mm
+antenna bore through a 3.75 mm wall. Verified by measuring per-layer
+cross-sectional area on all eight meshes; the biggest single unsupported area on
+any layer is about 93 mm².
+
+Two of those poses are load-bearing decisions rather than convenience, so do not
+re-orient them in the slicer:
+
+- **`side_panel` prints inner face down.** Flipping it puts a Ø26.5 mm bridged
+  ceiling directly beneath the 3.5 mm ligament that carries the radio's entire
+  weight through two M5 bolts. Inner-face-down makes that ligament ordinary solid
+  layers and reduces the part to four trivial Ø8.2 mm bridges.
+- **`base_plate` prints upside down**, flat top face on the bed. This is also why
+  it has no raised locating lips: with the plate inverted — the only pose in which
+  the feet and every insert mouth and counterbore point upward — the lips became
+  the first layers and left 98 % of the plate printing in mid-air.
+
+Five things matter more on this design than the usual quality knobs:
+
+1. **Perimeters carry the load, not infill.** Every joint on the frame is either
+   a bolt through a counterbore or a heat-set insert in a boss, and both react
+   into wall material. Given a choice between more infill and more perimeters,
+   always take the perimeters.
+2. **Solid layers at the M5 recess.** The ligament under the recess is only
+   3.5 mm — about 17 layers at 0.2 mm. With a slicer default of 4 top / 4 bottom
+   solid layers, the middle of the one feature carrying the radio would be
+   *infill*. Run the side panels at **6 top / 6 bottom** (or simply 100 % infill,
+   they are thin parts).
+3. **The M4 counterbore is 4.0 mm deep for a 4.0 mm head — zero margin.** If your
+   first layer is over-squished or elephant-foot compensation is set aggressively,
+   heads will sit proud. This specifically matters at the four top-crossbeam
+   bolts, because the handle lap pads seat directly on top of them: one proud head
+   there and the handle rocks. Check with a straightedge before fitting handles.
+4. **Ø8.2 mm counterbores will not accept an M4 washer** (≈Ø9 mm OD). Run the M4
+   bolts bare. The M5 recess has room for a washer if you want one.
+5. **Print one crossbeam first as a coupon.** `crossbeam_top_front` carries 12 of
+   the design's 40 inserts — four in its ends and eight in its front face — which
+   is two of the three insert axes in one part. Test-seat one insert and run an
+   M4 × 12 into it before committing the other three beams. (The third axis, the
+   downward pockets in the bottom beams' undersides, is the only one loaded purely
+   in compression, so it is the least critical to trial.)
+
+Rough filament expectation for a complete 11-piece set — the slicer is the
+authority, this is only for planning: **~250–300 g in PLA** at prototype
+settings, **~400–500 g in PETG** at production settings.
+
+Batch the four crossbeams together; they share an orientation and a profile.
+
+### 9.1 Prototype / dev — PLA
+
+Cheap and fast, for checking fit, clearances, radio hole alignment and handle
+feel. **Not a field frame** — see the caveats at the end of this subsection.
+
+| Setting            | Value                                                       |
+| ------------------ | ----------------------------------------------------------- |
+| Nozzle / layer     | 0.4 mm / **0.25 mm** (0.20 mm for the side panels)          |
+| Perimeters         | 2                                                           |
+| Top / bottom solid | 4 / 4 — but **6 / 6 on `side_panel`** (see Overview note 2) |
+| Infill             | 15 % gyroid                                                 |
+| Nozzle temp        | 215 °C (first layer 215 °C)                                 |
+| Bed temp           | 60 °C                                                       |
+| Cooling            | 100 %                                                       |
+| Brim               | 5 mm on the four crossbeams; none needed elsewhere          |
+| Supports           | none                                                        |
+
+Why a brim only on the crossbeams: their footprint is 124 × 16 mm and they stand
+24 mm tall, so they are the one narrow, tippy part in the set. Everything else
+has a large flat first layer (`side_panel` 9714 mm², `base_plate` 9579 mm²).
+
+Use 0.20 mm layers for the side panels even in prototype — the whole point of a
+prototype here is checking the M5 hole position and the counterbore depths, and
+those measurements shift with layer height.
+
+**PLA-specific caveats:**
+
+- **Heat-set inserts:** iron at 200–210 °C and go slowly. PLA's window between
+  "flows" and "gushes" is narrow, and an overheated boss will swallow the insert
+  crooked. For a fit check, install only the inserts you actually need.
+- **Torque finger-tight only.** PLA creeps under sustained preload; a PLA frame
+  will loosen at every joint over days, and the two M5 bolts through a 3.5 mm
+  PLA ligament are the worst case.
+- **Do not leave it in a car.** PLA's glass transition is around 60 °C. A closed
+  vehicle in sun will exceed that and the frame will sag under the radio's weight.
+- **Cheapest useful subset:** caliper the radio first (free, and it settles
+  `radio_h` / `radio_d` — see §8 item 2). Then print one crossbeam as the insert
+  coupon. Then the two side panels plus four crossbeams, which is the minimum
+  assembly that trial-fits the radio and proves both M5 holes. Leave the handles,
+  antenna mounts and base plate until the bay geometry is confirmed.
+
+### 9.2 Production / final — PETG
+
+| Setting            | Value                                                        |
+| ------------------ | ------------------------------------------------------------ |
+| Nozzle / layer     | 0.4 mm / **0.20 mm** (first layer 0.25 mm)                   |
+| Perimeters         | **4** — 5 on the four crossbeams                             |
+| Top / bottom solid | 5 / 5 — **6 / 6 on `side_panel`**                            |
+| Infill             | 40 % gyroid                                                  |
+| Nozzle temp        | 240 °C (first layer 245 °C)                                  |
+| Bed temp           | 85 °C                                                        |
+| Cooling            | **30–50 %**, and do not let bridge/overhang fan spike to 100 % |
+| Perimeter speed    | 40–50 mm/s                                                   |
+| Brim               | 5 mm on the four crossbeams                                  |
+| Supports           | none                                                         |
+
+**PETG-specific notes:**
+
+- **Keep the fan down.** This frame's strength lives in layer adhesion — insert
+  bosses resist pull-out across layers, and the beam-end joints are loaded in
+  shear across layers. Over-cooled PETG loses exactly that. Cool enough to hold
+  detail, no more, and slow the perimeters rather than adding fan.
+- **Dry the filament.** PETG is hygroscopic and wet PETG loses layer strength.
+  This is the single most common cause of insert bosses stripping out.
+- **Bed release.** PETG bonds hard to smooth PEI and can tear the sheet. Use a
+  textured sheet, or a glue-stick release layer on smooth. The two large flat
+  parts (`side_panel`, `base_plate`) are where this bites.
+- **Heat-set inserts:** iron at 250 °C. PETG is much more forgiving than PLA here.
+- **Torque:** snug, not hard. PETG takes real preload far better than PLA, but the
+  M5 ligament is still only 3.5 mm of plastic.
+
+**If the pack will live in a hot car or in direct desert sun, PETG is not the
+right answer** — it softens from about 80 °C and a dark pack in full sun can pass
+that. ASA is the correct material for that duty, but it wants an enclosure and it
+warps: the 164 mm `side_panel` is right at the limit of what an unenclosed Mini
+will hold flat. If you go that route, print the panels first and check them on a
+surface plate before committing to the rest.

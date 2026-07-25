@@ -355,10 +355,13 @@ module base_plate() {
             translate([0, 0, foot_h]) rbox(frame_w, frame_d, base_t, 2);
             for (x = foot_x, y = foot_y)
                 translate([x, y, 0]) cylinder(d = foot_d, h = foot_h + 1);
-            // panel locating lips, between the crossbeams so nothing fouls.
-            // Sunk 1 mm into the plate so they fuse rather than just touch.
-            for (x = [panel_t, frame_w - panel_t - 2])
-                translate([x, grip_y0, z_frame - 1]) rbox(2, grip_ap_len, 3, 0.8);
+            // NB: this plate deliberately has NO raised locating lips on its top
+            // face.  An earlier revision had two, and they made the part
+            // unprintable: with the plate inverted (the only pose in which the
+            // feet and every insert mouth face upward) the lips became the first
+            // layers and 98% of the plate was left printing in mid-air above
+            // them.  The side panels are located by their 16 bolts into the
+            // crossbeams, so the lips were redundant anyway.
         }
         // bolts up into the bottom crossbeams (heads flush in the underside)
         for (x = base_bolt_x, y = base_bolt_y)
@@ -404,9 +407,12 @@ module frame(ex = 0) {
 if      (part == "assembly") frame(0);
 else if (part == "exploded") frame(26);
 
-// flat on the bed, outer face down: 164 x 70 x 9
+// flat on the bed, INNER face down: 164 x 70 x 9.  This way the Ø26.468 M5
+// recess and the eight crossbeam counterbores all open upward as plain pockets.
+// Outer-face-down would instead bridge a Ø26.5 ceiling directly under the
+// 3.5 mm ligament that carries the radio's entire weight.
 else if (part == "side_panel")
-    translate([panel_h, 0, 0]) rotate([0, -90, 0])
+    translate([0, 0, panel_t]) rotate([0, 90, 0])
         translate([0, 0, -z_frame]) side_panel();
 
 // long axis on the bed, 24 mm tall: end and front-face inserts are both in-plane
@@ -424,6 +430,7 @@ else if (part == "handle")
 // print with no supports; bolt holes come out vertical
 else if (part == "antenna_mount") rotate([-90, 0, 0]) antenna_mount();
 
-// upside down so the feet print upward with no supports
+// upside down: flat top face on the bed, feet upward, and every counterbore and
+// insert mouth opening upward -- no supports, no bridges
 else if (part == "base_plate")
-    translate([0, frame_d, z_frame + 2]) rotate([180, 0, 0]) base_plate();
+    translate([0, frame_d, z_frame]) rotate([180, 0, 0]) base_plate();
