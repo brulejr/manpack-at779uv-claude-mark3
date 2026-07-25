@@ -58,13 +58,15 @@ Two measurements drove real design decisions and are worth calling out:
 | 4   | `crossbeam_bottom_front` | 1   | 124.25 × 16 × 24 | 45.9 cm³  | 6       |
 | 5   | `crossbeam_bottom_back`  | 1   | 124.25 × 16 × 24 | 45.9 cm³  | 6       |
 | 6   | `handle`                 | 2   | 78 × 70 × 12     | 37.6 cm³  | 4 each  |
-| 7   | `antenna_mount`          | 2   | 35 × 24 × 33     | 12.3 cm³  | —       |
-| 8   | `base_plate`             | 1   | 142.25 × 70 × 18 | 83.4 cm³  | 4       |
+| 7   | `antenna_mount_left`     | 1   | 35 × 24 × 33     | 12.3 cm³  | —       |
+| 8   | `antenna_mount_right`    | 1   | 35 × 24 × 33     | 12.3 cm³  | —       |
+| 9   | `base_plate`             | 1   | 142.25 × 70 × 18 | 83.1 cm³  | 4       |
 
-Largest part is 164 mm — **16 mm of bed margin**. All eight meshes verified
+Largest part is 164 mm — **16 mm of bed margin**. All nine meshes verified
 watertight, single-shell, and bed-legal.
 
-Solid volume for a full set is 398 cm³ (one of each) / 530 cm³ (all 11 pieces).
+Solid volume is 410 cm³ for one of each of the nine, or 529 cm³ for the full
+11-piece set.
 Actual filament use is far lower — the beams are small enough in section that
 the slicer's perimeters and infill dominate. If mass matters, the base plate is
 the obvious place to add a lightening window.
@@ -108,7 +110,7 @@ on four M4 bolts. The aperture sits above the panel's top edge, so the panel's
 own top edge forms the aperture floor exactly as it did in the reference — the
 grip geometry your hand meets is unchanged.
 
-### 7 — `antenna_mount` ×2
+### 7–8 — `antenna_mount_left` / `antenna_mount_right`
 
 The reference ear, made modular: Ø12.468 hole, 3.75 mm pad, 25 mm forward reach,
 hole 12.66 mm back from the pad tip, and the diagonal gusset. Bolts to the
@@ -116,7 +118,18 @@ hole 12.66 mm back from the pad tip, and the diagonal gusset. Bolts to the
 of clear bore below each pad for the connector nut and washer, and clear whip
 space above.
 
-### 8 — `base_plate`
+**These two are a mirrored pair, not two copies of one part.** The bolt columns
+sit at 14 and 30 mm across the 35 mm width — offset, not centred — because both
+have to clear the crossbeam's own end-insert pockets in the first and last 9 mm of
+the span. That pattern has no mirror symmetry, and it was verified that the mesh
+is asymmetric on all three axes, so no rigid flip substitutes one for the other.
+Print `antenna_mount_left.stl` **and** `antenna_mount_right.stl`, one each.
+
+For contrast, `side_panel` and `handle` *are* each a single part used twice: both
+were verified mirror-symmetric about their own Y mid-plane, so the mirrored
+instance in the assembly is just the same part turned around.
+
+### 9 — `base_plate`
 
 The modular bottom interface. Bolts up into the two bottom crossbeams on four
 M4 bolts. Its **four bosses are simultaneously the frame's feet and the M4
@@ -186,7 +199,7 @@ and 8.5 mm into the radio.
 | `side_panel`    | flat, **inner** face down          | M5 recess and all 8 beam counterbores open upward; only 4 × Ø8.2 bridges          |
 | `crossbeam` ×4  | long axis on the bed, 24 mm tall   | end **and** front-face inserts both come out in-plane                             |
 | `handle`        | flat, mating face down             | one bridge over the grip aperture; flattest face becomes the lap joint            |
-| `antenna_mount` | on its back                        | every layer smaller than the one below — no supports                              |
+| `antenna_mount` ×2 | on its back                     | every layer smaller than the one below — no supports; **L and R are different parts** |
 | `base_plate`    | upside down, flat top face on bed  | feet and every insert mouth point upward; fully self-supporting                    |
 
 Each `part=` value in the .scad already emits the part in its recommended pose,
@@ -226,7 +239,7 @@ heads, so the top beams go on first.
 
 Not just rendered — checked:
 
-- All 8 meshes watertight, **single connected shell**, within 180 × 180.
+- All 9 meshes watertight, **single connected shell**, within 180 × 180.
   (This caught two real defects: the antenna gusset and the base-plate locating
   lips initially only touched their neighbours on a coplanar face, producing
   two- and three-shell parts.)
@@ -300,7 +313,7 @@ Slice `stl/*.stl` as-is. Every part is already in its recommended pose (§5) and
 **no part on this frame needs supports** — the only ceilings anywhere are the
 tops of insert pockets and bolt bores, the largest of which is the Ø12.468 mm
 antenna bore through a 3.75 mm wall. Verified by measuring per-layer
-cross-sectional area on all eight meshes; the biggest single unsupported area on
+cross-sectional area on all nine meshes; the biggest single unsupported area on
 any layer is about 93 mm².
 
 Two of those poses are load-bearing decisions rather than convenience, so do not
@@ -357,7 +370,7 @@ feel. **Not a field frame** — see the caveats at the end of this subsection.
 | Perimeters         | 2                                                           |
 | Top / bottom solid | 4 / 4 — but **6 / 6 on `side_panel`** (see Overview note 2) |
 | Infill             | 15 % gyroid                                                 |
-| Nozzle temp        | 215 °C (first layer 215 °C)                                 |
+| Nozzle temp        | 210 °C (first layer 215 °C)                                 |
 | Bed temp           | 60 °C                                                       |
 | Cooling            | 100 %                                                       |
 | Brim               | 5 mm on the four crossbeams; none needed elsewhere          |
@@ -387,6 +400,57 @@ those measurements shift with layer height.
   assembly that trial-fits the radio and proves both M5 holes. Leave the handles,
   antenna mounts and base plate until the bay geometry is confirmed.
 
+#### PrusaSlicer 2.9.6 — PLA prototype profile (Prusa Mini, 0.4 mm nozzle)
+
+Start from **`0.25mm DRAFT @MINI`**, switch to **Expert** mode, change the values
+below, then *Save Print Settings as* **`MANPACK PLA 0.25 @MINI`**.
+
+Setting names are as they appear on each PrusaSlicer Print Settings page.
+Anything not listed keeps the base profile's value.
+
+| Page                  | Setting                    | Value                                   |
+| --------------------- | -------------------------- | --------------------------------------- |
+| Layers and perimeters | Layer height               | **0.25**                                |
+| Layers and perimeters | First layer height         | **0.20**                                |
+| Layers and perimeters | Perimeters                 | **2**                                   |
+| Layers and perimeters | Top solid layers           | **4**                                   |
+| Layers and perimeters | Bottom solid layers        | **4**                                   |
+| Layers and perimeters | Perimeter generator        | Arachne                                 |
+| Layers and perimeters | Detect bridging perimeters | ✔                                       |
+| Layers and perimeters | Seam position              | Aligned                                 |
+| Infill                | Fill density               | **15 %**                                |
+| Infill                | Fill pattern               | Gyroid                                  |
+| Infill                | Top / Bottom fill pattern  | Monotonic                               |
+| Infill                | Combine infill every       | 1                                       |
+| Skirt and brim        | Brim type                  | Outer brim only                         |
+| Skirt and brim        | Brim width                 | **5 mm** (crossbeam plate only, else 0) |
+| Skirt and brim        | Brim separation gap        | 0.1 mm                                  |
+| Support material      | Generate support material  | ✘ unchecked                             |
+| Speed                 | External perimeters        | **25 mm/s**                             |
+| Speed                 | Bridges                    | **25 mm/s**                             |
+| Advanced              | XY size compensation       | **0**                                   |
+| Advanced              | Elephant foot compensation | 0.2 mm                                  |
+
+**Filament Settings — a separate profile from Print Settings.** Temperatures and
+fan live here, not in the Print Settings profile. Start from `Generic PLA`, save
+as **`MANPACK PLA @MINI`**:
+
+| Page     | Setting                          | Value           |
+| -------- | -------------------------------- | --------------- |
+| Filament | Nozzle temperature, other layers | **210 °C**      |
+| Filament | Nozzle temperature, first layer  | **215 °C**      |
+| Filament | Bed temperature, both            | **60 °C**       |
+| Cooling  | Keep fan always on               | ✔               |
+| Cooling  | Min / Max fan speed              | **100 / 100 %** |
+| Cooling  | Bridges fan speed                | 100 %           |
+| Cooling  | Disable fan for the first        | 1 layer         |
+
+**A second Print Settings profile for the side panels.** The panels want 0.20 mm
+layers even in prototype, and PrusaSlicer sets layer height per plate, not per
+object. The two panels occupy a plate of their own anyway (§9.2 plate layout), so
+clone the above as **`MANPACK PLA 0.20 @MINI`** with *Layer height* **0.20** and
+*Top / Bottom solid layers* **5 / 5**, and select it for that plate.
+
 ### 9.2 Production / final — PETG
 
 | Setting            | Value                                                        |
@@ -395,8 +459,8 @@ those measurements shift with layer height.
 | Perimeters         | **4** — 5 on the four crossbeams                             |
 | Top / bottom solid | 5 / 5 — **6 / 6 on `side_panel`**                            |
 | Infill             | 40 % gyroid                                                  |
-| Nozzle temp        | 240 °C (first layer 245 °C)                                  |
-| Bed temp           | 85 °C                                                        |
+| Nozzle temp        | 240 °C (first layer 240 °C)                                  |
+| Bed temp           | 85 °C first layer, 90 °C after                               |
 | Cooling            | **30–50 %**, and do not let bridge/overhang fan spike to 100 % |
 | Perimeter speed    | 40–50 mm/s                                                   |
 | Brim               | 5 mm on the four crossbeams                                  |
@@ -423,3 +487,103 @@ that. ASA is the correct material for that duty, but it wants an enclosure and i
 warps: the 164 mm `side_panel` is right at the limit of what an unenclosed Mini
 will hold flat. If you go that route, print the panels first and check them on a
 surface plate before committing to the rest.
+
+#### PrusaSlicer 2.9.6 — PETG production profile (Prusa Mini, 0.4 mm nozzle)
+
+Start from **`0.20mm QUALITY @MINI`**, switch to **Expert** mode, change the
+values below, then *Save Print Settings as* **`MANPACK PETG 0.20 @MINI`**.
+
+| Page                  | Setting                       | Value                                   |
+| --------------------- | ----------------------------- | --------------------------------------- |
+| Layers and perimeters | Layer height                  | **0.20**                                |
+| Layers and perimeters | First layer height            | **0.25**                                |
+| Layers and perimeters | Perimeters                    | **4**                                   |
+| Layers and perimeters | Top solid layers              | **5**                                   |
+| Layers and perimeters | Bottom solid layers           | **5**                                   |
+| Layers and perimeters | Perimeter generator           | Arachne                                 |
+| Layers and perimeters | Detect bridging perimeters    | ✔                                       |
+| Layers and perimeters | Thick bridges                 | ✘ unchecked                             |
+| Layers and perimeters | Seam position                 | Aligned                                 |
+| Layers and perimeters | External perimeters first     | ✘ unchecked                             |
+| Infill                | Fill density                  | **40 %**                                |
+| Infill                | Fill pattern                  | Gyroid                                  |
+| Infill                | Top / Bottom fill pattern     | Monotonic                               |
+| Infill                | Combine infill every          | 1                                       |
+| Infill                | Infill/perimeters overlap     | 25 %                                    |
+| Skirt and brim        | Brim type                     | Outer brim only                         |
+| Skirt and brim        | Brim width                    | **5 mm** (crossbeam plate only, else 0) |
+| Skirt and brim        | Brim separation gap           | 0.1 mm                                  |
+| Support material      | Generate support material     | ✘ unchecked                             |
+| Speed                 | Perimeters                    | **45 mm/s**                             |
+| Speed                 | Small perimeters              | **25 mm/s**                             |
+| Speed                 | External perimeters           | **25 mm/s**                             |
+| Speed                 | Infill                        | 60 mm/s                                 |
+| Speed                 | Solid infill                  | 50 mm/s                                 |
+| Speed                 | Top solid infill              | 30 mm/s                                 |
+| Speed                 | Bridges                       | **25 mm/s**                             |
+| Advanced              | Extrusion width — Default     | 0.45 mm                                 |
+| Advanced              | Extrusion width — First layer | 0.42 mm                                 |
+| Advanced              | Extrusion width — Ext. perim. | 0.42 mm                                 |
+| Advanced              | XY size compensation          | **0**                                   |
+| Advanced              | Elephant foot compensation    | 0.2 mm                                  |
+
+Leaving *XY size compensation* at 0 is deliberate: it would shift the Ø5.7 insert
+pockets and the Ø4.4 bolt holes together, and those two want opposite corrections.
+Trim the pockets in the .scad (`m4_ins_d`) after the coupon print instead.
+
+**Filament Settings — a separate profile from Print Settings.** Start from
+`Prusament PETG`, save as **`MANPACK PETG @MINI`**:
+
+| Page       | Setting                            | Value                    |
+| ---------- | ---------------------------------- | ------------------------ |
+| Filament   | Nozzle temperature, other layers   | **240 °C**               |
+| Filament   | Nozzle temperature, first layer    | **240 °C**               |
+| Filament   | Bed temperature, first layer       | **85 °C**                |
+| Filament   | Bed temperature, other layers      | **90 °C**                |
+| Cooling    | Keep fan always on                 | ✔                        |
+| Cooling    | Min fan speed                      | **30 %**                 |
+| Cooling    | Max fan speed                      | **50 %**                 |
+| Cooling    | Bridges fan speed                  | **50 %** (not 100 %)     |
+| Cooling    | Disable fan for the first          | 1 layer                  |
+| Cooling    | Slow down if layer print time is below | 15 s                 |
+| Cooling    | Min print speed                    | 15 mm/s                  |
+| Filament   | Wipe while retracting (Overrides)  | ✔ (PETG stringing)       |
+
+Holding *Bridges fan speed* to 50 % is the one non-obvious entry. The stock PETG
+profile spikes it to 100 %, and the bridges on this frame are not cosmetic — the
+four Ø8.2 mm ceilings in `side_panel` are the bearing surfaces the handle bolt
+heads pull against, and blasting them with cold air is exactly how you get a weak
+inter-layer bond at a load-bearing face.
+
+#### Per-object modifiers (both profiles)
+
+Two settings are best applied per object rather than globally. Right-click the
+object in the 3D view → *Add settings*.
+
+| Object          | Modifier                                              | Why                                                                                                                 |
+| --------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `side_panel` ×2 | **Height range modifier, 0 → 4 mm, Fill density 100 %** | Guarantees the 3.5 mm ligament under the M5 recess is fully solid. At 0.20 mm that band is ~17 layers, so 5 top + 5 bottom solid layers would otherwise leave ~7 layers of *infill* inside the one feature carrying the radio. |
+| `crossbeam` ×4  | *Layers and perimeters → Perimeters* = **5**          | Lets the beams run 5 perimeters on a plate sliced with the global 4, without a second profile.                        |
+
+The height range modifier is the precise fix and costs almost nothing — 4 mm of a
+9 mm plate. Setting the whole panel to 100 % infill also works but roughly doubles
+its mass, and there are two of them.
+
+#### Plate layout (Prusa Mini, 180 × 180 mm)
+
+A full set is four plates. Footprints verified against the bed:
+
+| Plate | Contents                                | Footprint      | Margin        |
+| ----- | --------------------------------------- | -------------- | ------------- |
+| 1     | 2 × `side_panel`, stacked in Y          | 164 × 146 mm   | 16 / 34 mm    |
+| 2     | 4 × `crossbeam`, stacked in Y, 5 mm brim | 134 × 122 mm  | 46 / 58 mm    |
+| 3     | `base_plate` + both `antenna_mount` parts behind it | 142 × 100 mm | 38 / 80 mm |
+| 4     | 2 × `handle`, side by side in X          | 162 × 70 mm   | 18 / 110 mm   |
+
+Plate 1 is the tightest at 16 mm of X margin — check your Mini's actual usable
+area before nesting it, and note that the two panels are *identical*, not mirrored,
+so both come off the same STL.
+
+> These setting names are from PrusaSlicer 2.9.x in Expert mode. If any label
+> reads differently in your build, the values still apply — I have not been able
+> to click through a 2.9.6 install to confirm each label verbatim.

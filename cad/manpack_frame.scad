@@ -20,7 +20,7 @@ $fa = 2;
 $fs = 0.4;
 
 /* [Output] */
-part = "assembly"; // [assembly, exploded, side_panel, crossbeam_top_front, crossbeam_top_back, crossbeam_bottom_front, crossbeam_bottom_back, handle, antenna_mount, base_plate]
+part = "assembly"; // [assembly, exploded, side_panel, crossbeam_top_front, crossbeam_top_back, crossbeam_bottom_front, crossbeam_bottom_back, handle, antenna_mount_left, antenna_mount_right, base_plate]
 
 // lightening / ventilation windows in the side panels
 panel_windows = true;
@@ -426,9 +426,20 @@ else if (part == "handle")
     translate([handle_z2 - handle_z0, 0, 0]) rotate([0, -90, 0])
         translate([0, 0, -handle_z0]) handle();
 
-// on its back: every layer is smaller than the one below it, so the ribs and pad
-// print with no supports; bolt holes come out vertical
-else if (part == "antenna_mount") rotate([-90, 0, 0]) antenna_mount();
+// On its back: every layer is smaller than the one below it, so the ribs and pad
+// print with no supports and the bolt holes come out vertical.
+//
+// The two brackets are a genuine mirrored PAIR, not two copies of one part: the
+// bolt columns sit at 14 and 30 mm across a 35 mm width, because both must clear
+// the crossbeam's own end-insert pockets (the first/last 9 mm of the span), and
+// that offset pattern is not symmetric about the bracket centre. Verified: the
+// mesh has no mirror symmetry on any axis, so no rigid flip substitutes one for
+// the other. Print one of each.
+else if (part == "antenna_mount_left")
+    rotate([-90, 0, 0]) antenna_mount();
+else if (part == "antenna_mount_right")
+    rotate([-90, 0, 0]) translate([ant_bracket_w, 0, 0])
+        mirror([1, 0, 0]) antenna_mount();
 
 // upside down: flat top face on the bed, feet upward, and every counterbore and
 // insert mouth opening upward -- no supports, no bridges
