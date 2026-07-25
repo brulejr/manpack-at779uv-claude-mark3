@@ -1,6 +1,6 @@
 # Modular manpack internal frame — Retevis RT-95 / AnyTone AT-779UV
 
-This is a clean-room decomposition of the single-piece reference part
+This is a clean-room decomposition of the single-piece reference STL from
 [RT-95 Manpack Rails and BNC bulkhead antenna mount](https://makerworld.com/en/models/1117937-rt-95-manpack-rails-and-bnc-bulkhead-antenna-mount?from=search#profileId-1115768) with the following notable changes:
 
 - Separated into nine printable modules, each of which fits a Prusa Mini
