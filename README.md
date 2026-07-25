@@ -335,10 +335,12 @@ Five things matter more on this design than the usual quality knobs:
    into wall material. Given a choice between more infill and more perimeters,
    always take the perimeters.
 2. **Solid layers at the M5 recess.** The ligament under the recess is only
-   3.5 mm — about 17 layers at 0.2 mm. With a slicer default of 4 top / 4 bottom
+   3.5 mm — about 17 layers at 0.20 mm. With a slicer default of 4 top / 4 bottom
    solid layers, the middle of the one feature carrying the radio would be
-   *infill*. Run the side panels at **6 top / 6 bottom** (or simply 100 % infill,
-   they are thin parts).
+   *infill*. Bump the side panels to **5 top / 5 bottom**, and — this is the part
+   that actually guarantees it — apply the height range modifier described under
+   *Per-object modifiers* below, which forces that 4 mm band to 100 % solid
+   regardless of layer height.
 3. **The M4 counterbore is 4.0 mm deep for a 4.0 mm head — zero margin.** If your
    first layer is over-squished or elephant-foot compensation is set aggressively,
    heads will sit proud. This specifically matters at the four top-crossbeam
@@ -366,9 +368,9 @@ feel. **Not a field frame** — see the caveats at the end of this subsection.
 
 | Setting            | Value                                                       |
 | ------------------ | ----------------------------------------------------------- |
-| Nozzle / layer     | 0.4 mm / **0.25 mm** (0.20 mm for the side panels)          |
+| Nozzle / layer     | 0.4 mm / **0.20 mm**                                        |
 | Perimeters         | 2                                                           |
-| Top / bottom solid | 4 / 4 — but **6 / 6 on `side_panel`** (see Overview note 2) |
+| Top / bottom solid | **5 / 5**                                                   |
 | Infill             | 15 % gyroid                                                 |
 | Nozzle temp        | 210 °C (first layer 215 °C)                                 |
 | Bed temp           | 60 °C                                                       |
@@ -380,9 +382,13 @@ Why a brim only on the crossbeams: their footprint is 124 × 16 mm and they stan
 24 mm tall, so they are the one narrow, tippy part in the set. Everything else
 has a large flat first layer (`side_panel` 9714 mm², `base_plate` 9579 mm²).
 
-Use 0.20 mm layers for the side panels even in prototype — the whole point of a
-prototype here is checking the M5 hole position and the counterbore depths, and
-those measurements shift with layer height.
+**Why 0.20 mm and not something coarser.** The prototype's whole job is to check
+the M5 hole position, the counterbore depths and the insert-pocket fit, and all
+three shift with layer height — a coarser prototype would fail to validate the
+very dimensions it exists to validate. The savings come from 2 perimeters and
+15 % infill instead, which is where the bulk of the time and filament is anyway.
+Keeping prototype and production on the same 0.20 mm layer also means what you
+measure on the prototype still holds for the production run.
 
 **PLA-specific caveats:**
 
@@ -402,19 +408,22 @@ those measurements shift with layer height.
 
 #### PrusaSlicer 2.9.6 — PLA prototype profile (Prusa Mini, 0.4 mm nozzle)
 
-Start from **`0.25mm DRAFT @MINI`**, switch to **Expert** mode, change the values
-below, then *Save Print Settings as* **`MANPACK PLA 0.25 @MINI`**.
+Start from **`0.20mm SPEED @MINI`** — of the system presets the Mini offers
+(0.10 FAST DETAIL, 0.15 SPEED, 0.15 STRUCTURAL, 0.20 SPEED, 0.20 STRUCTURAL) this
+is the fastest at the 0.20 mm layer the prototype needs. Switch to **Expert**
+mode, change the values below, then *Save Print Settings as*
+**`MANPACK PLA 0.20 @MINI`**.
 
 Setting names are as they appear on each PrusaSlicer Print Settings page.
 Anything not listed keeps the base profile's value.
 
 | Page                  | Setting                    | Value                                   |
 | --------------------- | -------------------------- | --------------------------------------- |
-| Layers and perimeters | Layer height               | **0.25**                                |
+| Layers and perimeters | Layer height               | **0.20**                                |
 | Layers and perimeters | First layer height         | **0.20**                                |
 | Layers and perimeters | Perimeters                 | **2**                                   |
-| Layers and perimeters | Top solid layers           | **4**                                   |
-| Layers and perimeters | Bottom solid layers        | **4**                                   |
+| Layers and perimeters | Top solid layers           | **5**                                   |
+| Layers and perimeters | Bottom solid layers        | **5**                                   |
 | Layers and perimeters | Perimeter generator        | Arachne                                 |
 | Layers and perimeters | Detect bridging perimeters | ✔                                       |
 | Layers and perimeters | Seam position              | Aligned                                 |
@@ -445,17 +454,16 @@ as **`MANPACK PLA @MINI`**:
 | Cooling  | Bridges fan speed                | 100 %           |
 | Cooling  | Disable fan for the first        | 1 layer         |
 
-**A second Print Settings profile for the side panels.** The panels want 0.20 mm
-layers even in prototype, and PrusaSlicer sets layer height per plate, not per
-object. The two panels occupy a plate of their own anyway (§9.2 plate layout), so
-clone the above as **`MANPACK PLA 0.20 @MINI`** with *Layer height* **0.20** and
-*Top / Bottom solid layers* **5 / 5**, and select it for that plate.
+**One profile covers all four plates.** 5 / 5 solid layers is applied globally
+rather than only on the side-panel plate, so there is nothing to remember when you
+switch plates — the extra solid layer costs almost nothing on the beams and
+brackets. The only per-plate change in the whole set is *Brim width*.
 
 ### 9.2 Production / final — PETG
 
 | Setting            | Value                                                        |
 | ------------------ | ------------------------------------------------------------ |
-| Nozzle / layer     | 0.4 mm / **0.20 mm** (first layer 0.25 mm)                   |
+| Nozzle / layer     | 0.4 mm / **0.20 mm** (first layer 0.20 mm)                   |
 | Perimeters         | **4** — 5 on the four crossbeams                             |
 | Top / bottom solid | 5 / 5 — **6 / 6 on `side_panel`**                            |
 | Infill             | 40 % gyroid                                                  |
@@ -490,13 +498,21 @@ surface plate before committing to the rest.
 
 #### PrusaSlicer 2.9.6 — PETG production profile (Prusa Mini, 0.4 mm nozzle)
 
-Start from **`0.20mm QUALITY @MINI`**, switch to **Expert** mode, change the
+Start from **`0.20mm STRUCTURAL @MINI`**, switch to **Expert** mode, change the
 values below, then *Save Print Settings as* **`MANPACK PETG 0.20 @MINI`**.
+
+STRUCTURAL is the right base here rather than a SPEED or DETAIL preset: it already
+biases toward perimeters and slower, more solid extrusion, which is exactly what a
+frame whose every load path is a bolt-in-a-counterbore or an insert-in-a-boss
+wants (Overview note 1). Set the values below explicitly anyway, so the profile is
+deterministic no matter what the base preset ships with. If you prefer a finer
+finish, `0.15mm STRUCTURAL @MINI` works identically — just leave *Layer height* at
+0.15 and expect roughly a third more print time.
 
 | Page                  | Setting                       | Value                                   |
 | --------------------- | ----------------------------- | --------------------------------------- |
 | Layers and perimeters | Layer height                  | **0.20**                                |
-| Layers and perimeters | First layer height            | **0.25**                                |
+| Layers and perimeters | First layer height            | **0.20**                                |
 | Layers and perimeters | Perimeters                    | **4**                                   |
 | Layers and perimeters | Top solid layers              | **5**                                   |
 | Layers and perimeters | Bottom solid layers           | **5**                                   |
@@ -584,6 +600,12 @@ Plate 1 is the tightest at 16 mm of X margin — check your Mini's actual usable
 area before nesting it, and note that the two panels are *identical*, not mirrored,
 so both come off the same STL.
 
-> These setting names are from PrusaSlicer 2.9.x in Expert mode. If any label
-> reads differently in your build, the values still apply — I have not been able
-> to click through a 2.9.6 install to confirm each label verbatim.
+> **On preset and setting names.** The two system presets named above
+> (`0.20mm SPEED @MINI`, `0.20mm STRUCTURAL @MINI`) were confirmed against an
+> actual PrusaSlicer 2.9.6 install, whose Mini system presets are: 0.10mm FAST
+> DETAIL, 0.15mm SPEED, 0.15mm STRUCTURAL, 0.20mm SPEED, 0.20mm STRUCTURAL. Older
+> Prusa profile bundles used QUALITY/DRAFT naming instead, so if you sync a
+> different bundle version the names may shift again — pick the preset at the
+> nearest layer height and let the tables govern. The individual *setting* labels
+> are from PrusaSlicer 2.9.x Expert mode but have not each been clicked through;
+> if one reads differently, the value still applies.
