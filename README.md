@@ -58,15 +58,19 @@ Two measurements drove real design decisions and are worth calling out:
 | 4   | `crossbeam_bottom_front` | 1   | 124.25 × 16 × 24 | 45.9 cm³  | 6       |
 | 5   | `crossbeam_bottom_back`  | 1   | 124.25 × 16 × 24 | 45.9 cm³  | 6       |
 | 6   | `handle`                 | 2   | 78 × 70 × 12     | 37.6 cm³  | 4 each  |
-| 7   | `antenna_mount_left`     | 1   | 35 × 24 × 33     | 12.3 cm³  | —       |
-| 8   | `antenna_mount_right`    | 1   | 35 × 24 × 33     | 12.3 cm³  | —       |
+| 7   | `antenna_mount_bnc`      | 2\* | 35 × 24 × 33     | 10.9 cm³  | —       |
+| 8   | `antenna_mount_so239`    | 2\* | 35 × 24 × 38     | 11.6 cm³  | —       |
 | 9   | `base_plate`             | 1   | 142.25 × 70 × 18 | 83.1 cm³  | 4       |
+
+\* Parts 7 and 8 are alternatives — print **two of whichever connector you use**,
+not both. They share an identical leg, rib and bolt pattern, so they are
+interchangeable on the same crossbeam without touching anything else.
 
 Largest part is 164 mm — **16 mm of bed margin**. All nine meshes verified
 watertight, single-shell, and bed-legal.
 
-Solid volume is 410 cm³ for one of each of the nine, or 529 cm³ for the full
-11-piece set.
+Solid volume is 408 cm³ for one of each of the nine files, or 526 cm³ for a full
+11-piece build (528 cm³ with SO-239 mounts).
 Actual filament use is far lower — the beams are small enough in section that
 the slicer's perimeters and infill dominate. If mass matters, the base plate is
 the obvious place to add a lightening window.
@@ -110,24 +114,59 @@ on four M4 bolts. The aperture sits above the panel's top edge, so the panel's
 own top edge forms the aperture floor exactly as it did in the reference — the
 grip geometry your hand meets is unchanged.
 
-### 7–8 — `antenna_mount_left` / `antenna_mount_right`
+### 7–8 — `antenna_mount_bnc` / `antenna_mount_so239`
 
-The reference ear, made modular: Ø12.468 hole, 3.75 mm pad, 25 mm forward reach,
-hole 12.66 mm back from the pad tip, and the diagonal gusset. Bolts to the
-**front face of the top-front crossbeam** on four M4 bolts. Verified: Ø17 × 22 mm
-of clear bore below each pad for the connector nut and washer, and clear whip
-space above.
+The reference ear, made modular and offered in two connector variants. Both share
+an identical leg, gusset ribs and M4 bolt pattern, so either bolts to the same
+inserts in the top-front crossbeam — you can swap connector type later without
+reprinting anything else.
 
-**These two are a mirrored pair, not two copies of one part.** The bolt columns
-sit at 14 and 30 mm across the 35 mm width — offset, not centred — because both
-have to clear the crossbeam's own end-insert pockets in the first and last 9 mm of
-the span. That pattern has no mirror symmetry, and it was verified that the mesh
-is asymmetric on all three axes, so no rigid flip substitutes one for the other.
-Print `antenna_mount_left.stl` **and** `antenna_mount_right.stl`, one each.
+|                       | `antenna_mount_bnc`     | `antenna_mount_so239`             |
+| --------------------- | ----------------------- | --------------------------------- |
+| Connector             | BNC bulkhead            | SO-239 / UHF female, 4-hole flange |
+| Bore                  | **Ø12.468 mm** [PORTED] | **Ø15.88 mm** (0.625")            |
+| Flange screws         | —                       | 4 × Ø3.4 on a **17.98 mm** square (0.708") |
+| Forward reach         | 25 mm [PORTED]          | 30 mm                             |
+| Bore setback from tip | 12.66 mm [PORTED]       | 17 mm                             |
+| Print size            | 35 × 24 × 33 mm         | 35 × 24 × 38 mm                   |
 
-For contrast, `side_panel` and `handle` *are* each a single part used twice: both
-were verified mirror-symmetric about their own Y mid-plane, so the mirrored
-instance in the assembly is just the same part turned around.
+The BNC variant is the reference connector carried over verbatim — the reference
+STL is itself titled a *BNC bulkhead* antenna mount, which is what the Ø12.468
+bore is for. The SO-239 variant reaches 30 mm rather than 25 mm and sets its bore
+17 mm back from the tip; both were needed so the rear pair of flange screws clears
+the bracket's own leg and the front pair keeps material at the pad tip.
+
+**Both variants are a single symmetric part used twice.** An earlier revision
+needed a mirrored left/right pair because the bolt columns were offset to dodge
+the crossbeam's end-insert pockets. Insetting the whole bracket 6 mm from the
+panel inner face solves that instead, which lets the bolts sit symmetrically
+between the ribs and removes the handedness.
+
+Verified: bore clear below each pad for the connector body, all four flange-screw
+nut positions clear, and zero enclosed voids in either part.
+
+#### Rework history (v2)
+
+The first version of this bracket had three defects, all found on a printed part:
+
+1. **One entire bolt column was unusable.** The ribs were 8 mm thick at the
+   bracket edges and the bolt columns sat at 14 and 30 mm across a 35 mm width —
+   so the 30 mm column landed inside the right-hand rib. Worse than overlapping:
+   because the rib spans the full pad depth, up to **19.75 mm of solid rib sat in
+   front of the counterbore mouth**, sealing both holes into enclosed internal
+   voids with no tool access. The printed part showed them as blind dimples where
+   the slicer had bridged over a sealed cavity.
+2. **The ribs were too wide**, leaving no clear span to put the bolts in.
+3. **The ribs were not actually joined to the pad.** The rib profile stopped
+   exactly at the pad's underside, so the two shared a plane and nothing more —
+   zero volumetric overlap. Combined with the fillet on the pad's edge, that left
+   a real groove along the top of each rib, visible on the print.
+
+Fixes: ribs thinned 8 → **5 mm**, bolts moved to **10.5 / 24.5 mm** in the open
+span between them, the whole bracket inset 6 mm so those symmetric columns still
+clear the crossbeam's end inserts, and the rib profile carried up through the
+pad's full thickness so it merges rather than touches. Consequence: antenna bore
+spacing drops from 89.25 mm to **77.25 mm**.
 
 ### 9 — `base_plate`
 
@@ -152,8 +191,8 @@ These are engineering necessities, not preferences. Each is a parameter.
 | Crossbeam section    | 7 × 4 mm                  | **16 × 24 mm**                     | An M4 heat-set insert needs a Ø5.7 × 9 mm pocket. It physically cannot fit in a 7 × 4 mm beam. This is the direct cost of the M4-bolted requirement.                                                                              |
 | Frame depth          | 60 mm                     | **70 mm**                          | With four beams instead of two, front beams now exist at the top. At 60 mm deep they would overhang the radio's upward-facing control panel by 12 mm per side. At 70 mm the overhang is **zero** — verified in `img/asm_top.png`. |
 | Panel thickness      | 8.25 mm                   | **9.0 mm**                         | Leaves 5.0 mm under an M4 counterbore and 3.5 mm under the M5 recess (reference: 2.75 mm).                                                                                                                                        |
-| Antenna gusset       | one rib in the rail plane | **two ribs, one per bracket edge** | A bolt-on bracket has no rail plane to hide the rib in. Duplicating it onto both edges keeps the bore under the hole clear and makes the bracket symmetric.                                                                       |
-| Antenna hole spacing | 101.5 mm                  | **89.25 mm**                       | Consequence of the above: the hole moves to the bracket centre, between the two ribs.                                                                                                                                             |
+| Antenna gusset       | one 8.25 mm rib in the rail plane | **two 5 mm ribs, one per bracket edge** | A bolt-on bracket has no rail plane to hide the rib in. Duplicating it onto both edges keeps the bore under the hole clear and makes the bracket symmetric; 5 mm rather than 8 mm leaves a clear central span for the bolts. |
+| Antenna hole spacing | 101.5 mm                  | **77.25 mm**                       | Consequence of the above plus the 6 mm bracket inset needed to clear the crossbeam's end inserts. Both bores stay centred between their ribs.                                                                                    |
 | Handle thickness     | 8.25 mm                   | **12 mm**                          | Needed to seat an axial M4 insert. Slightly chunkier grip bar; the aperture is unchanged.                                                                                                                                         |
 | Leg standoff         | 45 mm of integral leg     | **18 mm base plate**               | That 45 mm of dead space is now where a bolt-on module goes.                                                                                                                                                                      |
 
@@ -179,6 +218,7 @@ All bolts stainless, socket cap. All inserts brass M4, 6.0 mm OD × 8.0 mm long
 | Antenna mounts → top-front beam | M4 × 12        | 8                        | top-front beam front face           |
 | Base plate → bottom beams       | M4 × 12        | 4                        | bottom beam undersides              |
 | Future module → base plate      | M4 × (module)  | 4                        | base plate feet                     |
+| SO-239 flange → antenna mount   | M3 × 10 + nut  | 4 per mount              | (through-holes; SO-239 variant only) |
 | **Radio → side panels**         | **M5 × 10–12** | **2**                    | the radio's own threaded side holes |
 |                                 | **M4 total**   | **36 bolts, 40 inserts** |                                     |
 
@@ -199,7 +239,7 @@ and 8.5 mm into the radio.
 | `side_panel`    | flat, **inner** face down          | M5 recess and all 8 beam counterbores open upward; only 4 × Ø8.2 bridges          |
 | `crossbeam` ×4  | long axis on the bed, 24 mm tall   | end **and** front-face inserts both come out in-plane                             |
 | `handle`        | flat, mating face down             | one bridge over the grip aperture; flattest face becomes the lap joint            |
-| `antenna_mount` ×2 | on its back                     | every layer smaller than the one below — no supports; **L and R are different parts** |
+| `antenna_mount` ×2 | on its back                     | every layer smaller than the one below — no supports; one symmetric part, print two |
 | `base_plate`    | upside down, flat top face on bed  | feet and every insert mouth point upward; fully self-supporting                    |
 
 Each `part=` value in the .scad already emits the part in its recommended pose,
@@ -248,7 +288,14 @@ Not just rendered — checked:
 - **All 36 M4 bolt axes and both M5 axes** traced: each passes through a
   clearance hole in one part and lands inside the insert pocket of the other,
   with no material fouling the shank.
-- Antenna bore: Ø17 × 22 mm clear below each pad, Ø20 × 40 mm clear above.
+- Antenna bore clear below each pad for the connector body, and for the SO-239
+  variant all four flange-screw nut positions clear.
+- **Void connectivity**: every M4 counterbore traced back to outside air, and
+  both antenna brackets confirmed to contain **zero enclosed voids**. This is the
+  check that would have caught the v1 bracket, whose two right-hand bolt holes
+  were sealed inside the rib.
+- Both antenna variants confirmed **mirror-symmetric in X**, so one part serves
+  both sides.
 - **Per-layer cross-sectional area of every shipped STL in its print pose**, to
   find material laid over voids. This caught two real orientation defects: the
   base plate printing 98 % in mid-air on two locating lips, and the side panel
@@ -262,7 +309,7 @@ Reported clearances at the shipped parameters:
 
 ```
 frame body            = 142.25 x 70 x 180 mm
-assembled envelope    = 166.25 x 103 x 210 mm
+assembled envelope    = 166.25 x 108 x 210 mm  (depth shown for the deeper SO-239 bracket)
 radio bay (WxDxH)     = 124.25 x 38 x 116 mm
 radio clearance  side = 1 mm/side   above/below = 7.5 mm
 panel print footprint = 164 x 70  (bed 180) -> margin 16 mm
@@ -593,7 +640,7 @@ A full set is four plates. Footprints verified against the bed:
 | ----- | --------------------------------------- | -------------- | ------------- |
 | 1     | 2 × `side_panel`, stacked in Y          | 164 × 146 mm   | 16 / 34 mm    |
 | 2     | 4 × `crossbeam`, stacked in Y, 5 mm brim | 134 × 122 mm  | 46 / 58 mm    |
-| 3     | `base_plate` + both `antenna_mount` parts behind it | 142 × 100 mm | 38 / 80 mm |
+| 3     | `base_plate` + 2 × `antenna_mount` behind it | 142 × 100 mm | 38 / 80 mm |
 | 4     | 2 × `handle`, side by side in X          | 162 × 70 mm   | 18 / 110 mm   |
 
 Plate 1 is the tightest at 16 mm of X margin — check your Mini's actual usable

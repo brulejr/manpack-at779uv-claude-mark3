@@ -20,7 +20,10 @@ $fa = 2;
 $fs = 0.4;
 
 /* [Output] */
-part = "assembly"; // [assembly, exploded, side_panel, crossbeam_top_front, crossbeam_top_back, crossbeam_bottom_front, crossbeam_bottom_back, handle, antenna_mount_left, antenna_mount_right, base_plate]
+part = "assembly"; // [assembly, exploded, side_panel, crossbeam_top_front, crossbeam_top_back, crossbeam_bottom_front, crossbeam_bottom_back, handle, antenna_mount_bnc, antenna_mount_so239, base_plate]
+
+// which connector variant the assembly views fit
+ant_style = "bnc"; // [bnc, so239]
 
 // lightening / ventilation windows in the side panels
 panel_windows = true;
@@ -64,20 +67,39 @@ m5_recess_d = 26.468;  // [PORTED] outer-face knob / bolt-head recess
 m5_recess_h = 5.5;     // [PORTED]
 
 // -----------------------------------------------------------------------------
-//  PORTED ANTENNA-EAR FEATURE
+//  ANTENNA MOUNT -- shared bracket, two connector variants
 // -----------------------------------------------------------------------------
-ant_hole_d       = 12.468; // [PORTED] antenna bulkhead hole
-ant_pad_t        = 3.75;   // [PORTED] pad thickness
-ant_reach        = 25;     // [PORTED] cantilever forward of the frame front face
-ant_hole_setback = 12.66;  // [PORTED] hole centre, back from the pad's front tip
-ant_rib_t        = 8;      // [PORTED] gusset rib thickness (ref rail plane = 8.25)
-ant_leg_t        = 8;      // bracket leg thickness (new: bolted joint)
-ant_bracket_w    = 35;     // bracket width in X
-// In the reference the single gusset lives inside the 8.25 mm rail plane, which
-// is what leaves the void under the antenna hole.  A bolt-on bracket has no rail
-// to hide in, so the rib is duplicated onto BOTH edges of the bracket and the
-// hole moves to the bracket centre, between them.
-ant_hole_x       = ant_bracket_w / 2;   // 17.5, clear of both ribs
+//  Chassis common to both variants.  Keeping the leg, ribs and bolt pattern
+//  identical means a BNC and an SO-239 bracket are interchangeable on the same
+//  crossbeam insert pattern.
+ant_pad_t     = 3.75;  // [PORTED] pad thickness
+ant_leg_t     = 8;     // bracket leg thickness (new: bolted joint)
+ant_bracket_w = 35;    // bracket width in X
+ant_rib_t     = 5;     // gusset rib thickness.  Was 8, which swallowed one whole
+                       //   bolt column: at 8 mm the rib spanned the full pad
+                       //   depth in front of the counterbore mouth, sealing both
+                       //   holes into inaccessible internal voids.
+ant_inset     = 6;     // bracket's outboard edge, inboard of the panel inner
+                       //   face.  Buys the bolt pockets 4.65 mm of clearance
+                       //   from the crossbeam's own end-insert pockets.
+// Bolts sit in the open span BETWEEN the ribs, symmetric about the centre.
+// That symmetry is what lets one part serve both sides of the frame.
+ant_bolt_dx   = [ant_bracket_w / 2 - 7, ant_bracket_w / 2 + 7];  // 10.5, 24.5
+
+// --- variant A: BNC bulkhead (the reference connector) ---
+bnc_bore_d  = 12.468;  // [PORTED]
+bnc_reach   = 25;      // [PORTED] cantilever forward of the frame front face
+bnc_setback = 12.66;   // [PORTED] bore centre, back from the pad's front tip
+
+// --- variant B: SO-239 / UHF female, 4-hole square flange ---
+//  0.625" panel cutout, four 0.138" holes on a 0.708" square (= 0.500" radius).
+//  VERIFY against your own connectors before printing: flange patterns vary a
+//  little between manufacturers.
+so239_bore_d      = 15.88;  // 0.625"
+so239_flange_p    = 17.98;  // 0.708" square pattern pitch
+so239_flange_hole = 3.4;    // clearance for M3 / #4-40
+so239_reach       = 30;     // longer than BNC so the flange screws clear the leg
+so239_setback     = 17;     // bore centre, back from the pad's front tip
 
 // -----------------------------------------------------------------------------
 //  PORTED HANDLE FEATURE
@@ -123,16 +145,11 @@ grip_y1   = grip_y0 + grip_ap_len;            // 51.875
 handle_z1 = z_tb1 + grip_ap_h;                // 198.5
 handle_z2 = handle_z1 + grip_bar_h;           // 210
 
-// antenna brackets: outboard edge on a panel inner face, hole at the
-// reference's 11.375 mm inboard offset.  Right-hand bracket is mirrored.
-ant_x_l     = panel_t;                        // 9
-ant_x_r     = frame_w - panel_t;              // 133.25 (mirror plane)
-// Bolt columns must stay >=3 mm clear of the beam's own end-insert pockets
-// (which occupy the first/last 9 mm of the span), hence 14 rather than 5.
-ant_bolt_dx = [14, 30];                       // from the bracket's outboard edge
-ant_bolt_z  = [z_tb0 + 6, z_tb0 + 16];        // 162, 172
-ant_bolt_gx = [ant_x_l + ant_bolt_dx[0], ant_x_l + ant_bolt_dx[1],
-               ant_x_r - ant_bolt_dx[1], ant_x_r - ant_bolt_dx[0]];
+// antenna brackets: inset from each panel's inner face, both unmirrored
+ant_x_l     = panel_t + ant_inset;                              // 15
+ant_x_r     = frame_w - panel_t - ant_inset - ant_bracket_w;    // 92.25
+ant_bolt_z  = [z_tb0 + 6, z_tb0 + 16];                          // 162, 172
+ant_bolt_gx = [for (bx = [ant_x_l, ant_x_r], dx = ant_bolt_dx) bx + dx];
 
 // bottom interface plate
 base_bolt_x = [35, frame_w - 35];             // 35, 107.25
@@ -153,7 +170,8 @@ win_b = [16, 118, 54, 132];
 BED = 180;
 echo(str("frame body            = ", frame_w, " x ", frame_d, " x ", z_tb1, " mm"));
 echo(str("assembled envelope    = ", frame_w + 2 * handle_t, " x ",
-         frame_d + ant_leg_t + ant_reach, " x ", handle_z2, " mm"));
+         frame_d + ant_leg_t + max(bnc_reach, so239_reach), " x ",
+         handle_z2, " mm  (depth shown for the deeper SO-239 bracket)"));
 echo(str("radio bay (WxDxH)     = ", radio_w, " x ", frame_d - 2 * beam_d,
          " x ", bay_h, " mm"));
 echo(str("radio clearance  side = ", (frame_d - 2 * beam_d - radio_h) / 2,
@@ -310,35 +328,61 @@ module handle() {
 //  Local frame: X 0..ant_bracket_w (0 = outboard edge), Y -(leg+reach)..0,
 //               Z 0..beam_h (0 = the top-front beam's underside).
 // =============================================================================
-module antenna_mount() {
-    pad_z0 = beam_h - ant_pad_t;          // 20.25
-    tip_y  = -(ant_leg_t + ant_reach);    // -33
-    hole_y = tip_y + ant_hole_setback;    // -20.34
+module antenna_mount(bore_d, reach, setback, flange_p = 0, flange_d = 0) {
+    pad_z0 = beam_h - ant_pad_t;        // 20.25
+    tip_y  = -(ant_leg_t + reach);
+    bore_y = tip_y + setback;
+    bore_x = ant_bracket_w / 2;         // 17.5, centred between the ribs
     difference() {
         union() {
             // leg against the crossbeam's front face
             translate([0, -ant_leg_t, 0]) rbox(ant_bracket_w, ant_leg_t, beam_h);
             // horizontal pad
             translate([0, tip_y, pad_z0])
-                rbox(ant_bracket_w, ant_leg_t + ant_reach, ant_pad_t);
-            // [PORTED] diagonal gusset ribs, one on each edge, leaving the bore
-            // under the antenna hole clear.  The tail runs back to Y=0 so each
-            // rib interlocks with the leg's volume instead of merely touching it
-            // on a coplanar face.
+                rbox(ant_bracket_w, ant_leg_t + reach, ant_pad_t);
+            // [PORTED] diagonal gusset ribs, one on each edge.
+            //
+            // The profile deliberately runs the FULL height to beam_h rather than
+            // stopping at the pad's underside. Stopping at pad_z0 left the rib
+            // and the pad sharing nothing but a plane -- zero volumetric overlap
+            // -- which printed as a visible seam along the top of every rib. The
+            // extra material is entirely inside the pad, so the outer shape is
+            // unchanged. The tail likewise runs back to Y=0 to interlock with
+            // the leg.
             for (rx = [0, ant_bracket_w - ant_rib_t])
                 translate([rx, 0, 0]) rotate([90, 0, 90])
                     linear_extrude(height = ant_rib_t)
-                        polygon([[tip_y, pad_z0], [0, pad_z0],
+                        polygon([[tip_y, pad_z0], [tip_y, beam_h], [0, beam_h],
                                  [0, 0], [-ant_leg_t, 0]]);
         }
-        // [PORTED] antenna bulkhead hole
-        translate([ant_hole_x, hole_y, pad_z0 - 1])
-            cylinder(d = ant_hole_d, h = ant_pad_t + 2);
-        // four M4 bolts into the crossbeam's front face
+        // connector bore
+        translate([bore_x, bore_y, pad_z0 - 1])
+            cylinder(d = bore_d, h = ant_pad_t + 2);
+        // SO-239 only: four flange screw holes on a square pattern
+        if (flange_p > 0)
+            for (dx = [-flange_p/2, flange_p/2], dy = [-flange_p/2, flange_p/2])
+                translate([bore_x + dx, bore_y + dy, pad_z0 - 1])
+                    cylinder(d = flange_d, h = ant_pad_t + 2);
+        // four M4 bolts into the crossbeam's front face, in the open span
+        // between the ribs so every counterbore mouth is reachable
         for (dx = ant_bolt_dx, z = ant_bolt_z)
             translate([dx, -ant_leg_t, z - z_tb0])
                 rotate([-90, 0, 0]) m4_bolt_hole(ant_leg_t);
     }
+}
+
+module antenna_mount_bnc() {
+    antenna_mount(bnc_bore_d, bnc_reach, bnc_setback);
+}
+
+module antenna_mount_so239() {
+    antenna_mount(so239_bore_d, so239_reach, so239_setback,
+                  so239_flange_p, so239_flange_hole);
+}
+
+// the variant drawn in the assembly views
+module antenna_mount_fitted() {
+    if (ant_style == "so239") antenna_mount_so239(); else antenna_mount_bnc();
 }
 
 // =============================================================================
@@ -393,8 +437,8 @@ module frame(ex = 0) {
     color("#b05a4a") translate([-ex, 0, 0]) mirror([1, 0, 0]) handle();
     color("#b05a4a") translate([frame_w + ex, 0, 0]) handle();
 
-    color("#5f9e6e") translate([ant_x_l, -ex, z_tb0]) antenna_mount();
-    color("#5f9e6e") translate([ant_x_r, -ex, z_tb0]) mirror([1, 0, 0]) antenna_mount();
+    for (bx = [ant_x_l, ant_x_r])
+        color("#5f9e6e") translate([bx, -ex, z_tb0]) antenna_mount_fitted();
 
     color("#8a8f98") translate([0, 0, -ex]) base_plate();
 
@@ -429,17 +473,13 @@ else if (part == "handle")
 // On its back: every layer is smaller than the one below it, so the ribs and pad
 // print with no supports and the bolt holes come out vertical.
 //
-// The two brackets are a genuine mirrored PAIR, not two copies of one part: the
-// bolt columns sit at 14 and 30 mm across a 35 mm width, because both must clear
-// the crossbeam's own end-insert pockets (the first/last 9 mm of the span), and
-// that offset pattern is not symmetric about the bracket centre. Verified: the
-// mesh has no mirror symmetry on any axis, so no rigid flip substitutes one for
-// the other. Print one of each.
-else if (part == "antenna_mount_left")
-    rotate([-90, 0, 0]) antenna_mount();
-else if (part == "antenna_mount_right")
-    rotate([-90, 0, 0]) translate([ant_bracket_w, 0, 0])
-        mirror([1, 0, 0]) antenna_mount();
+// Each variant is a SINGLE symmetric part used twice -- print two of whichever
+// connector you want. The earlier left/right split existed only because the bolt
+// columns were offset (14/30) to dodge the crossbeam's end-insert pockets;
+// insetting the whole bracket 6 mm instead lets the columns sit symmetrically
+// between the ribs, which removes the handedness.
+else if (part == "antenna_mount_bnc")   rotate([-90, 0, 0]) antenna_mount_bnc();
+else if (part == "antenna_mount_so239") rotate([-90, 0, 0]) antenna_mount_so239();
 
 // upside down: flat top face on the bed, feet upward, and every counterbore and
 // insert mouth opening upward -- no supports, no bridges
