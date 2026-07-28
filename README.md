@@ -52,7 +52,7 @@ Two measurements drove real design decisions and are worth calling out:
 
 | #   | Part                     | Qty | Print size (mm)  | Solid vol | Inserts |
 | --- | ------------------------ | --- | ---------------- | --------- | ------- |
-| 1   | `side_panel`             | 2   | 164 × 70 × 9     | 81.9 cm³  | —       |
+| 1   | `side_panel`             | 2   | 164 × 70 × 9     | 76.0 cm³  | —       |
 | 2   | `crossbeam_top_front`    | 1   | 124.25 × 16 × 24 | 44.5 cm³  | 12      |
 | 3   | `crossbeam_top_back`     | 1   | 124.25 × 16 × 24 | 46.3 cm³  | 4       |
 | 4   | `crossbeam_bottom_front` | 1   | 124.25 × 16 × 24 | 45.9 cm³  | 6       |
@@ -60,17 +60,18 @@ Two measurements drove real design decisions and are worth calling out:
 | 6   | `handle`                 | 2   | 78 × 70 × 12     | 37.6 cm³  | 4 each  |
 | 7   | `antenna_mount_bnc`      | 2\* | 35 × 24 × 33     | 10.9 cm³  | —       |
 | 8   | `antenna_mount_so239`    | 2\* | 35 × 24 × 38     | 11.6 cm³  | —       |
-| 9   | `base_plate`             | 1   | 142.25 × 70 × 18 | 83.1 cm³  | 4       |
+| 9   | `base_plate`             | 1   | 142.25 × 70 × 16 | 54.9 cm³  | 4       |
+| 10  | `battery_box`            | 1   | 143 × 59.8 × 94.8 | 103.3 cm³ | 4  |
 
 \* Parts 7 and 8 are alternatives — print **two of whichever connector you use**,
 not both. They share an identical leg, rib and bolt pattern, so they are
 interchangeable on the same crossbeam without touching anything else.
 
-Largest part is 164 mm — **16 mm of bed margin**. All nine meshes verified
+Largest part is 164 mm — **16 mm of bed margin**. All ten meshes verified
 watertight, single-shell, and bed-legal.
 
-Solid volume is 408 cm³ for one of each of the nine files, or 526 cm³ for a full
-11-piece build (528 cm³ with SO-239 mounts).
+Solid volume is 477 cm³ for one of each of the ten files, or 590 cm³ for a full
+12-piece build (BNC mounts, battery frame included).
 Actual filament use is far lower — the beams are small enough in section that
 the slicer's perimeters and infill dominate. If mass matters, the base plate is
 the obvious place to add a lightening window.
@@ -82,8 +83,13 @@ for the beams and handle. No feet, no handle, no antenna mount, and **no heat-se
 inserts at all** — every insert lives in the mating part, which is what keeps
 this a simple flat print.
 
-- Radio mount: Ø5.000 through-hole at (Y 35, Z 98) with the Ø26.468 × 5.5 mm
-  outer-face recess, both verbatim from the reference.
+- Radio mount: **two** Ø5.000 through-holes at Y 35, each with the Ø26.468 × 5.5 mm
+  outer-face recess, verbatim from the reference. **Z 98** is the ported reference
+  position and suits the RT-95; **Z 129** is 31 mm higher for the AT-779UV. See
+  §2.10 for the derivation. Use whichever pair matches the radio; the unused pair
+  is just a drain hole.
+- Windows: the upper one moved from Z 118–132 to **Z 150–172**. The new AT-779UV
+  recess spans Z 115.8–142.2 and ran straight through where it used to be.
 - 8 × M4 clearance holes, heads counterbored flush in the **outer** face → the
   four crossbeams.
 - 4 × M4 clearance holes, heads counterbored flush in the **inner** face → the
@@ -175,10 +181,103 @@ M4 bolts. Its **four bosses are simultaneously the frame's feet and the M4
 attachment grid** that future modules (battery, tuner, ATU) bolt up into — one
 feature doing both jobs, so nothing else needs to hang off the frame.
 
+**It is a ring, not a plate.** All that remains is the perimeter backing the two
+side panels (X 0–9 and 133.25–142.25) and the two bottom crossbeams, widened front
+and back to carry the feet. The centre is a **124.25 × 30 mm stadium opening**,
+which also serves as the battery lead's pass-through — it spans the same 30 mm of
+depth the old 36 × 26 cable slot did and the entire width, so it passes anything
+that slot did, and the separate slot is gone.
+
+The opening cannot follow the beam lines exactly. The Ø16 feet at Y 12 / 58 reach
+4 mm past them, and **corner rounding cannot rescue it**: at the ideal Y 16–54 the
+largest radius that fits is 19 mm, still short of the 19.2 mm needed to clear a
+foot. Counter-intuitively a *larger* radius helps — a small corner brings the
+opening nearer the foot — so the optimum is the limit case, a full stadium. At
+Y 20–50 with r = 15 it leaves **2.08 mm** of material between each foot boss and
+the opening edge, which the model asserts on every render.
+
+Verified after the cut: the perimeter still fully backs both side panels and both
+crossbeams, and the material around all four feet and all four base bolts is
+intact. Opening the centre took the plate from 75.9 cm³ to **54.9 cm³**, 28 %
+lighter.
+
 Its top face is deliberately left flat. An earlier revision had two raised
 locating lips for the panel bottom edges; they made the part unprintable (see
 §9), and since the panels are located by their 16 bolts into the crossbeams, the
 lips were redundant.
+
+### 10 — `battery_box`
+
+An **open frame** — not a box — for a **TalentCell LF4011 12 V 6 Ah LiFePO4**
+pack lying flat on its largest face (**132 × 75.8 × 37.3 mm**, measured).
+
+**It bolts into the four Ø16 foot bosses on the base plate** (X 14 / 128.25,
+Y 12 / 58) with 4 × M4 × 12 into the heat-set inserts already in them. Those
+bosses were designed from the start as both the frame's feet and the M4 module
+interface, so **nothing on the frame changes to accept it** — the base plate is
+reprinted only for the cable slot, not for this.
+
+Structure: two end walls, a back wall and a floor, every one of them windowed,
+plus a centre rib under the pack. The front is open so the pack slides in, and
+the top is open because the base plate is the lid. That is also why it needs no
+cable hole of its own — the lead goes straight up into the base plate's slot.
+
+Retention is by geometry, not just the strap. A **top flange runs the full length
+of each end wall**, reaching 19.5 mm inboard so it laps 18 mm over each of the
+pack's long edges. The pack can lift 2.5 mm before it meets them. The flange runs
+the full length rather than being four pads because the bolts sit 10.4 mm inboard
+of the walls — too far to cantilever cleanly — and a full-width cross rail would
+have been a 135 mm bridge. A hook-and-loop strap through the four slots crosses
+the 13.5 mm clear zone in front of the pack and stops it sliding out.
+
+|                     |                                                    |
+| ------------------- | -------------------------------------------------- |
+| Cavity              | 135 × 90.8 × 38.8 mm                               |
+| Outer               | 143 × 94.8 × 51.8 mm, reaching 24.8 mm forward     |
+| Behind the frame    | nothing — the back wall is flush with the frame back |
+| Bolts               | 4 × M4 × 12 into the base plate feet               |
+| Print pose          | back wall down, 143 × 59.8 mm footprint, 94.8 tall |
+| Stacking feet       | 4 × Ø16 × 8 mm with M4 inserts, at the same X 14 / 128.25, Y 12 / 58 |
+| Stack pitch         | 59.8 mm per module                                 |
+
+**It presents the same interface on its underside that it consumes on top.** Four
+Ø16 × 8 mm feet with M4 inserts sit at the same X 14 / 128.25, Y 12 / 58, so a
+further module bolts under the battery frame exactly as the battery frame bolts
+under the base plate — verified by stacking a second copy at the 59.8 mm pitch
+with zero interference and all four bolts clean. Cables reach a module below
+through the floor windows, so no extra pass-through was needed.
+
+The feet are plain cylinders rather than ramped. A 45° print ramp would have to
+run toward +Y, which is the downward direction in the print pose, and for the
+rear pair at Y 58 that would have reached Y 74 — past the back face, breaking
+both the "nothing behind the wearer" rule and the print pose's bed datum. Left
+unramped they cost about 18 mm² of unsupported area each, which is what any
+horizontal boss costs. The floor windows were reshaped around all four pads.
+
+Windowing still nearly halves it: 103.3 cm³ against ~190 cm³ for the equivalent
+closed box.
+
+### Radio mount positions — why two sets of holes
+
+The two radios differ almost entirely in the dimension that becomes the standing
+height in this frame:
+
+| Radio             | W × D × H       | Standing height | Mount hole |
+| ----------------- | --------------- | --------------- | ---------- |
+| Retevis RT-95     | 124 × **163** × 39 | 163 mm       | **Z 98**   |
+| AnyTone AT-779UV  | 124 × **101** × 36 | 101 mm       | **Z 129**  |
+
+With a single hole at Z 98 and each radio's side hole at its own mid-depth, the
+RT-95 spans Z 16.5–179.5 — filling the frame with its face flush at the top. The
+AT-779UV spans Z 47.5–148.5, leaving its control face 31 mm down inside the
+frame. That is the "too low" symptom exactly, and it makes the offset
+(163 − 101) / 2 = **31 mm**. At Z 129 the AT-779UV's face reaches the same 179.5
+the RT-95 does.
+
+The two Ø26.468 recesses end up 4.5 mm apart. The material between them is full
+9 mm thickness — only the recess discs themselves are thinned to 3.5 mm.
+
+---
 
 ---
 
@@ -217,10 +316,11 @@ All bolts stainless, socket cap. All inserts brass M4, 6.0 mm OD × 8.0 mm long
 | Side panels → handles           | M4 × 12        | 8                        | handle legs                         |
 | Antenna mounts → top-front beam | M4 × 12        | 8                        | top-front beam front face           |
 | Base plate → bottom beams       | M4 × 12        | 4                        | bottom beam undersides              |
-| Future module → base plate      | M4 × (module)  | 4                        | base plate feet                     |
+| **Battery box → base plate**    | **M4 × 12**    | **4**                    | base plate feet                     |
+| Next module → battery box       | M4 × 12        | 4                        | battery box feet                    |
 | SO-239 flange → antenna mount   | M3 × 10 + nut  | 4 per mount              | (through-holes; SO-239 variant only) |
 | **Radio → side panels**         | **M5 × 10–12** | **2**                    | the radio's own threaded side holes |
-|                                 | **M4 total**   | **36 bolts, 40 inserts** |                                     |
+|                                 | **M4 total**   | **40 bolts, 44 inserts** |                                     |
 
 M4 × 12 is correct throughout: 4.0 mm counterbore, plus 5.0 mm of remaining
 panel, plus 7.0 mm of thread engagement, against a 9.0 mm pocket. Do not fit
@@ -241,6 +341,7 @@ and 8.5 mm into the radio.
 | `handle`        | flat, mating face down             | one bridge over the grip aperture; flattest face becomes the lap joint            |
 | `antenna_mount` ×2 | on its back                     | every layer smaller than the one below — no supports; one symmetric part, print two |
 | `base_plate`    | upside down, flat top face on bed  | feet and every insert mouth point upward; fully self-supporting                    |
+| `battery_box`   | **back wall down**, open front up  | floor-down would cantilever both top flanges 19.5 mm along their whole length; on its back they become ribs off the back wall |
 
 Each `part=` value in the .scad already emits the part in its recommended pose,
 so `stl/*.stl` are ready to slice as-is. **Do not re-orient them** — the poses
@@ -272,6 +373,9 @@ heads, so the top beams go on first.
 5. Bolt on the two handles (8 × M4 × 12, heads on the **inside**, flush).
 6. Bolt on the two antenna mounts (8 × M4 × 12), then fit the antenna
    connectors.
+7. If fitting the battery box: bolt it up into the four feet (4 × M4 × 12),
+   route the battery lead up through the base plate's central opening, slide the
+   pack in from the front and strap it.
 
 ---
 
@@ -279,7 +383,7 @@ heads, so the top beams go on first.
 
 Not just rendered — checked:
 
-- All 9 meshes watertight, **single connected shell**, within 180 × 180.
+- All 10 meshes watertight, **single connected shell**, within 180 × 180.
   (This caught two real defects: the antenna gusset and the base-plate locating
   lips initially only touched their neighbours on a coplanar face, producing
   two- and three-shell parts.)
@@ -296,6 +400,21 @@ Not just rendered — checked:
   were sealed inside the rib.
 - Both antenna variants confirmed **mirror-symmetric in X**, so one part serves
   both sides.
+- Battery box: all four bolts traced into the base plate's foot inserts, cable
+  column clear through both parts, zero enclosed voids.
+- **Recursive stack test**: a second battery frame placed one pitch (59.8 mm)
+  below the first shows zero interference and all four bolts running cleanly from
+  the lower flange into the upper frame's foot inserts. The module interface
+  therefore repeats indefinitely.
+- Battery frame's rearmost point is Y 69.99 against a frame back of 70.0 —
+  nothing protrudes behind the wearer.
+- Base plate after opening the centre: perimeter coverage re-sampled under both
+  side panels (100 %) and both crossbeams, material around all four feet and all
+  four base bolts intact, and the foot-to-opening ligament asserted at ≥ 1.5 mm.
+- **Regression check that nothing already printed was invalidated**: every STL
+  compared against the committed version. Only `side_panel` and `base_plate`
+  changed; the four crossbeams, both handles and both antenna mounts are
+  bit-for-bit the same geometry.
 - **Per-layer cross-sectional area of every shipped STL in its print pose**, to
   find material laid over voids. This caught two real orientation defects: the
   base plate printing 98 % in mid-air on two locating lips, and the side panel
@@ -344,7 +463,15 @@ panel under M5 recess = 3.5 mm of material carrying the radio
    control panel — but it means a radio thicker than 38 mm needs `frame_d`
    increased.
 
-5. The Ø26.468 × 5.5 mm recess is reproduced because the brief says to transfer
+5. **The RT-95 does not fit this frame in Y.** Its 39 mm body against the 38 mm
+   clear channel between the front and back crossbeams is a **1 mm
+   interference** — the mount holes at Z 98 are right for it, but the beams are
+   1 mm too close. The fix is `beam_d` 16 → 15, giving 40 mm clear, but that
+   means reprinting all four crossbeams, so it has been left alone rather than
+   forced on a frame that is already built and working with the AT-779UV. The
+   model prints a warning rather than failing when `radio = "rt95"`.
+
+6. The Ø26.468 × 5.5 mm recess is reproduced because the brief says to transfer
    the radio mounts, but its purpose is inferred: it is far too large for an M5
    head, so it is almost certainly a seat for the OEM knurled mounting knob. If
    you are using plain M5 socket caps, it can shrink to Ø10 and reclaim 2 mm of
@@ -360,7 +487,7 @@ Slice `stl/*.stl` as-is. Every part is already in its recommended pose (§5) and
 **no part on this frame needs supports** — the only ceilings anywhere are the
 tops of insert pockets and bolt bores, the largest of which is the Ø12.468 mm
 antenna bore through a 3.75 mm wall. Verified by measuring per-layer
-cross-sectional area on all nine meshes; the biggest single unsupported area on
+cross-sectional area on all ten meshes; the biggest single unsupported area on
 any layer is about 93 mm².
 
 Two of those poses are load-bearing decisions rather than convenience, so do not
@@ -634,7 +761,7 @@ its mass, and there are two of them.
 
 #### Plate layout (Prusa Mini, 180 × 180 mm)
 
-A full set is four plates. Footprints verified against the bed:
+A full set is five plates. Footprints verified against the bed:
 
 | Plate | Contents                                | Footprint      | Margin        |
 | ----- | --------------------------------------- | -------------- | ------------- |
@@ -642,6 +769,7 @@ A full set is four plates. Footprints verified against the bed:
 | 2     | 4 × `crossbeam`, stacked in Y, 5 mm brim | 134 × 122 mm  | 46 / 58 mm    |
 | 3     | `base_plate` + 2 × `antenna_mount` behind it | 142 × 100 mm | 38 / 80 mm |
 | 4     | 2 × `handle`, side by side in X          | 162 × 70 mm   | 18 / 110 mm   |
+| 5     | `battery_box` (only if you build it)     | 143 × 60 mm   | 37 / 120 mm   |
 
 Plate 1 is the tightest at 16 mm of X margin — check your Mini's actual usable
 area before nesting it, and note that the two panels are *identical*, not mirrored,

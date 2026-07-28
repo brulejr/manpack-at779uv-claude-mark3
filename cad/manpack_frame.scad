@@ -20,7 +20,7 @@ $fa = 2;
 $fs = 0.4;
 
 /* [Output] */
-part = "assembly"; // [assembly, exploded, side_panel, crossbeam_top_front, crossbeam_top_back, crossbeam_bottom_front, crossbeam_bottom_back, handle, antenna_mount_bnc, antenna_mount_so239, base_plate]
+part = "assembly"; // [assembly, exploded, side_panel, crossbeam_top_front, crossbeam_top_back, crossbeam_bottom_front, crossbeam_bottom_back, handle, antenna_mount_bnc, antenna_mount_so239, base_plate, battery_box]
 
 // which connector variant the assembly views fit
 ant_style = "bnc"; // [bnc, so239]
@@ -31,12 +31,30 @@ panel_windows = true;
 // draw a radio proxy block in the assembly views
 show_radio = true;
 
+// draw the bolt-on battery frame in the assembly views
+show_battery_box = true;
+
 // -----------------------------------------------------------------------------
 //  RADIO
 // -----------------------------------------------------------------------------
+//  Both radios share the 124 mm width the frame is built around; they differ in
+//  the depth that becomes the standing height, which is why the frame carries two
+//  sets of mount holes.
+//
+//      Retevis RT-95    124 x 163 x 39 mm   -> 163 mm standing
+//      AnyTone AT-779UV 124 x 101 x 36 mm   -> 101 mm standing
+//
 radio_w = 124.25;  // X  [PORTED] clear span measured between the reference rails
-radio_h = 36;      // Y  body thickness
-radio_d = 101;     // Z  body depth, standing on end
+
+rt95_d   = 163;    // Z  standing height
+rt95_h   = 39;     // Y  body thickness
+at779_d  = 101;    // Z  standing height
+at779_h  = 36;     // Y  body thickness
+
+// which radio the assembly views draw
+radio = "at779uv"; // [at779uv, rt95]
+radio_d = (radio == "rt95") ? rt95_d : at779_d;
+radio_h = (radio == "rt95") ? rt95_h : at779_h;
 
 // -----------------------------------------------------------------------------
 //  FRAME
@@ -131,11 +149,23 @@ beam_dz = 5.5;
 bb_z = [z_bb0 + beam_h/2 - beam_dz, z_bb0 + beam_h/2 + beam_dz]; // 22.5, 33.5
 tb_z = [z_tb0 + beam_h/2 - beam_dz, z_tb0 + beam_h/2 + beam_dz]; // 162.5, 173.5
 
-// radio side bolt: dead centre of the bay in Y and Z, exactly as the reference
-radio_by = frame_d / 2;               // 35
-radio_bz = (z_bb1 + z_tb0) / 2;       // 98
-radio_z0 = radio_bz - radio_d / 2;    // 47.5
-radio_z1 = radio_bz + radio_d / 2;    // 148.5
+// Radio side bolts.  Y is the bay centre for both radios, exactly as the
+// reference.  In Z there are TWO positions:
+//
+//   RT-95     Z 98  -- the ported reference position, bay centre.  A 163 mm
+//                      radio hung here spans Z 16.5..179.5, filling the frame.
+//   AT-779UV  Z 129 -- 31 mm higher, i.e. (163-101)/2, which puts the shorter
+//                      radio's control face at the same 179.5 the RT-95 reaches.
+//                      At the RT-95 hole the AT-779UV sat 31 mm too low.
+//
+// Both hole sets are cut in every panel; use whichever pair suits the radio.
+radio_by      = frame_d / 2;                        // 35
+radio_bz_rt95 = (z_bb1 + z_tb0) / 2;                // 98
+radio_bz_at779= radio_bz_rt95 + (rt95_d - at779_d) / 2;  // 129
+radio_bz_all  = [radio_bz_rt95, radio_bz_at779];
+radio_bz = (radio == "rt95") ? radio_bz_rt95 : radio_bz_at779;
+radio_z0 = radio_bz - radio_d / 2;
+radio_z1 = radio_bz + radio_d / 2;
 
 // handle
 handle_z0 = z_tb1 - handle_lap;               // 132
@@ -157,9 +187,34 @@ base_bolt_y = [beam_cy_f, beam_cy_b];         // 8, 62
 foot_x      = [14, frame_w - 14];             // 14, 128.25
 foot_y      = [12, frame_d - 12];             // 12, 58
 
+// Base-plate central opening.  The plate is a ring: all that remains is the
+// perimeter backing the two side panels (X 0..9 and 133.25..142.25) and the two
+// bottom crossbeams, widened front and back to carry the feet.
+//
+// It cannot follow the beam lines exactly.  The Ø16 feet at Y 12 / 58 reach 4 mm
+// past them, and corner rounding cannot rescue it: at Y 16..54 the largest
+// radius that fits (19) is still short of the 19.2 needed to clear a foot.
+// Counter-intuitively a LARGER radius helps -- a small corner brings the opening
+// nearer the foot -- so the optimum is the limit case, a full stadium.
+//
+// This also supersedes the old 36 x 26 cable slot: the opening spans the same
+// 30 mm of Y and the entire width, so it passes anything the slot did.
+base_open_x0 = panel_t;                                   // 9
+base_open_x1 = frame_w - panel_t;                         // 133.25
+base_open_y0 = 20;
+base_open_y1 = frame_d - base_open_y0;                    // 50
+base_open_r  = (base_open_y1 - base_open_y0) / 2;         // 15 -> stadium ends
+// material left between a foot boss and the opening edge
+base_open_gap = sqrt(pow(base_open_x0 + base_open_r - foot_x[0], 2) +
+                     pow(base_open_y0 + base_open_r - foot_y[0], 2))
+                - base_open_r - foot_d / 2;
+
 // panel windows: kept well clear of the M5 recess ligament and every counterbore
-win_a = [16, 44, 54, 74];   // y0 z0 y1 z1
-win_b = [16, 118, 54, 132];
+// Panel windows.  The upper one used to sit at Z 118..132, which the new
+// AT-779UV recess (Z 115.8..142.2) runs straight through, so it moves above both
+// recesses into the clear band between the recess top and the panel top.
+win_a = [16, 44, 54, 74];    // y0 z0 y1 z1
+win_b = [16, 150, 54, 172];
 
 // =============================================================================
 //  DERIVED-DIMENSION REPORT
@@ -180,11 +235,26 @@ echo(str("panel print footprint = ", panel_h, " x ", frame_d,
          "  (bed ", BED, ") -> margin ", BED - panel_h, " mm"));
 echo(str("panel under M5 recess = ", panel_t - m5_recess_h,
          " mm of material carrying the radio"));
+echo(str("base plate opening    = ", base_open_x1 - base_open_x0, " x ",
+         base_open_y1 - base_open_y0, " mm stadium, leaving ", base_open_gap,
+         " mm of material to each foot"));
+assert(base_open_gap >= 1.5, "base plate opening cuts too close to the feet");
 assert(panel_h <= BED && frame_d <= BED, "side panel exceeds the print bed");
 assert(radio_w <= BED, "crossbeam span exceeds the print bed");
-assert(frame_d - 2 * beam_d >= radio_h,
-       "frame_d too small: the top crossbeams would overhang the control panel");
-assert(bay_h >= radio_d, "bay_h too small for the radio's standing height");
+// The radio is NOT limited by bay_h: the crossbeams sit at the extreme front and
+// back in Y, so a radio in the Y 17..53 channel passes between them and may use
+// the full panel height.  What it must clear is the beams in Y, and the base
+// plate / panel top in Z.
+// Warning, not an assert: the frame is already built, and whether a 1 mm
+// interference is acceptable is the builder's call, not the model's.
+if (frame_d - 2 * beam_d < radio_h)
+    echo(str("WARNING: a ", radio_h, " mm radio does not fit the ",
+             frame_d - 2 * beam_d, " mm clear channel between the crossbeams -- ",
+             "short by ", radio_h - (frame_d - 2 * beam_d),
+             " mm. Fix is beam_d ", beam_d, " -> ", beam_d - 1,
+             ", which means reprinting all four crossbeams."));
+assert(radio_z0 >= z_frame && radio_z1 <= z_tb1,
+       "radio does not fit between the base plate and the panel top");
 assert(panel_t - m5_recess_h >= 3.0, "too little panel left under the M5 recess");
 assert(m4_ins_h + m4_cb_h <= panel_t + beam_d, "M4 joint stack does not close");
 
@@ -223,6 +293,22 @@ module m4_bolt_hole(thru) {
     translate([0, 0, -0.01]) cylinder(d = m4_clear, h = thru + 0.02);
 }
 
+// Through-windows: rounded in their own plane, STRAIGHT through the thickness.
+// (rbox rounds all twelve edges, which closes the cut over its through direction
+// and leaves a full-width bridging lip -- fine for solids, wrong for windows.)
+module win_thruZ(x0, y0, z0, dx, dy, dz, r = 3) {
+    hull() for (x = [x0+r, x0+dx-r], y = [y0+r, y0+dy-r])
+        translate([x, y, z0]) cylinder(r = r, h = dz);
+}
+module win_thruX(x0, y0, z0, dx, dy, dz, r = 3) {
+    hull() for (y = [y0+r, y0+dy-r], z = [z0+r, z0+dz-r])
+        translate([x0, y, z]) rotate([0, 90, 0]) cylinder(r = r, h = dx);
+}
+module win_thruY(x0, y0, z0, dx, dy, dz, r = 3) {
+    hull() for (x = [x0+r, x0+dx-r], z = [z0+r, z0+dz-r])
+        translate([x, y0, z]) rotate([-90, 0, 0]) cylinder(r = r, h = dy);
+}
+
 // 2D profile rounded on both convex and concave corners.
 module round2d(r) {
     offset(r = r) offset(r = -2 * r) offset(r = r) children();
@@ -241,10 +327,16 @@ module side_panel() {
         translate([0, 0, z_frame]) plate_x(panel_t, frame_d, panel_h);
 
         // --- [PORTED] radio mount: M5 through-hole + outer-face recess ---
-        translate([-1, radio_by, radio_bz]) rotate([0, 90, 0])
-            cylinder(d = m5_clear, h = panel_t + 2);
-        translate([-0.01, radio_by, radio_bz]) rotate([0, 90, 0])
-            cylinder(d = m5_recess_d, h = m5_recess_h + 0.01);
+        // Two sets, one per radio.  Lower = RT-95 (the ported position), upper =
+        // AT-779UV, 31 mm higher so the shorter radio's face reaches the same
+        // height.  Recess edges end up 4.5 mm apart; the material between them is
+        // full 9 mm thickness, only the discs themselves are thinned to 3.5 mm.
+        for (bz = radio_bz_all) {
+            translate([-1, radio_by, bz]) rotate([0, 90, 0])
+                cylinder(d = m5_clear, h = panel_t + 2);
+            translate([-0.01, radio_by, bz]) rotate([0, 90, 0])
+                cylinder(d = m5_recess_d, h = m5_recess_h + 0.01);
+        }
 
         // --- crossbeam bolts: heads recessed in the OUTER face ---
         for (y = [beam_cy_f, beam_cy_b], z = concat(bb_z, tb_z))
@@ -413,8 +505,139 @@ module base_plate() {
         // future-module inserts, opening downward through the feet
         for (x = foot_x, y = foot_y)
             translate([x, y, 0]) m4_insert();
+        // central opening -- also the battery lead's pass-through
+        hull() for (x = [base_open_x0 + base_open_r, base_open_x1 - base_open_r],
+                    y = [base_open_y0 + base_open_r, base_open_y1 - base_open_r])
+            translate([x, y, foot_h - 1]) cylinder(r = base_open_r, h = base_t + 2);
     }
 }
+
+// =============================================================================
+//  PART 10 -- battery_box
+// -----------------------------------------------------------------------------
+//  Open-face strap cradle for a TalentCell LF4011 12 V 6 Ah LiFePO4 pack. Bolts
+//  up into the four M4 inserts in the base plate's feet -- the module interface
+//  that was designed in from the start, so nothing on the frame changes.
+//
+//  Three walls plus a floor; the front face (-Y) is open so the pack slides in,
+//  and the top is closed by the base plate itself. A hook-and-loop strap through
+//  the four side slots crosses the open face and retains the pack.
+//
+//  >>> batt_x / batt_y / batt_z ARE PROVISIONAL <<<
+//  Published TalentCell figures (90 x 70 x 105 mm, 730 g) are almost certainly
+//  the retail carton -- a four-cell 32700 LiFePO4 pack weighing 730 g is much
+//  smaller than that. MEASURE THE PACK and set these three numbers before
+//  printing. Everything else follows from them. The strap-retained open face
+//  makes the cradle forgiving of a pack that measures under, but not over.
+// =============================================================================
+//  The pack lies FLAT on its largest face.  Measured, not published:
+batt_x = 132;    // along frame X
+batt_y = 75.8;   // along frame Y
+batt_z = 37.3;   // along frame Z  (lying flat)
+
+box_wall   = 4;      // end and back wall thickness
+box_floor  = 4;      // floor thickness
+box_boss   = 8;      // top flange thickness; 8 keeps the joint on M4 x 12
+box_clear  = 1.5;    // clearance around the pack
+strap_zone = 13.5;   // clear space in front of the pack for the retaining strap
+flange_w   = 19.5;   // how far the top flange reaches inboard from each end wall
+strap_w    = 27;     // strap slot height (25 mm strap)
+strap_t    = 4.5;    // strap slot thickness
+win_inset  = 12;     // material left around each frame window
+
+// derived
+bb_cav_x = batt_x + 2 * box_clear;               // 135
+bb_cav_y = batt_y + box_clear + strap_zone;      // 90.8
+bb_cav_z = batt_z + box_clear;                   // 38.8
+bb_out_x = bb_cav_x + 2 * box_wall;              // 143
+bb_out_y = bb_cav_y + box_wall;                  // 94.8
+bb_out_z = box_boss + 1 + bb_cav_z + box_floor;  // 51.8
+bb_x0    = frame_w / 2 - bb_out_x / 2;           // -0.375, centred on the frame
+bb_y0    = frame_d - bb_out_y;                   // -24.8, back flush with the frame
+bb_z0    = -bb_out_z;                            // -51.8, underside of the floor
+bb_cz1   = -(box_boss + 1);                      // -9,    cavity ceiling
+bb_cz0   = bb_cz1 - bb_cav_z;                    // -47.8, cavity floor
+bb_bat_y1= bb_y0 + bb_out_y - box_wall;          // 66, pack seats against the back
+bb_bat_y0= bb_bat_y1 - batt_y;                   // -9.8, pack's front face
+bb_tot_z = bb_out_z + foot_h;                    // 59.8, including the feet
+// Side strips of floor left solid to carry the stacking feet, and the clear
+// band between the two foot zones where a window can still go.
+bb_pad_x = [[bb_x0, 26], [116.25, bb_x0 + bb_out_x]];
+
+module battery_box() {
+    difference() {
+        union() {
+            // two end walls, back wall and floor -- an open frame, not a box
+            for (wx = [bb_x0, bb_x0 + bb_out_x - box_wall])
+                translate([wx, bb_y0, bb_z0]) rbox(box_wall, bb_out_y, bb_out_z, 1.5);
+            translate([bb_x0, bb_bat_y1, bb_z0])
+                rbox(bb_out_x, box_wall, bb_out_z, 1.5);
+            translate([bb_x0, bb_y0, bb_z0]) rbox(bb_out_x, bb_out_y, box_floor, 1.5);
+            // Top flange along the full length of each end wall.  It overlaps the
+            // pack's long edges by 18 mm and is what holds it down, and it carries
+            // the four M4 bolts.  It runs the whole length rather than being four
+            // pads because the bolts sit 10.4 mm inboard of the walls -- too far
+            // to cantilever, and a full-width cross rail would be a 135 mm bridge.
+            for (fx = [bb_x0, bb_x0 + bb_out_x - box_wall - flange_w])
+                translate([fx, bb_y0, -box_boss])
+                    rbox(box_wall + flange_w, bb_out_y, box_boss, 1.5);
+            // Stacking interface: the same four feet the base plate presents, at
+            // the same X/Y, so a further module bolts under this one exactly as
+            // this one bolts under the base plate.
+            //
+            // Deliberately plain cylinders. A 45 degree print ramp would have to
+            // run toward +Y (the downward direction in the print pose), and for
+            // the rear pair at Y 58 that would reach Y 74 -- past the back face,
+            // breaking both the "nothing behind the frame" rule and the print
+            // pose's bed datum. Unramped they cost ~18 mm2 of unsupported area
+            // each, which is what any horizontal boss costs.
+            for (x = foot_x, y = foot_y)
+                translate([x, y, bb_z0 - foot_h]) cylinder(d = foot_d, h = foot_h + 1);
+        }
+        // four M4 bolts up into the base plate's foot inserts
+        for (x = foot_x, y = foot_y)
+            translate([x, y, -box_boss]) m4_bolt_hole(box_boss);
+        // Floor windows.  Reshaped around the stacking feet: a pair of central
+        // windows either side of a centre rib, plus one small window in each
+        // side strip in the clear band between that strip's two foot pads.
+        for (sx = [28, frame_w/2 + 6])
+            win_thruZ(sx, bb_y0 + 6, bb_z0 - 1,
+                      37.1, bb_out_y - 18, box_floor + 2);
+        for (sx = [5, 119.25])
+            win_thruZ(sx, 27, bb_z0 - 1, 18, 16, box_floor + 2);
+        // end wall windows, kept below the top flange
+        for (wx = [bb_x0 - 1, bb_x0 + bb_out_x - box_wall - 1])
+            win_thruX(wx, bb_y0 + win_inset + strap_zone, bb_z0 + win_inset,
+                      box_wall + 2, bb_out_y - 2*win_inset - strap_zone,
+                      bb_out_z - box_boss - 2*win_inset);
+        // back wall window
+        win_thruY(bb_x0 + win_inset, bb_bat_y1 - 1, bb_z0 + win_inset,
+                  bb_out_x - 2*win_inset, box_wall + 2,
+                  bb_out_z - box_boss - 2*win_inset);
+        // Pack cavity: open at the front (-Y). It stops at the cavity ceiling and
+        // must NOT run up into the flange zone -- the flanges reach inboard over
+        // the pack on purpose and are the hold-downs. The top is still open
+        // between them, because nothing is ever built there.
+        translate([bb_x0 + box_wall, bb_y0 - 1, bb_cz0])
+            rbox(bb_cav_x, bb_cav_y + 1, bb_cav_z, 1.5);
+        // next-module inserts, opening downward through the feet
+        for (x = foot_x, y = foot_y)
+            translate([x, y, bb_z0 - foot_h]) m4_insert();
+        // strap slots through both end walls, in the clear zone ahead of the pack
+        for (wx = [bb_x0 - 1, bb_x0 + bb_out_x - box_wall - 1])
+            translate([wx, bb_y0 + strap_zone/2 - strap_t/2,
+                       bb_cz0 + bb_cav_z/2 - strap_w/2])
+                rbox(box_wall + 2, strap_t, strap_w, 1.2);
+    }
+}
+
+echo(str("battery frame outer   = ", bb_out_x, " x ", bb_out_y, " x ", bb_out_z,
+         " mm, reaching ", -bb_y0, " mm forward of the frame"));
+echo(str("battery cavity        = ", bb_cav_x, " x ", bb_cav_y, " x ", bb_cav_z,
+         " mm  for a ", batt_x, " x ", batt_y, " x ", batt_z, " mm pack lying flat"));
+assert(bb_out_x <= BED && bb_tot_z <= BED && bb_out_y <= BED,
+       "battery frame does not fit the print bed in its print pose");
+assert(bb_cav_x >= batt_x && bb_cav_z >= batt_z, "cavity smaller than the pack");
 
 // =============================================================================
 //  ASSEMBLY
@@ -441,6 +664,8 @@ module frame(ex = 0) {
         color("#5f9e6e") translate([bx, -ex, z_tb0]) antenna_mount_fitted();
 
     color("#8a8f98") translate([0, 0, -ex]) base_plate();
+    if (show_battery_box)
+        color("#6d7f96") translate([0, 0, -2 * ex]) battery_box();
 
     if (show_radio) radio_proxy();
 }
@@ -485,3 +710,12 @@ else if (part == "antenna_mount_so239") rotate([-90, 0, 0]) antenna_mount_so239(
 // insert mouth opening upward -- no supports, no bridges
 else if (part == "base_plate")
     translate([0, frame_d, z_frame]) rotate([180, 0, 0]) base_plate();
+
+// open face up: the cavity mouth becomes the top, so the floor is the bed
+// face and nothing overhangs
+// BACK WALL DOWN.  Floor-down would leave the two top flanges cantilevering
+// 19.5 mm along the whole length of each end wall.  Stood on its back the
+// flanges become vertical ribs growing off the back wall, supported the whole
+// way, and the open front simply faces up.
+else if (part == "battery_box")
+    translate([-bb_x0, bb_tot_z, frame_d]) rotate([-90, 0, 0]) battery_box();
