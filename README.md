@@ -57,7 +57,7 @@ Two measurements drove real design decisions and are worth calling out:
 | 3   | `crossbeam_top_back`     | 1   | 124.25 × 16 × 24 | 46.3 cm³  | 4       |
 | 4   | `crossbeam_bottom_front` | 1   | 124.25 × 16 × 24 | 45.9 cm³  | 6       |
 | 5   | `crossbeam_bottom_back`  | 1   | 124.25 × 16 × 24 | 45.9 cm³  | 6       |
-| 6   | `handle`                 | 2   | 78 × 70 × 12     | 37.6 cm³  | 4 each  |
+| 6   | `handle`                 | 2   | 68 × 70 × 12     | 23.1 cm³  | 4 each  |
 | 7   | `antenna_mount_bnc`      | 2\* | 35 × 24 × 33     | 10.9 cm³  | —       |
 | 8   | `antenna_mount_so239`    | 2\* | 35 × 24 × 38     | 11.6 cm³  | —       |
 | 9   | `base_plate`             | 1   | 142.25 × 70 × 16 | 55.9 cm³  | 4       |
@@ -70,7 +70,7 @@ interchangeable on the same crossbeam without touching anything else.
 Largest part is 164 mm — **16 mm of bed margin**. All ten meshes verified
 watertight, single-shell, and bed-legal.
 
-Solid volume is 478 cm³ for one of each of the ten files, or 591 cm³ for a full
+Solid volume is 463 cm³ for one of each of the ten files, or 562 cm³ for a full
 12-piece build (BNC mounts, battery frame included).
 Actual filament use is far lower — the beams are small enough in section that
 the slicer's perimeters and infill dominate. If mass matters, the base plate is
@@ -114,11 +114,58 @@ Extra insert faces by position:
 
 ### 6 — `handle` ×2
 
-The reference grip loop ported as a separate inverted-U: same **33.75 × 18.5 mm**
-hand aperture and **11.5 mm** grip bar. It laps 48 mm down the panel's outer face
-on four M4 bolts. The aperture sits above the panel's top edge, so the panel's
-own top edge forms the aperture floor exactly as it did in the reference — the
-grip geometry your hand meets is unchanged.
+An arch, not the reference's squared loop. It still laps 48 mm down the panel's
+outer face on four M4 bolts, and the panel's top edge still forms the aperture
+floor, but everything above that line was reworked after the built pack showed
+the original reading as two blocky slabs.
+
+| | reference / v1 | now |
+| --- | --- | --- |
+| Proud of the frame | 30 mm | **20 mm** |
+| Overall height | 78 mm | **68 mm** |
+| Hand aperture | 33.75 × 18.5 | **40 × 13** |
+| Grip bar section | 11.5 × 12 mm, square edges | **7 × 12 mm, fully radiused** |
+| Volume | 37.6 cm³ | **22.6 cm³** |
+
+Three changes, each aimed at a stated problem:
+
+- **10 mm off the height.** This is the whole pack's tallest point, so it comes
+  straight off the assembled envelope: 210 → **200 mm**.
+- **Shoulders tapered.** Above the panel line the outline is a half-ellipse
+  springing from the panel top, so the handle stops carrying its full 70 mm depth
+  up to a flat square top. That is what removes the bulk near the top.
+- **Everything radiused except the mating face.** The part is filleted 2.5 mm on
+  every edge, then sliced back at the mating plane so the face that lands on the
+  panel stays dead flat and full width. Extruding to `handle_t - fill` and
+  shrinking the profile by `fill` first is what makes the sphere restore full size
+  at that plane rather than doming it.
+
+**The trade:** the aperture loses 5.5 mm of height. It is widened 33.75 → 40 mm to
+claw some back, but it is now a two-finger lifting loop rather than a three-finger
+grip. If that reads as too tight in the hand, `grip_ap_h` and `grip_bar_h` are the
+two numbers — they sum to whatever you want proud of the frame, and the bar cannot
+go below ~6 mm because the fillet construction needs the profile to survive an
+`offset(-2.5)`.
+
+**The arch is constant thickness, and that was a correction.** The first cut of
+this rework gave the aperture a flat top under a curved outer arch. A flat line
+under a curve necessarily pinches at the ends: the band waisted to **5.29 mm at
+Y 21 and Y 49** against 7.00 mm at the apex — a 24 % notch sitting exactly where
+the arch meets the shoulder. My own scan showed it and I let it pass because the
+bending moment is low there, which was the wrong call: a waist at a joint is a
+stress raiser whatever the nominal moment. The aperture's top now follows the
+outer arch offset inward by `grip_bar_h`, so the band holds 7.0–7.25 mm across the
+span and *grows* to 8.25 mm into the shoulders.
+
+| at the arch/shoulder joint | waisted | constant band |
+| --- | --- | --- |
+| minimum depth | 5.00 mm | **7.00 mm** |
+| section modulus | 46.4 mm³ | **94.3 mm³** |
+| stress, one-handed 6× drop-catch | 7.06 MPa | **3.47 MPa** |
+| safety factor (PLA) | 7.1 | **14.4** |
+
+Note this part renders through an `offset()` plus `minkowski()` and takes ~65 s to
+export, against well under a second for everything else.
 
 ### 7–8 — `antenna_mount_bnc` / `antenna_mount_so239`
 
@@ -301,7 +348,8 @@ These are engineering necessities, not preferences. Each is a parameter.
 | Panel thickness      | 8.25 mm                   | **9.0 mm**                         | Leaves 5.0 mm under an M4 counterbore and 3.5 mm under the M5 recess (reference: 2.75 mm).                                                                                                                                        |
 | Antenna gusset       | one 8.25 mm rib in the rail plane | **two 5 mm ribs, one per bracket edge** | A bolt-on bracket has no rail plane to hide the rib in. Duplicating it onto both edges keeps the bore under the hole clear and makes the bracket symmetric; 5 mm rather than 8 mm leaves a clear central span for the bolts. |
 | Antenna hole spacing | 101.5 mm                  | **77.25 mm**                       | Consequence of the above plus the 6 mm bracket inset needed to clear the crossbeam's end inserts. Both bores stay centred between their ribs.                                                                                    |
-| Handle thickness     | 8.25 mm                   | **12 mm**                          | Needed to seat an axial M4 insert. Slightly chunkier grip bar; the aperture is unchanged.                                                                                                                                         |
+| Handle thickness     | 8.25 mm                   | **12 mm**                          | Needed to seat an axial M4 insert.                                                                                                                                                                                                |
+| Handle form          | squared loop, 30 mm proud, 33.75 × 18.5 aperture under an 11.5 mm bar | **arch, 20 mm proud, 40 × 13 aperture under a 7 mm bar** | The built pack showed the squared loops reading as two blocky slabs — hard on the bag it only just fits, and hard on the hand. See §2.6.                                    |
 | Leg standoff         | 45 mm of integral leg     | **18 mm base plate**               | That 45 mm of dead space is now where a bolt-on module goes.                                                                                                                                                                      |
 
 Unchanged on purpose: inner span 124.25 mm, M5 hole Ø5.000 at the bay centre,
@@ -417,6 +465,18 @@ Not just rendered — checked:
   therefore repeats indefinitely.
 - Battery frame's rearmost point is Y 69.99 against a frame back of 70.0 —
   nothing protrudes behind the wearer.
+- Handle after the arch rework: self-supporting in its print pose (the only
+  growing layers are the four insert pockets' chamfers and ceilings), mating face
+  flat at 2055 mm², all four bolt axes still landing in their inserts with the
+  narrower 15 mm legs, and the assembly's tallest point down to 199.95 mm.
+- Arch band thickness scanned along the whole span, not just at the apex. This is
+  what caught the waist at the arch/shoulder joint; the band is now measured at
+  7.0 mm minimum, rising to 8.25 mm at the shoulders.
+- Full load-path check at one-handed lift with a 3× snatch (54.7 N on one handle,
+  from a measured 1.86 kg pack): arch apex 5.5 MPa, legs 0.15, bolt bearing 0.28,
+  insert shear 13.6 N each, lap peel 13.6 N/bolt, lateral across layers 3.3 MPa.
+  The handle prints flat so arch bending runs along the filaments, not across
+  layer bonds.
 - Base plate after opening the centre: perimeter coverage re-sampled under both
   side panels (100 %) and both crossbeams, material around all four feet and all
   four base bolts intact, the foot-to-opening ligament asserted at ≥ 1.5 mm, and
@@ -438,7 +498,7 @@ Reported clearances at the shipped parameters:
 
 ```
 frame body            = 142.25 x 70 x 180 mm
-assembled envelope    = 166.25 x 108 x 210 mm  (depth shown for the deeper SO-239 bracket)
+assembled envelope    = 166.25 x 108 x 200 mm  (depth shown for the deeper SO-239 bracket)
 radio bay (WxDxH)     = 124.25 x 38 x 116 mm
 radio clearance  side = 1 mm/side   above/below = 7.5 mm
 panel print footprint = 164 x 70  (bed 180) -> margin 16 mm
@@ -778,7 +838,7 @@ A full set is five plates. Footprints verified against the bed:
 | 1     | 2 × `side_panel`, stacked in Y          | 164 × 146 mm   | 16 / 34 mm    |
 | 2     | 4 × `crossbeam`, stacked in Y, 5 mm brim | 134 × 122 mm  | 46 / 58 mm    |
 | 3     | `base_plate` + 2 × `antenna_mount` behind it | 142 × 100 mm | 38 / 80 mm |
-| 4     | 2 × `handle`, side by side in X          | 162 × 70 mm   | 18 / 110 mm   |
+| 4     | 2 × `handle`, side by side in X          | 142 × 70 mm   | 38 / 110 mm   |
 | 5     | `battery_box` (only if you build it)     | 143 × 60 mm   | 37 / 120 mm   |
 
 Plate 1 is the tightest at 16 mm of X margin — check your Mini's actual usable

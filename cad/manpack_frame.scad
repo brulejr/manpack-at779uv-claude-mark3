@@ -122,11 +122,19 @@ so239_setback     = 17;     // bore centre, back from the pad's front tip
 // -----------------------------------------------------------------------------
 //  PORTED HANDLE FEATURE
 // -----------------------------------------------------------------------------
-grip_ap_len = 33.75; // [PORTED] hand aperture length (Y)
-grip_ap_h   = 18.5;  // [PORTED] hand aperture height (Z)
-grip_bar_h  = 11.5;  // [PORTED] grip bar section height
+//  The reference grip was a squared-off loop: 33.75 x 18.5 aperture under an
+//  11.5 mm bar, 30 mm proud of the frame. On the built pack that reads as two
+//  blocky slabs -- hard on the bag it just fits into, and hard on the hand.
+//  Reworked into an arch: 10 mm shorter overall, the shoulders tapered away
+//  above the panel line, and every surface rounded except the face that mates to
+//  the panel. The aperture is widened to keep roughly the same finger room after
+//  losing height.
+grip_ap_len = 40;    // hand aperture length (Y)   (ref 33.75)
+grip_ap_h   = 13;    // hand aperture height (Z)   (ref 18.5)
+grip_bar_h  = 7;     // grip bar section height    (ref 11.5)
 handle_t    = 12;    // handle thickness (ref 8.25; +3.75 to seat axial M4 inserts)
 handle_lap  = 48;    // lap length onto the panel's outer face
+handle_fill = 2.5;   // 3D edge fillet on every face except the mating face
 
 // =============================================================================
 //  DERIVED
@@ -402,15 +410,58 @@ module crossbeam(antenna_face = false, base_face = false) {
 //  face on four M4 bolts (inserts in the handle legs, heads flush in the panel).
 //  Local frame: mating face at X = 0, body running +X.
 // =============================================================================
+// Outer silhouette, in (u = Y, v = Z - handle_z0).  Straight-sided over the lap,
+// then a half-ellipse arch springing from the panel line, so the shoulders taper
+// instead of carrying the full 70 mm depth to a flat square top.
+// `extend` drops the base further down, used when offsetting for the aperture.
+module handle_outer(extend = 0) {
+    lap_v = z_tb1 - handle_z0;                    // 48, panel top
+    top_v = handle_z2 - handle_z0;                // 68, handle top
+    union() {
+        translate([0, -extend]) square([frame_d, lap_v + extend]);
+        translate([frame_d/2, lap_v])
+            scale([1, (top_v - lap_v) / (frame_d/2)])
+                difference() {
+                    circle(r = frame_d/2);
+                    translate([-frame_d/2, -frame_d/2])
+                        square([frame_d, frame_d/2]);
+                }
+    }
+}
+
+// The aperture's top is the OUTER arch offset inward by grip_bar_h, not a flat
+// line.  A flat top under a curved arch necessarily pinches at the ends: it
+// waisted the band to 5.29 mm at Y 21 and Y 49 against 7.00 mm at the apex -- a
+// 24% notch sitting exactly where the arch meets the shoulder, which is the last
+// place you want one.  Following the arch keeps the band constant instead, and it
+// then widens naturally into the leg where the aperture's sides cut it off.
+module handle_profile() {
+    difference() {
+        handle_outer();
+        round2d(4) intersection() {
+            translate([grip_y0, -40]) square([grip_ap_len, 400]);
+            offset(r = -grip_bar_h) handle_outer(extend = 40);
+        }
+    }
+}
+
 module handle() {
     difference() {
         translate([0, 0, handle_z0]) rotate([90, 0, 90])
-            linear_extrude(height = handle_t)
-                round2d(3) difference() {
-                    square([frame_d, handle_z2 - handle_z0]);
-                    translate([grip_y0, -1])
-                        square([grip_ap_len, handle_z1 - handle_z0 + 1]);
+            difference() {
+                // Fillet every edge by handle_fill, then slice the result back at
+                // the mating plane.  Extruding to handle_t - fill and shrinking the
+                // profile by fill first means the sphere restores full size, so the
+                // mating face comes out flat and full-width while the outer face
+                // and the whole perimeter stay rounded.
+                minkowski() {
+                    linear_extrude(height = handle_t - handle_fill)
+                        offset(r = -handle_fill) handle_profile();
+                    sphere(r = handle_fill, $fn = 16);
                 }
+                translate([-60, -60, -2 * handle_fill])
+                    cube([250, 250, 2 * handle_fill]);
+            }
         // insert pockets, axis along X, opening onto the mating face
         for (y = [beam_cy_f, beam_cy_b], z = handle_bz)
             translate([0, y, z]) rotate([0, 90, 0]) m4_insert();
