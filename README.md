@@ -60,7 +60,7 @@ Two measurements drove real design decisions and are worth calling out:
 | 6   | `handle`                 | 2   | 78 × 70 × 12     | 37.6 cm³  | 4 each  |
 | 7   | `antenna_mount_bnc`      | 2\* | 35 × 24 × 33     | 10.9 cm³  | —       |
 | 8   | `antenna_mount_so239`    | 2\* | 35 × 24 × 38     | 11.6 cm³  | —       |
-| 9   | `base_plate`             | 1   | 142.25 × 70 × 16 | 54.9 cm³  | 4       |
+| 9   | `base_plate`             | 1   | 142.25 × 70 × 16 | 55.9 cm³  | 4       |
 | 10  | `battery_box`            | 1   | 143 × 59.8 × 94.8 | 103.3 cm³ | 4  |
 
 \* Parts 7 and 8 are alternatives — print **two of whichever connector you use**,
@@ -70,7 +70,7 @@ interchangeable on the same crossbeam without touching anything else.
 Largest part is 164 mm — **16 mm of bed margin**. All ten meshes verified
 watertight, single-shell, and bed-legal.
 
-Solid volume is 477 cm³ for one of each of the ten files, or 590 cm³ for a full
+Solid volume is 478 cm³ for one of each of the ten files, or 591 cm³ for a full
 12-piece build (BNC mounts, battery frame included).
 Actual filament use is far lower — the beams are small enough in section that
 the slicer's perimeters and infill dominate. If mass matters, the base plate is
@@ -183,7 +183,7 @@ feature doing both jobs, so nothing else needs to hang off the frame.
 
 **It is a ring, not a plate.** All that remains is the perimeter backing the two
 side panels (X 0–9 and 133.25–142.25) and the two bottom crossbeams, widened front
-and back to carry the feet. The centre is a **124.25 × 30 mm stadium opening**,
+and back to carry the feet. The centre is a **120.25 × 30 mm stadium opening**,
 which also serves as the battery lead's pass-through — it spans the same 30 mm of
 depth the old 36 × 26 cable slot did and the entire width, so it passes anything
 that slot did, and the separate slot is gone.
@@ -193,13 +193,22 @@ The opening cannot follow the beam lines exactly. The Ø16 feet at Y 12 / 58 rea
 largest radius that fits is 19 mm, still short of the 19.2 mm needed to clear a
 foot. Counter-intuitively a *larger* radius helps — a small corner brings the
 opening nearer the foot — so the optimum is the limit case, a full stadium. At
-Y 20–50 with r = 15 it leaves **2.08 mm** of material between each foot boss and
-the opening edge, which the model asserts on every render.
+Y 20–50 with r = 15, inset 2 mm from the panel inner faces, it leaves **2.94 mm**
+of material between each foot boss and the opening edge, which the model asserts
+on every render.
 
-Verified after the cut: the perimeter still fully backs both side panels and both
-crossbeams, and the material around all four feet and all four base bolts is
-intact. Opening the centre took the plate from 75.9 cm³ to **54.9 cm³**, 28 %
-lighter.
+The 2 mm inset is deliberate. Running the opening right up to the panel line — the
+literal reading of "line up with the side panels" — made the arc exactly tangent
+to the panel's inner face at Y 35: zero margin at one point. Because the plate
+prints upside down that face is the *first layer*, where elephant-foot
+compensation enlarges a hole, so the opening would have crept ~0.2 mm under the
+panel edge. The inset costs ~120 mm² of opening (3 %) and, as a bonus, improves
+the foot ligament from 2.08 to 2.94 mm.
+
+Verified after the cut: the perimeter still fully backs both side panels (100 % of
+samples) and both crossbeams, the material around all four feet and all four base
+bolts is intact, and the worst-case panel margin measures 1.995 mm. Opening the
+centre took the plate from 75.9 cm³ to **55.9 cm³**, 26 % lighter.
 
 Its top face is deliberately left flat. An earlier revision had two raised
 locating lips for the panel bottom edges; they made the part unprintable (see
@@ -410,7 +419,8 @@ Not just rendered — checked:
   nothing protrudes behind the wearer.
 - Base plate after opening the centre: perimeter coverage re-sampled under both
   side panels (100 %) and both crossbeams, material around all four feet and all
-  four base bolts intact, and the foot-to-opening ligament asserted at ≥ 1.5 mm.
+  four base bolts intact, the foot-to-opening ligament asserted at ≥ 1.5 mm, and
+  the opening-to-panel margin fine-probed at 1.995 mm on both sides.
 - **Regression check that nothing already printed was invalidated**: every STL
   compared against the committed version. Only `side_panel` and `base_plate`
   changed; the four crossbeams, both handles and both antenna mounts are

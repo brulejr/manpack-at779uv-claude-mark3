@@ -199,8 +199,14 @@ foot_y      = [12, frame_d - 12];             // 12, 58
 //
 // This also supersedes the old 36 x 26 cable slot: the opening spans the same
 // 30 mm of Y and the entire width, so it passes anything the slot did.
-base_open_x0 = panel_t;                                   // 9
-base_open_x1 = frame_w - panel_t;                         // 133.25
+// Inset 2 mm from the panel inner faces rather than tangent to them.  Tangent
+// left exactly zero margin at the arc's leftmost point, and because the plate
+// prints upside down that face is the first layer, where elephant-foot
+// compensation enlarges a hole -- which would have let the opening creep ~0.2 mm
+// under the panel edge.  Costs ~120 mm2 of opening, 3%.
+base_open_inset = 2;
+base_open_x0 = panel_t + base_open_inset;                 // 11
+base_open_x1 = frame_w - panel_t - base_open_inset;       // 131.25
 base_open_y0 = 20;
 base_open_y1 = frame_d - base_open_y0;                    // 50
 base_open_r  = (base_open_y1 - base_open_y0) / 2;         // 15 -> stadium ends
@@ -631,8 +637,10 @@ module battery_box() {
     }
 }
 
-echo(str("battery frame outer   = ", bb_out_x, " x ", bb_out_y, " x ", bb_out_z,
-         " mm, reaching ", -bb_y0, " mm forward of the frame"));
+echo(str("battery frame outer   = ", bb_out_x, " x ", bb_out_y, " x ", bb_tot_z,
+         " mm (", bb_out_z, " to the floor + ", foot_h, " of stacking feet), ",
+         "reaching ", -bb_y0, " mm forward of the frame, nothing behind it"));
+echo(str("module stack pitch    = ", bb_tot_z, " mm"));
 echo(str("battery cavity        = ", bb_cav_x, " x ", bb_cav_y, " x ", bb_cav_z,
          " mm  for a ", batt_x, " x ", batt_y, " x ", batt_z, " mm pack lying flat"));
 assert(bb_out_x <= BED && bb_tot_z <= BED && bb_out_y <= BED,
