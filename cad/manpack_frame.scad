@@ -20,7 +20,10 @@ $fa = 2;
 $fs = 0.4;
 
 /* [Output] */
-part = "assembly"; // [assembly, exploded, side_panel, crossbeam_top_front, crossbeam_top_back, crossbeam_bottom_front, crossbeam_bottom_back, handle, antenna_mount_bnc, antenna_mount_so239, base_plate, battery_box]
+part = "assembly"; // [assembly, exploded, side_panel, crossbeam_top_front_dual, crossbeam_top_front_grid, crossbeam_top_back, crossbeam_bottom_front, crossbeam_bottom_back, crossbeam_top_front_triple, handle, antenna_mount_bnc, antenna_mount_so239, base_plate, battery_box]
+
+// which top-front crossbeam the assembly is built with
+top_front = "grid"; // [grid, triple, dual]
 
 // which connector variant the assembly views fit
 ant_style = "bnc"; // [bnc, so239]
@@ -90,6 +93,32 @@ m5_recess_h = 5.5;     // [PORTED]
 //  Chassis common to both variants.  Keeping the leg, ribs and bolt pattern
 //  identical means a BNC and an SO-239 bracket are interchangeable on the same
 //  crossbeam insert pattern.
+// -----------------------------------------------------------------------------
+//  ACCESSORY RAIL -- top-front crossbeam's front face
+// -----------------------------------------------------------------------------
+//  Four equally spaced STATIONS across the front bar, each one a copy of the
+//  antenna mount's own 4-bolt pattern -- two columns 14 mm apart, two rows 10 mm
+//  apart.  So anything built to the antenna-mount footprint (mic hook, DC
+//  charge-port holder, Le Frite compute box) bolts to any station, and the
+//  antenna brackets themselves are unchanged.
+grid_n       = 7;      // the grid layout's column count
+grid_pitch   = 14;     // == the antenna mount's own bolt spacing, so EVERY
+                       //   adjacent pair of columns is a valid station.  7 at
+                       //   14 mm spans 84 mm and leaves 5.3 mm of material at
+                       //   each beam end.
+triple_pitch = 38;     // the triple layout's station pitch.  38 clears 35 mm
+                       //   brackets by 3 mm, keeps 5.3 mm of material at the
+                       //   beam ends, and puts stations 1 and 3 76 mm apart
+rail_pitch   = 26;     // (unused; kept only as the note below)  26 was the quad
+                       //   layout's station pitch before it became a grid:
+                       //   it leaves 4.3 mm of material between the outermost
+                       //   accessory pocket and the beam's own end-insert
+                       //   pocket, and it puts antenna stations 1 and 4 78 mm
+                       //   apart -- the original 77.25 mm spacing, recovered.
+rail_bolt_dx = 7;      // half the within-station column spacing
+dual_inset   = 6;      // dual layout: bracket's outboard edge, inboard of the
+                       //   panel inner face
+
 ant_pad_t     = 3.75;  // [PORTED] pad thickness
 ant_leg_t     = 8;     // bracket leg thickness (new: bolted joint)
 ant_bracket_w = 35;    // bracket width in X
@@ -97,12 +126,9 @@ ant_rib_t     = 5;     // gusset rib thickness.  Was 8, which swallowed one whol
                        //   bolt column: at 8 mm the rib spanned the full pad
                        //   depth in front of the counterbore mouth, sealing both
                        //   holes into inaccessible internal voids.
-ant_inset     = 6;     // bracket's outboard edge, inboard of the panel inner
-                       //   face.  Buys the bolt pockets 4.65 mm of clearance
-                       //   from the crossbeam's own end-insert pockets.
 // Bolts sit in the open span BETWEEN the ribs, symmetric about the centre.
 // That symmetry is what lets one part serve both sides of the frame.
-ant_bolt_dx   = [ant_bracket_w / 2 - 7, ant_bracket_w / 2 + 7];  // 10.5, 24.5
+ant_bolt_dx   = [ant_bracket_w/2 - rail_bolt_dx, ant_bracket_w/2 + rail_bolt_dx];
 
 // --- variant A: BNC bulkhead (the reference connector) ---
 bnc_bore_d  = 12.468;  // [PORTED]
@@ -183,11 +209,45 @@ grip_y1   = grip_y0 + grip_ap_len;            // 51.875
 handle_z1 = z_tb1 + grip_ap_h;                // 198.5
 handle_z2 = handle_z1 + grip_bar_h;           // 210
 
-// antenna brackets: inset from each panel's inner face, both unmirrored
-ant_x_l     = panel_t + ant_inset;                              // 15
-ant_x_r     = frame_w - panel_t - ant_inset - ant_bracket_w;    // 92.25
-ant_bolt_z  = [z_tb0 + 6, z_tb0 + 16];                          // 162, 172
-ant_bolt_gx = [for (bx = [ant_x_l, ant_x_r], dx = ant_bolt_dx) bx + dx];
+rail_z = [z_tb0 + 6, z_tb0 + 16];                               // 162, 172
+
+// Two front-face layouts are kept.  Both use the SAME station pattern -- the
+// antenna mount's four bolts -- they differ only in how many stations and where.
+//
+//   dual: 2 stations, one per antenna mount, at the reference bore spacing.
+//         The original layout; leaves the beam's face otherwise bare.
+//   quad: 4 equally spaced stations, a general accessory rail.
+//
+function stations(n, p) = [for (i = [0 : n-1]) frame_w/2 + (i - (n-1)/2) * p];
+function station_bolts(sx) = [for (c = sx, d = [-rail_bolt_dx, rail_bolt_dx]) c + d];
+
+dual_x    = [panel_t + dual_inset + ant_bracket_w/2,
+             frame_w - panel_t - dual_inset - ant_bracket_w/2]; // 32.5, 109.75
+triple_x  = stations(3, triple_pitch);                          // 33.125 .. 109.125
+// The grid is defined by its COLUMNS, not by station centres: at a 14 mm pitch
+// every adjacent pair already forms the antenna mount's bolt pattern, so the
+// layout offers grid_n - 1 station positions instead of a fixed few.
+grid_cols = stations(grid_n, grid_pitch);                       // 29.125 .. 113.125
+
+// bolt columns each layout cuts into the beam's front face
+dual_cols   = station_bolts(dual_x);
+triple_cols = station_bolts(triple_x);
+front_cols  = (top_front == "dual")   ? dual_cols
+            : (top_front == "triple") ? triple_cols
+            :                           grid_cols;
+
+// antenna brackets: outermost stations of whichever layout.  On the grid that
+// means the outermost adjacent column pairs.
+grid_ant  = [(grid_cols[0] + grid_cols[1]) / 2,
+             (grid_cols[grid_n-2] + grid_cols[grid_n-1]) / 2];  // 36.125, 106.125
+station_x = (top_front == "dual")   ? dual_x
+          : (top_front == "triple") ? triple_x
+          :                           grid_ant;
+
+// antenna brackets sit on the outermost two stations of whichever layout
+ant_bolt_z  = rail_z;
+ant_x_l     = station_x[0] - ant_bracket_w / 2;
+ant_x_r     = station_x[len(station_x) - 1] - ant_bracket_w / 2;
 
 // bottom interface plate
 base_bolt_x = [35, frame_w - 35];             // 35, 107.25
@@ -253,6 +313,30 @@ echo(str("base plate opening    = ", base_open_x1 - base_open_x0, " x ",
          base_open_y1 - base_open_y0, " mm stadium, leaving ", base_open_gap,
          " mm of material to each foot"));
 assert(base_open_gap >= 1.5, "base plate opening cuts too close to the feet");
+echo(str("top-front layout      = ", top_front, ", ", len(front_cols),
+         " bolt columns at X ", front_cols));
+echo(str("                        ",
+         (top_front == "grid")
+             ? str(len(front_cols) - 1, " overlapping stations at ", grid_pitch, " mm")
+             : str(len(front_cols) / 2, " fixed stations"),
+         "; antenna bores ", station_x[len(station_x)-1] - station_x[0],
+         " mm apart"));
+// every layout's outermost pocket must clear the beam's own end-insert pockets
+assert(min(dual_cols[0], triple_cols[0], grid_cols[0]) - m4_ins_d/2
+           >= panel_t + m4_ins_h + 3 &&
+       max(dual_cols[3], triple_cols[5], grid_cols[grid_n-1]) + m4_ins_d/2
+           <= frame_w - panel_t - m4_ins_h - 3,
+       "accessory columns foul the crossbeam's end inserts");
+// the grid only works as a grid if its pitch IS the mount's bolt spacing
+assert(grid_pitch == 2 * rail_bolt_dx,
+       "grid pitch must equal the antenna mount's bolt spacing");
+// the triple layout exists so three full-width brackets fit side by side
+assert(triple_pitch > ant_bracket_w,
+       "triple station pitch is narrower than the antenna bracket");
+// antenna bolts must stay clear of the bracket's own gusset ribs
+assert(ant_bolt_dx[0] - m4_cb_d/2 >= ant_rib_t &&
+       ant_bolt_dx[1] + m4_cb_d/2 <= ant_bracket_w - ant_rib_t,
+       "antenna bracket bolts overlap its gusset ribs");
 assert(panel_h <= BED && frame_d <= BED, "side panel exceeds the print bed");
 assert(radio_w <= BED, "crossbeam span exceeds the print bed");
 // The radio is NOT limited by bay_h: the crossbeams sit at the extreme front and
@@ -377,7 +461,7 @@ module side_panel() {
 //  Two axial M4 inserts per end: ALL inserts for the panel joint live here.
 //  Local frame: X 0..radio_w along the span, Y 0..beam_d, Z 0..beam_h.
 // =============================================================================
-module crossbeam(antenna_face = false, base_face = false) {
+module crossbeam(front_cols = [], base_face = false) {
     difference() {
         rbox(radio_w, beam_d, beam_h);
 
@@ -389,11 +473,10 @@ module crossbeam(antenna_face = false, base_face = false) {
                 rotate([0, -90, 0]) m4_insert();
         }
 
-        // top-front beam: inserts in the FRONT face for the antenna brackets
-        if (antenna_face)
-            for (gx = ant_bolt_gx, z = ant_bolt_z)
-                translate([gx - panel_t, 0, z - z_tb0])
-                    rotate([-90, 0, 0]) m4_insert();
+        // top-front beam: accessory bolt columns in its FRONT face
+        for (gx = front_cols, z = rail_z)
+            translate([gx - panel_t, 0, z - z_tb0])
+                rotate([-90, 0, 0]) m4_insert();
 
         // bottom beams: inserts in the UNDERSIDE for the bottom interface plate
         if (base_face)
@@ -713,7 +796,8 @@ module frame(ex = 0) {
 
     color("#c9a227") translate([panel_t, beam_y_f, z_bb0 - ex]) crossbeam(base_face = true);
     color("#c9a227") translate([panel_t, beam_y_b, z_bb0 - ex]) crossbeam(base_face = true);
-    color("#c9a227") translate([panel_t, beam_y_f, z_tb0 + ex]) crossbeam(antenna_face = true);
+    color("#c9a227") translate([panel_t, beam_y_f, z_tb0 + ex])
+        crossbeam(front_cols = front_cols);
     color("#c9a227") translate([panel_t, beam_y_b, z_tb0 + ex]) crossbeam();
 
     color("#b05a4a") translate([-ex, 0, 0]) mirror([1, 0, 0]) handle();
@@ -744,7 +828,9 @@ else if (part == "side_panel")
         translate([0, 0, -z_frame]) side_panel();
 
 // long axis on the bed, 24 mm tall: end and front-face inserts are both in-plane
-else if (part == "crossbeam_top_front")    crossbeam(antenna_face = true);
+else if (part == "crossbeam_top_front_dual")   crossbeam(front_cols = dual_cols);
+else if (part == "crossbeam_top_front_triple") crossbeam(front_cols = triple_cols);
+else if (part == "crossbeam_top_front_grid")   crossbeam(front_cols = grid_cols);
 else if (part == "crossbeam_top_back")     crossbeam();
 else if (part == "crossbeam_bottom_front") crossbeam(base_face = true);
 else if (part == "crossbeam_bottom_back")  crossbeam(base_face = true);

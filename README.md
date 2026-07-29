@@ -50,28 +50,34 @@ Two measurements drove real design decisions and are worth calling out:
 
 ## 2. Part breakdown
 
-| #   | Part                     | Qty | Print size (mm)  | Solid vol | Inserts |
-| --- | ------------------------ | --- | ---------------- | --------- | ------- |
-| 1   | `side_panel`             | 2   | 164 × 70 × 9     | 76.0 cm³  | —       |
-| 2   | `crossbeam_top_front`    | 1   | 124.25 × 16 × 24 | 44.5 cm³  | 12      |
-| 3   | `crossbeam_top_back`     | 1   | 124.25 × 16 × 24 | 46.3 cm³  | 4       |
-| 4   | `crossbeam_bottom_front` | 1   | 124.25 × 16 × 24 | 45.9 cm³  | 6       |
-| 5   | `crossbeam_bottom_back`  | 1   | 124.25 × 16 × 24 | 45.9 cm³  | 6       |
-| 6   | `handle`                 | 2   | 68 × 70 × 12     | 23.1 cm³  | 4 each  |
-| 7   | `antenna_mount_bnc`      | 2\* | 35 × 24 × 33     | 10.9 cm³  | —       |
-| 8   | `antenna_mount_so239`    | 2\* | 35 × 24 × 38     | 11.6 cm³  | —       |
-| 9   | `base_plate`             | 1   | 142.25 × 70 × 16 | 55.9 cm³  | 4       |
-| 10  | `battery_box`            | 1   | 143 × 59.8 × 94.8 | 103.3 cm³ | 4  |
+| #   | Part                       | Qty   | Print size (mm)   | Solid vol | Inserts |
+| --- | -------------------------- | ----- | ----------------- | --------- | ------- |
+| 1   | `side_panel`               | 2     | 164 × 70 × 9      | 76.0 cm³  | —       |
+| 2a  | `crossbeam_top_front_dual` | 1\*\* | 124.25 × 16 × 24  | 44.5 cm³  | 12      |
+| 2b  | `crossbeam_top_front_triple` | 1\*\* | 124.25 × 16 × 24  | 43.5 cm³  | 16      |
+| 2c  | `crossbeam_top_front_grid` | 1\*\* | 124.25 × 16 × 24  | 43.1 cm³  | 14      |
+| 3   | `crossbeam_top_back`       | 1     | 124.25 × 16 × 24  | 46.3 cm³  | 4       |
+| 4   | `crossbeam_bottom_front`   | 1     | 124.25 × 16 × 24  | 45.9 cm³  | 6       |
+| 5   | `crossbeam_bottom_back`    | 1     | 124.25 × 16 × 24  | 45.9 cm³  | 6       |
+| 6   | `handle`                   | 2     | 68 × 70 × 12      | 23.1 cm³  | 4 each  |
+| 7   | `antenna_mount_bnc`        | 2\*   | 35 × 24 × 33      | 10.9 cm³  | —       |
+| 8   | `antenna_mount_so239`      | 2\*   | 35 × 24 × 38      | 11.6 cm³  | —       |
+| 9   | `base_plate`               | 1     | 142.25 × 70 × 16  | 55.9 cm³  | 4       |
+| 10  | `battery_box`              | 1     | 143 × 59.8 × 94.8 | 103.3 cm³ | 4       |
+
+\*\* Parts 2a–2c are alternatives — the three top-front layouts (§2.11). Print one.
+`_dual` is the original and is bit-identical to it, so an existing beam still fits.
 
 \* Parts 7 and 8 are alternatives — print **two of whichever connector you use**,
 not both. They share an identical leg, rib and bolt pattern, so they are
 interchangeable on the same crossbeam without touching anything else.
 
-Largest part is 164 mm — **16 mm of bed margin**. All ten meshes verified
+Largest part is 164 mm — **16 mm of bed margin**. All twelve meshes verified
 watertight, single-shell, and bed-legal.
 
-Solid volume is 463 cm³ for one of each of the ten files, or 562 cm³ for a full
-12-piece build (BNC mounts, battery frame included).
+Solid volume is 550 cm³ for one of each of the twelve files. A full 12-piece
+build (BNC mounts, battery frame included) is 560 cm³ with the grid beam, 561 cm³
+with the triple, 562 cm³ with the dual.
 Actual filament use is far lower — the beams are small enough in section that
 the slicer's perimeters and infill dominate. If mass matters, the base plate is
 the obvious place to add a lightening window.
@@ -107,8 +113,8 @@ cannot rotate about a single bolt.
 
 Extra insert faces by position:
 
-- `crossbeam_top_front` — 8 inserts in its **front face** for the two antenna
-  mounts.
+- `crossbeam_top_front_dual` / `_triple` / `_grid` — 8, 12 or 14 inserts in the
+  **front face**, the accessory stations (§2.11).
 - `crossbeam_bottom_front` / `_bottom_back` — 2 inserts each in their
   **undersides** for the base plate.
 
@@ -119,13 +125,13 @@ outer face on four M4 bolts, and the panel's top edge still forms the aperture
 floor, but everything above that line was reworked after the built pack showed
 the original reading as two blocky slabs.
 
-| | reference / v1 | now |
-| --- | --- | --- |
-| Proud of the frame | 30 mm | **20 mm** |
-| Overall height | 78 mm | **68 mm** |
-| Hand aperture | 33.75 × 18.5 | **40 × 13** |
-| Grip bar section | 11.5 × 12 mm, square edges | **7 × 12 mm, fully radiused** |
-| Volume | 37.6 cm³ | **22.6 cm³** |
+|                    | reference / v1             | now                           |
+| ------------------ | -------------------------- | ----------------------------- |
+| Proud of the frame | 30 mm                      | **20 mm**                     |
+| Overall height     | 78 mm                      | **68 mm**                     |
+| Hand aperture      | 33.75 × 18.5               | **40 × 13**                   |
+| Grip bar section   | 11.5 × 12 mm, square edges | **7 × 12 mm, fully radiused** |
+| Volume             | 37.6 cm³                   | **22.6 cm³**                  |
 
 Three changes, each aimed at a stated problem:
 
@@ -155,14 +161,14 @@ the arch meets the shoulder. My own scan showed it and I let it pass because the
 bending moment is low there, which was the wrong call: a waist at a joint is a
 stress raiser whatever the nominal moment. The aperture's top now follows the
 outer arch offset inward by `grip_bar_h`, so the band holds 7.0–7.25 mm across the
-span and *grows* to 8.25 mm into the shoulders.
+span and _grows_ to 8.25 mm into the shoulders.
 
-| at the arch/shoulder joint | waisted | constant band |
-| --- | --- | --- |
-| minimum depth | 5.00 mm | **7.00 mm** |
-| section modulus | 46.4 mm³ | **94.3 mm³** |
-| stress, one-handed 6× drop-catch | 7.06 MPa | **3.47 MPa** |
-| safety factor (PLA) | 7.1 | **14.4** |
+| at the arch/shoulder joint       | waisted  | constant band |
+| -------------------------------- | -------- | ------------- |
+| minimum depth                    | 5.00 mm  | **7.00 mm**   |
+| section modulus                  | 46.4 mm³ | **94.3 mm³**  |
+| stress, one-handed 6× drop-catch | 7.06 MPa | **3.47 MPa**  |
+| safety factor (PLA)              | 7.1      | **14.4**      |
 
 Note this part renders through an `offset()` plus `minkowski()` and takes ~65 s to
 export, against well under a second for everything else.
@@ -174,17 +180,17 @@ an identical leg, gusset ribs and M4 bolt pattern, so either bolts to the same
 inserts in the top-front crossbeam — you can swap connector type later without
 reprinting anything else.
 
-|                       | `antenna_mount_bnc`     | `antenna_mount_so239`             |
-| --------------------- | ----------------------- | --------------------------------- |
-| Connector             | BNC bulkhead            | SO-239 / UHF female, 4-hole flange |
-| Bore                  | **Ø12.468 mm** [PORTED] | **Ø15.88 mm** (0.625")            |
+|                       | `antenna_mount_bnc`     | `antenna_mount_so239`                      |
+| --------------------- | ----------------------- | ------------------------------------------ |
+| Connector             | BNC bulkhead            | SO-239 / UHF female, 4-hole flange         |
+| Bore                  | **Ø12.468 mm** [PORTED] | **Ø15.88 mm** (0.625")                     |
 | Flange screws         | —                       | 4 × Ø3.4 on a **17.98 mm** square (0.708") |
-| Forward reach         | 25 mm [PORTED]          | 30 mm                             |
-| Bore setback from tip | 12.66 mm [PORTED]       | 17 mm                             |
-| Print size            | 35 × 24 × 33 mm         | 35 × 24 × 38 mm                   |
+| Forward reach         | 25 mm [PORTED]          | 30 mm                                      |
+| Bore setback from tip | 12.66 mm [PORTED]       | 17 mm                                      |
+| Print size            | 35 × 24 × 33 mm         | 35 × 24 × 38 mm                            |
 
 The BNC variant is the reference connector carried over verbatim — the reference
-STL is itself titled a *BNC bulkhead* antenna mount, which is what the Ø12.468
+STL is itself titled a _BNC bulkhead_ antenna mount, which is what the Ø12.468
 bore is for. The SO-239 variant reaches 30 mm rather than 25 mm and sets its bore
 17 mm back from the tip; both were needed so the rear pair of flange screws clears
 the bracket's own leg and the front pair keeps material at the pad tip.
@@ -238,7 +244,7 @@ that slot did, and the separate slot is gone.
 The opening cannot follow the beam lines exactly. The Ø16 feet at Y 12 / 58 reach
 4 mm past them, and **corner rounding cannot rescue it**: at the ideal Y 16–54 the
 largest radius that fits is 19 mm, still short of the 19.2 mm needed to clear a
-foot. Counter-intuitively a *larger* radius helps — a small corner brings the
+foot. Counter-intuitively a _larger_ radius helps — a small corner brings the
 opening nearer the foot — so the optimum is the limit case, a full stadium. At
 Y 20–50 with r = 15, inset 2 mm from the panel inner faces, it leaves **2.94 mm**
 of material between each foot boss and the opening edge, which the model asserts
@@ -247,7 +253,7 @@ on every render.
 The 2 mm inset is deliberate. Running the opening right up to the panel line — the
 literal reading of "line up with the side panels" — made the arc exactly tangent
 to the panel's inner face at Y 35: zero margin at one point. Because the plate
-prints upside down that face is the *first layer*, where elephant-foot
+prints upside down that face is the _first layer_, where elephant-foot
 compensation enlarges a hole, so the opening would have crept ~0.2 mm under the
 panel edge. The inset costs ~120 mm² of opening (3 %) and, as a bonus, improves
 the foot ligament from 2.08 to 2.94 mm.
@@ -286,15 +292,15 @@ of the walls — too far to cantilever cleanly — and a full-width cross rail w
 have been a 135 mm bridge. A hook-and-loop strap through the four slots crosses
 the 13.5 mm clear zone in front of the pack and stops it sliding out.
 
-|                     |                                                    |
-| ------------------- | -------------------------------------------------- |
-| Cavity              | 135 × 90.8 × 38.8 mm                               |
-| Outer               | 143 × 94.8 × 51.8 mm, reaching 24.8 mm forward     |
-| Behind the frame    | nothing — the back wall is flush with the frame back |
-| Bolts               | 4 × M4 × 12 into the base plate feet               |
-| Print pose          | back wall down, 143 × 59.8 mm footprint, 94.8 tall |
-| Stacking feet       | 4 × Ø16 × 8 mm with M4 inserts, at the same X 14 / 128.25, Y 12 / 58 |
-| Stack pitch         | 59.8 mm per module                                 |
+|                  |                                                                      |
+| ---------------- | -------------------------------------------------------------------- |
+| Cavity           | 135 × 90.8 × 38.8 mm                                                 |
+| Outer            | 143 × 94.8 × 51.8 mm, reaching 24.8 mm forward                       |
+| Behind the frame | nothing — the back wall is flush with the frame back                 |
+| Bolts            | 4 × M4 × 12 into the base plate feet                                 |
+| Print pose       | back wall down, 143 × 59.8 mm footprint, 94.8 tall                   |
+| Stacking feet    | 4 × Ø16 × 8 mm with M4 inserts, at the same X 14 / 128.25, Y 12 / 58 |
+| Stack pitch      | 59.8 mm per module                                                   |
 
 **It presents the same interface on its underside that it consumes on top.** Four
 Ø16 × 8 mm feet with M4 inserts sit at the same X 14 / 128.25, Y 12 / 58, so a
@@ -313,15 +319,100 @@ horizontal boss costs. The floor windows were reshaped around all four pads.
 Windowing still nearly halves it: 103.3 cm³ against ~190 cm³ for the equivalent
 closed box.
 
+### 11 — the top-front crossbeam: three layouts
+
+All three use the **same station pattern** — a copy of the antenna mount's own
+four bolts, two M4 columns 14 mm apart and two rows 10 mm apart at Z 162 / 172.
+They differ only in how many stations and where, so the antenna mounts are
+unchanged and interchangeable between them.
+
+| | `_dual` | `_triple` | `_grid` |
+| --- | --- | --- | --- |
+| Bolt columns | 4 | 6 | **7, uniform** |
+| Column spacing | 14 / 63 / 14 | 14 / 24 / 14 / 24 / 14 | **14 mm throughout** |
+| Inserts | 8 | 12 | 14 |
+| Mounting positions | 2 fixed | 3 fixed | **6, overlapping at 14 mm** |
+| Wider bolt spans | no | no | **yes — 28, 42, 56, 70, 84 mm** |
+| Outer bore spacing | 77.25 mm | 76 mm | 70 mm |
+| **35 mm brackets at once** | 2 | **3** | 2 |
+| Volume | 44.5 cm³ | 43.5 cm³ | 43.1 cm³ |
+
+`_dual` is the original: one station per antenna mount, nothing else. It is
+**bit-identical to the beam already printed**, so it is not a reprint.
+
+`_triple` is the one to pick if you want **three full-width mounts at once** —
+three SO-239 brackets sit side by side with a 3 mm gap, spanning X 15.625 to
+126.625. It is the only layout that fits three, because its 38 mm pitch exceeds
+the 35 mm bracket width while 26 mm does not.
+
+`_grid` is a **uniform 14 mm column grid**, not a set of fixed stations. Because
+the pitch equals the antenna mount's own bolt spacing, *every adjacent pair of
+columns is a station* — six positions at 14 mm increments rather than a few fixed
+ones. It also lets a wider accessory span three, five or all seven columns for a
+28 / 56 / 84 mm bolt base, which the fixed layouts cannot offer at all: good for a
+Le Frite compute box or a DC charge-port plate that wants a broad, stiff footprint.
+
+The model asserts `grid_pitch == 2 * rail_bolt_dx`, because the grid only works as
+a grid while its pitch matches the mount's bolt spacing.
+
+An earlier revision of this layout used four fixed stations at 26 mm, which gave
+columns alternating 14 / 12 mm — the stations were equally spaced but the holes
+were not. Four stations *cannot* be made uniform: that needs a 28 mm pitch, which
+overruns the beam's usable bolt span by 1.7 mm at each end and drives the outer
+pockets into its own end inserts. Dropping to a 7-column grid fits with 5.3 mm to
+spare and gives more positions, not fewer.
+
+**Four full-width mounts are not possible on any layout.** Their bolts must lie
+within X 23.85–118.40 (94.55 mm) to stay 3 mm clear of the beam's own end-insert
+pockets, and four brackets packed edge to edge need 119 mm of bolt span. Shrinking
+the bracket to the ≤26.85 mm that would allow it leaves 2.33 mm per gusset rib,
+down from 5 mm — and those ribs carry the cantilevered pad and the antenna's
+bending load.
+
+Every layout keeps its outermost pocket at least 3 mm clear of the crossbeam's
+own end-insert pockets, which occupy the first and last 9 mm of the span; the
+model asserts it. `_dual` and `_triple` have ~5.3 mm of material there, `_grid`
+5.3 mm.
+
+**What can coexist on `_grid`.** Positions run every 14 mm — 36.125, 50.125,
+64.125, 78.125, 92.125, 106.125 — so what fits together depends only on how many
+positions apart you go. Two accessories clash if their half-widths sum to more
+than the gap:
+
+| positions apart | gap | two 35 mm items | 35 mm + a 22 mm one | two 22 mm items |
+| --- | --- | --- | --- | --- |
+| 1 | 14 mm | no | no | no |
+| 2 | 28 mm | no | no | **yes** |
+| 3 | 42 mm | **yes** | **yes** | **yes** |
+| 4–5 | 56–70 mm | **yes** | **yes** | **yes** |
+
+The narrowest an accessory can physically be is about 22 mm — the 14 mm bolt span
+plus two Ø8.2 counterbores. So in practice:
+
+- **two** 35 mm antenna mounts, three positions apart or more (1&4 gives 42 mm,
+  1&6 gives 70 mm)
+- **three** minimum-width items at positions 1, 3, 5
+- or a mix: an antenna at position 1 leaves 4, 5 and 6 open for anything
+
+Four full-width mounts remain impossible on any layout — their bolts would need
+119 mm of span against the 94.55 mm available. `_triple` is still the only layout
+that fits three 35 mm brackets, because its 38 mm pitch exceeds the bracket width
+outright.
+
+Set `top_front` to `"dual"`, `"triple"` or `"grid"` to pick which one the assembly views build
+with; it also moves the antenna brackets to that layout's outer stations.
+
+---
+
 ### Radio mount positions — why two sets of holes
 
 The two radios differ almost entirely in the dimension that becomes the standing
 height in this frame:
 
-| Radio             | W × D × H       | Standing height | Mount hole |
-| ----------------- | --------------- | --------------- | ---------- |
-| Retevis RT-95     | 124 × **163** × 39 | 163 mm       | **Z 98**   |
-| AnyTone AT-779UV  | 124 × **101** × 36 | 101 mm       | **Z 129**  |
+| Radio            | W × D × H          | Standing height | Mount hole |
+| ---------------- | ------------------ | --------------- | ---------- |
+| Retevis RT-95    | 124 × **163** × 39 | 163 mm          | **Z 98**   |
+| AnyTone AT-779UV | 124 × **101** × 36 | 101 mm          | **Z 129**  |
 
 With a single hole at Z 98 and each radio's side hole at its own mid-depth, the
 RT-95 spans Z 16.5–179.5 — filling the frame with its face flush at the top. The
@@ -341,16 +432,16 @@ The two Ø26.468 recesses end up 4.5 mm apart. The material between them is full
 
 These are engineering necessities, not preferences. Each is a parameter.
 
-| Change               | From                      | To                                 | Why                                                                                                                                                                                                                               |
-| -------------------- | ------------------------- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Crossbeam section    | 7 × 4 mm                  | **16 × 24 mm**                     | An M4 heat-set insert needs a Ø5.7 × 9 mm pocket. It physically cannot fit in a 7 × 4 mm beam. This is the direct cost of the M4-bolted requirement.                                                                              |
-| Frame depth          | 60 mm                     | **70 mm**                          | With four beams instead of two, front beams now exist at the top. At 60 mm deep they would overhang the radio's upward-facing control panel by 12 mm per side. At 70 mm the overhang is **zero** — verified in `img/asm_top.png`. |
-| Panel thickness      | 8.25 mm                   | **9.0 mm**                         | Leaves 5.0 mm under an M4 counterbore and 3.5 mm under the M5 recess (reference: 2.75 mm).                                                                                                                                        |
-| Antenna gusset       | one 8.25 mm rib in the rail plane | **two 5 mm ribs, one per bracket edge** | A bolt-on bracket has no rail plane to hide the rib in. Duplicating it onto both edges keeps the bore under the hole clear and makes the bracket symmetric; 5 mm rather than 8 mm leaves a clear central span for the bolts. |
-| Antenna hole spacing | 101.5 mm                  | **77.25 mm**                       | Consequence of the above plus the 6 mm bracket inset needed to clear the crossbeam's end inserts. Both bores stay centred between their ribs.                                                                                    |
-| Handle thickness     | 8.25 mm                   | **12 mm**                          | Needed to seat an axial M4 insert.                                                                                                                                                                                                |
-| Handle form          | squared loop, 30 mm proud, 33.75 × 18.5 aperture under an 11.5 mm bar | **arch, 20 mm proud, 40 × 13 aperture under a 7 mm bar** | The built pack showed the squared loops reading as two blocky slabs — hard on the bag it only just fits, and hard on the hand. See §2.6.                                    |
-| Leg standoff         | 45 mm of integral leg     | **18 mm base plate**               | That 45 mm of dead space is now where a bolt-on module goes.                                                                                                                                                                      |
+| Change               | From                                                                  | To                                                       | Why                                                                                                                                                                                                                               |
+| -------------------- | --------------------------------------------------------------------- | -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Crossbeam section    | 7 × 4 mm                                                              | **16 × 24 mm**                                           | An M4 heat-set insert needs a Ø5.7 × 9 mm pocket. It physically cannot fit in a 7 × 4 mm beam. This is the direct cost of the M4-bolted requirement.                                                                              |
+| Frame depth          | 60 mm                                                                 | **70 mm**                                                | With four beams instead of two, front beams now exist at the top. At 60 mm deep they would overhang the radio's upward-facing control panel by 12 mm per side. At 70 mm the overhang is **zero** — verified in `img/asm_top.png`. |
+| Panel thickness      | 8.25 mm                                                               | **9.0 mm**                                               | Leaves 5.0 mm under an M4 counterbore and 3.5 mm under the M5 recess (reference: 2.75 mm).                                                                                                                                        |
+| Antenna gusset       | one 8.25 mm rib in the rail plane                                     | **two 5 mm ribs, one per bracket edge**                  | A bolt-on bracket has no rail plane to hide the rib in. Duplicating it onto both edges keeps the bore under the hole clear and makes the bracket symmetric; 5 mm rather than 8 mm leaves a clear central span for the bolts.      |
+| Antenna hole spacing | 101.5 mm                                                              | **70–77.25 mm**                                          | Set by which top-front layout the brackets sit on (§2.11): 77.25 mm on `_dual`, 76 mm on `_triple`, 70 mm on `_grid`.                                                                                                            |
+| Handle thickness     | 8.25 mm                                                               | **12 mm**                                                | Needed to seat an axial M4 insert.                                                                                                                                                                                                |
+| Handle form          | squared loop, 30 mm proud, 33.75 × 18.5 aperture under an 11.5 mm bar | **arch, 20 mm proud, 40 × 13 aperture under a 7 mm bar** | The built pack showed the squared loops reading as two blocky slabs — hard on the bag it only just fits, and hard on the hand. See §2.6.                                                                                          |
+| Leg standoff         | 45 mm of integral leg                                                 | **18 mm base plate**                                     | That 45 mm of dead space is now where a bolt-on module goes.                                                                                                                                                                      |
 
 Unchanged on purpose: inner span 124.25 mm, M5 hole Ø5.000 at the bay centre,
 Ø26.468 × 5.5 recess, Ø12.468 antenna hole, 3.75 mm pad, 25 mm reach, 12.66 mm
@@ -367,17 +458,17 @@ them redundant.
 All bolts stainless, socket cap. All inserts brass M4, 6.0 mm OD × 8.0 mm long
 (Ruthex/Bumat type) — the pockets are Ø5.7 × 9.0 mm with a Ø6.6 lead-in chamfer.
 
-| Joint                           | Bolt           | Qty                      | Insert lives in                     |
-| ------------------------------- | -------------- | ------------------------ | ----------------------------------- |
-| Side panels → 4 crossbeams      | M4 × 12        | 16                       | crossbeam ends                      |
-| Side panels → handles           | M4 × 12        | 8                        | handle legs                         |
-| Antenna mounts → top-front beam | M4 × 12        | 8                        | top-front beam front face           |
-| Base plate → bottom beams       | M4 × 12        | 4                        | bottom beam undersides              |
-| **Battery box → base plate**    | **M4 × 12**    | **4**                    | base plate feet                     |
-| Next module → battery box       | M4 × 12        | 4                        | battery box feet                    |
+| Joint                           | Bolt           | Qty                      | Insert lives in                      |
+| ------------------------------- | -------------- | ------------------------ | ------------------------------------ |
+| Side panels → 4 crossbeams      | M4 × 12        | 16                       | crossbeam ends                       |
+| Side panels → handles           | M4 × 12        | 8                        | handle legs                          |
+| Antenna mounts → top-front beam | M4 × 12        | 8                        | top-front beam front face            |
+| Base plate → bottom beams       | M4 × 12        | 4                        | bottom beam undersides               |
+| **Battery box → base plate**    | **M4 × 12**    | **4**                    | base plate feet                      |
+| Next module → battery box       | M4 × 12        | 4                        | battery box feet                     |
 | SO-239 flange → antenna mount   | M3 × 10 + nut  | 4 per mount              | (through-holes; SO-239 variant only) |
-| **Radio → side panels**         | **M5 × 10–12** | **2**                    | the radio's own threaded side holes |
-|                                 | **M4 total**   | **40 bolts, 44 inserts** |                                     |
+| **Radio → side panels**         | **M5 × 10–12** | **2**                    | the radio's own threaded side holes  |
+|                                 | **M4 total**   | **40 bolts, 44 inserts** |                                      |
 
 M4 × 12 is correct throughout: 4.0 mm counterbore, plus 5.0 mm of remaining
 panel, plus 7.0 mm of thread engagement, against a 9.0 mm pocket. Do not fit
@@ -391,14 +482,14 @@ and 8.5 mm into the radio.
 
 ## 5. Printing
 
-| Part            | Orientation                        | Notes                                                                             |
-| --------------- | ---------------------------------- | --------------------------------------------------------------------------------- |
-| `side_panel`    | flat, **inner** face down          | M5 recess and all 8 beam counterbores open upward; only 4 × Ø8.2 bridges          |
-| `crossbeam` ×4  | long axis on the bed, 24 mm tall   | end **and** front-face inserts both come out in-plane                             |
-| `handle`        | flat, mating face down             | one bridge over the grip aperture; flattest face becomes the lap joint            |
-| `antenna_mount` ×2 | on its back                     | every layer smaller than the one below — no supports; one symmetric part, print two |
-| `base_plate`    | upside down, flat top face on bed  | feet and every insert mouth point upward; fully self-supporting                    |
-| `battery_box`   | **back wall down**, open front up  | floor-down would cantilever both top flanges 19.5 mm along their whole length; on its back they become ribs off the back wall |
+| Part               | Orientation                       | Notes                                                                                                                         |
+| ------------------ | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `side_panel`       | flat, **inner** face down         | M5 recess and all 8 beam counterbores open upward; only 4 × Ø8.2 bridges                                                      |
+| `crossbeam` ×4     | long axis on the bed, 24 mm tall  | end **and** front-face inserts both come out in-plane                                                                         |
+| `handle`           | flat, mating face down            | one bridge over the grip aperture; flattest face becomes the lap joint                                                        |
+| `antenna_mount` ×2 | on its back                       | every layer smaller than the one below — no supports; one symmetric part, print two                                           |
+| `base_plate`       | upside down, flat top face on bed | feet and every insert mouth point upward; fully self-supporting                                                               |
+| `battery_box`      | **back wall down**, open front up | floor-down would cantilever both top flanges 19.5 mm along their whole length; on its back they become ribs off the back wall |
 
 Each `part=` value in the .scad already emits the part in its recommended pose,
 so `stl/*.stl` are ready to slice as-is. **Do not re-orient them** — the poses
@@ -440,7 +531,7 @@ heads, so the top beams go on first.
 
 Not just rendered — checked:
 
-- All 10 meshes watertight, **single connected shell**, within 180 × 180.
+- All 12 meshes watertight, **single connected shell**, within 180 × 180.
   (This caught two real defects: the antenna gusset and the base-plate locating
   lips initially only touched their neighbours on a coplanar face, producing
   two- and three-shell parts.)
@@ -457,6 +548,9 @@ Not just rendered — checked:
   were sealed inside the rib.
 - Both antenna variants confirmed **mirror-symmetric in X**, so one part serves
   both sides.
+- All 16 accessory-rail bolt axes traced into the crossbeam's inserts, and the
+  station-to-station clash table computed from real part widths rather than
+  assumed.
 - Battery box: all four bolts traced into the base plate's foot inserts, cable
   column clear through both parts, zero enclosed voids.
 - **Recursive stack test**: a second battery frame placed one pitch (59.8 mm)
@@ -557,7 +651,7 @@ Slice `stl/*.stl` as-is. Every part is already in its recommended pose (§5) and
 **no part on this frame needs supports** — the only ceilings anywhere are the
 tops of insert pockets and bolt bores, the largest of which is the Ø12.468 mm
 antenna bore through a 3.75 mm wall. Verified by measuring per-layer
-cross-sectional area on all ten meshes; the biggest single unsupported area on
+cross-sectional area on all twelve meshes; the biggest single unsupported area on
 any layer is about 93 mm².
 
 Two of those poses are load-bearing decisions rather than convenience, so do not
@@ -581,9 +675,9 @@ Five things matter more on this design than the usual quality knobs:
 2. **Solid layers at the M5 recess.** The ligament under the recess is only
    3.5 mm — about 17 layers at 0.20 mm. With a slicer default of 4 top / 4 bottom
    solid layers, the middle of the one feature carrying the radio would be
-   *infill*. Bump the side panels to **5 top / 5 bottom**, and — this is the part
+   _infill_. Bump the side panels to **5 top / 5 bottom**, and — this is the part
    that actually guarantees it — apply the height range modifier described under
-   *Per-object modifiers* below, which forces that 4 mm band to 100 % solid
+   _Per-object modifiers_ below, which forces that 4 mm band to 100 % solid
    regardless of layer height.
 3. **The M4 counterbore is 4.0 mm deep for a 4.0 mm head — zero margin.** If your
    first layer is over-squished or elephant-foot compensation is set aggressively,
@@ -592,7 +686,7 @@ Five things matter more on this design than the usual quality knobs:
    there and the handle rocks. Check with a straightedge before fitting handles.
 4. **Ø8.2 mm counterbores will not accept an M4 washer** (≈Ø9 mm OD). Run the M4
    bolts bare. The M5 recess has room for a washer if you want one.
-5. **Print one crossbeam first as a coupon.** `crossbeam_top_front` carries 12 of
+5. **Print one crossbeam first as a coupon.** `crossbeam_top_front_dual` carries 12 of
    the design's 40 inserts — four in its ends and eight in its front face — which
    is two of the three insert axes in one part. Test-seat one insert and run an
    M4 × 12 into it before committing the other three beams. (The third axis, the
@@ -610,17 +704,17 @@ Batch the four crossbeams together; they share an orientation and a profile.
 Cheap and fast, for checking fit, clearances, radio hole alignment and handle
 feel. **Not a field frame** — see the caveats at the end of this subsection.
 
-| Setting            | Value                                                       |
-| ------------------ | ----------------------------------------------------------- |
-| Nozzle / layer     | 0.4 mm / **0.20 mm**                                        |
-| Perimeters         | 2                                                           |
-| Top / bottom solid | **5 / 5**                                                   |
-| Infill             | 15 % gyroid                                                 |
-| Nozzle temp        | 210 °C (first layer 215 °C)                                 |
-| Bed temp           | 60 °C                                                       |
-| Cooling            | 100 %                                                       |
-| Brim               | 5 mm on the four crossbeams; none needed elsewhere          |
-| Supports           | none                                                        |
+| Setting            | Value                                              |
+| ------------------ | -------------------------------------------------- |
+| Nozzle / layer     | 0.4 mm / **0.20 mm**                               |
+| Perimeters         | 2                                                  |
+| Top / bottom solid | **5 / 5**                                          |
+| Infill             | 15 % gyroid                                        |
+| Nozzle temp        | 210 °C (first layer 215 °C)                        |
+| Bed temp           | 60 °C                                              |
+| Cooling            | 100 %                                              |
+| Brim               | 5 mm on the four crossbeams; none needed elsewhere |
+| Supports           | none                                               |
 
 Why a brim only on the crossbeams: their footprint is 124 × 16 mm and they stand
 24 mm tall, so they are the one narrow, tippy part in the set. Everything else
@@ -655,7 +749,7 @@ measure on the prototype still holds for the production run.
 Start from **`0.20mm SPEED @MINI`** — of the system presets the Mini offers
 (0.10 FAST DETAIL, 0.15 SPEED, 0.15 STRUCTURAL, 0.20 SPEED, 0.20 STRUCTURAL) this
 is the fastest at the 0.20 mm layer the prototype needs. Switch to **Expert**
-mode, change the values below, then *Save Print Settings as*
+mode, change the values below, then _Save Print Settings as_
 **`MANPACK PLA 0.20 @MINI`**.
 
 Setting names are as they appear on each PrusaSlicer Print Settings page.
@@ -701,22 +795,22 @@ as **`MANPACK PLA @MINI`**:
 **One profile covers all four plates.** 5 / 5 solid layers is applied globally
 rather than only on the side-panel plate, so there is nothing to remember when you
 switch plates — the extra solid layer costs almost nothing on the beams and
-brackets. The only per-plate change in the whole set is *Brim width*.
+brackets. The only per-plate change in the whole set is _Brim width_.
 
 ### 9.2 Production / final — PETG
 
-| Setting            | Value                                                        |
-| ------------------ | ------------------------------------------------------------ |
-| Nozzle / layer     | 0.4 mm / **0.20 mm** (first layer 0.20 mm)                   |
-| Perimeters         | **4** — 5 on the four crossbeams                             |
-| Top / bottom solid | 5 / 5 — **6 / 6 on `side_panel`**                            |
-| Infill             | 40 % gyroid                                                  |
-| Nozzle temp        | 240 °C (first layer 240 °C)                                  |
-| Bed temp           | 85 °C first layer, 90 °C after                               |
+| Setting            | Value                                                          |
+| ------------------ | -------------------------------------------------------------- |
+| Nozzle / layer     | 0.4 mm / **0.20 mm** (first layer 0.20 mm)                     |
+| Perimeters         | **4** — 5 on the four crossbeams                               |
+| Top / bottom solid | 5 / 5 — **6 / 6 on `side_panel`**                              |
+| Infill             | 40 % gyroid                                                    |
+| Nozzle temp        | 240 °C (first layer 240 °C)                                    |
+| Bed temp           | 85 °C first layer, 90 °C after                                 |
 | Cooling            | **30–50 %**, and do not let bridge/overhang fan spike to 100 % |
-| Perimeter speed    | 40–50 mm/s                                                   |
-| Brim               | 5 mm on the four crossbeams                                  |
-| Supports           | none                                                         |
+| Perimeter speed    | 40–50 mm/s                                                     |
+| Brim               | 5 mm on the four crossbeams                                    |
+| Supports           | none                                                           |
 
 **PETG-specific notes:**
 
@@ -743,14 +837,14 @@ surface plate before committing to the rest.
 #### PrusaSlicer 2.9.6 — PETG production profile (Prusa Mini, 0.4 mm nozzle)
 
 Start from **`0.20mm STRUCTURAL @MINI`**, switch to **Expert** mode, change the
-values below, then *Save Print Settings as* **`MANPACK PETG 0.20 @MINI`**.
+values below, then _Save Print Settings as_ **`MANPACK PETG 0.20 @MINI`**.
 
 STRUCTURAL is the right base here rather than a SPEED or DETAIL preset: it already
 biases toward perimeters and slower, more solid extrusion, which is exactly what a
 frame whose every load path is a bolt-in-a-counterbore or an insert-in-a-boss
 wants (Overview note 1). Set the values below explicitly anyway, so the profile is
 deterministic no matter what the base preset ships with. If you prefer a finer
-finish, `0.15mm STRUCTURAL @MINI` works identically — just leave *Layer height* at
+finish, `0.15mm STRUCTURAL @MINI` works identically — just leave _Layer height_ at
 0.15 and expect roughly a third more print time.
 
 | Page                  | Setting                       | Value                                   |
@@ -787,29 +881,29 @@ finish, `0.15mm STRUCTURAL @MINI` works identically — just leave *Layer height
 | Advanced              | XY size compensation          | **0**                                   |
 | Advanced              | Elephant foot compensation    | 0.2 mm                                  |
 
-Leaving *XY size compensation* at 0 is deliberate: it would shift the Ø5.7 insert
+Leaving _XY size compensation_ at 0 is deliberate: it would shift the Ø5.7 insert
 pockets and the Ø4.4 bolt holes together, and those two want opposite corrections.
 Trim the pockets in the .scad (`m4_ins_d`) after the coupon print instead.
 
 **Filament Settings — a separate profile from Print Settings.** Start from
 `Prusament PETG`, save as **`MANPACK PETG @MINI`**:
 
-| Page       | Setting                            | Value                    |
-| ---------- | ---------------------------------- | ------------------------ |
-| Filament   | Nozzle temperature, other layers   | **240 °C**               |
-| Filament   | Nozzle temperature, first layer    | **240 °C**               |
-| Filament   | Bed temperature, first layer       | **85 °C**                |
-| Filament   | Bed temperature, other layers      | **90 °C**                |
-| Cooling    | Keep fan always on                 | ✔                        |
-| Cooling    | Min fan speed                      | **30 %**                 |
-| Cooling    | Max fan speed                      | **50 %**                 |
-| Cooling    | Bridges fan speed                  | **50 %** (not 100 %)     |
-| Cooling    | Disable fan for the first          | 1 layer                  |
-| Cooling    | Slow down if layer print time is below | 15 s                 |
-| Cooling    | Min print speed                    | 15 mm/s                  |
-| Filament   | Wipe while retracting (Overrides)  | ✔ (PETG stringing)       |
+| Page     | Setting                                | Value                |
+| -------- | -------------------------------------- | -------------------- |
+| Filament | Nozzle temperature, other layers       | **240 °C**           |
+| Filament | Nozzle temperature, first layer        | **240 °C**           |
+| Filament | Bed temperature, first layer           | **85 °C**            |
+| Filament | Bed temperature, other layers          | **90 °C**            |
+| Cooling  | Keep fan always on                     | ✔                    |
+| Cooling  | Min fan speed                          | **30 %**             |
+| Cooling  | Max fan speed                          | **50 %**             |
+| Cooling  | Bridges fan speed                      | **50 %** (not 100 %) |
+| Cooling  | Disable fan for the first              | 1 layer              |
+| Cooling  | Slow down if layer print time is below | 15 s                 |
+| Cooling  | Min print speed                        | 15 mm/s              |
+| Filament | Wipe while retracting (Overrides)      | ✔ (PETG stringing)   |
 
-Holding *Bridges fan speed* to 50 % is the one non-obvious entry. The stock PETG
+Holding _Bridges fan speed_ to 50 % is the one non-obvious entry. The stock PETG
 profile spikes it to 100 %, and the bridges on this frame are not cosmetic — the
 four Ø8.2 mm ceilings in `side_panel` are the bearing surfaces the handle bolt
 heads pull against, and blasting them with cold air is exactly how you get a weak
@@ -818,12 +912,12 @@ inter-layer bond at a load-bearing face.
 #### Per-object modifiers (both profiles)
 
 Two settings are best applied per object rather than globally. Right-click the
-object in the 3D view → *Add settings*.
+object in the 3D view → _Add settings_.
 
-| Object          | Modifier                                              | Why                                                                                                                 |
-| --------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| `side_panel` ×2 | **Height range modifier, 0 → 4 mm, Fill density 100 %** | Guarantees the 3.5 mm ligament under the M5 recess is fully solid. At 0.20 mm that band is ~17 layers, so 5 top + 5 bottom solid layers would otherwise leave ~7 layers of *infill* inside the one feature carrying the radio. |
-| `crossbeam` ×4  | *Layers and perimeters → Perimeters* = **5**          | Lets the beams run 5 perimeters on a plate sliced with the global 4, without a second profile.                        |
+| Object          | Modifier                                                | Why                                                                                                                                                                                                                            |
+| --------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `side_panel` ×2 | **Height range modifier, 0 → 4 mm, Fill density 100 %** | Guarantees the 3.5 mm ligament under the M5 recess is fully solid. At 0.20 mm that band is ~17 layers, so 5 top + 5 bottom solid layers would otherwise leave ~7 layers of _infill_ inside the one feature carrying the radio. |
+| `crossbeam` ×4  | _Layers and perimeters → Perimeters_ = **5**            | Lets the beams run 5 perimeters on a plate sliced with the global 4, without a second profile.                                                                                                                                 |
 
 The height range modifier is the precise fix and costs almost nothing — 4 mm of a
 9 mm plate. Setting the whole panel to 100 % infill also works but roughly doubles
@@ -833,16 +927,16 @@ its mass, and there are two of them.
 
 A full set is five plates. Footprints verified against the bed:
 
-| Plate | Contents                                | Footprint      | Margin        |
-| ----- | --------------------------------------- | -------------- | ------------- |
-| 1     | 2 × `side_panel`, stacked in Y          | 164 × 146 mm   | 16 / 34 mm    |
-| 2     | 4 × `crossbeam`, stacked in Y, 5 mm brim | 134 × 122 mm  | 46 / 58 mm    |
-| 3     | `base_plate` + 2 × `antenna_mount` behind it | 142 × 100 mm | 38 / 80 mm |
-| 4     | 2 × `handle`, side by side in X          | 142 × 70 mm   | 38 / 110 mm   |
-| 5     | `battery_box` (only if you build it)     | 143 × 60 mm   | 37 / 120 mm   |
+| Plate | Contents                                     | Footprint    | Margin      |
+| ----- | -------------------------------------------- | ------------ | ----------- |
+| 1     | 2 × `side_panel`, stacked in Y               | 164 × 146 mm | 16 / 34 mm  |
+| 2     | 4 × `crossbeam`, stacked in Y, 5 mm brim     | 134 × 122 mm | 46 / 58 mm  |
+| 3     | `base_plate` + 2 × `antenna_mount` behind it | 142 × 100 mm | 38 / 80 mm  |
+| 4     | 2 × `handle`, side by side in X              | 142 × 70 mm  | 38 / 110 mm |
+| 5     | `battery_box` (only if you build it)         | 143 × 60 mm  | 37 / 120 mm |
 
 Plate 1 is the tightest at 16 mm of X margin — check your Mini's actual usable
-area before nesting it, and note that the two panels are *identical*, not mirrored,
+area before nesting it, and note that the two panels are _identical_, not mirrored,
 so both come off the same STL.
 
 > **On preset and setting names.** The two system presets named above
@@ -851,6 +945,12 @@ so both come off the same STL.
 > DETAIL, 0.15mm SPEED, 0.15mm STRUCTURAL, 0.20mm SPEED, 0.20mm STRUCTURAL. Older
 > Prusa profile bundles used QUALITY/DRAFT naming instead, so if you sync a
 > different bundle version the names may shift again — pick the preset at the
-> nearest layer height and let the tables govern. The individual *setting* labels
+> nearest layer height and let the tables govern. The individual _setting_ labels
 > are from PrusaSlicer 2.9.x Expert mode but have not each been clicked through;
 > if one reads differently, the value still applies.
+
+# Resources
+
+- MakerWorld
+  - [4x4_Fam - RT-95 Manpack Rails and BNC bulkhead antenna mount](https://makerworld.com/en/models/1117937-rt-95-manpack-rails-and-bnc-bulkhead-antenna-mount?from=search#profileId-1115768)
+  - [El Guardo - ManPack Retevis RT95 / Anytone AT778 UV](https://makerworld.com/en/models/2820039-manpack-retevis-rt95-anytone-at778-uv#profileId-3140415)
