@@ -91,6 +91,19 @@ plain one is bit-identical to the beam already printed.
 AT-779UV's own microphone bracket (§2.6.1); print it for one side and a plain
 `handle` for the other, or two plain ones if you do not want the mic mount.
 
+#### Which variants do I actually print?
+
+Five of the entries above are alternates, not additions. The minimum working
+frame is **12 parts**; everything else is opt-in.
+
+| Choose | Options | Pick this if… |
+| ------ | ------- | ------------- |
+| Top-front beam | `_dual` / `_triple` / `_grid` | `_dual` if you only want two antenna mounts and already own the printed beam — it is bit-identical. `_grid` if you want the accessory rail. `_triple` for three stations. |
+| Bottom-front beam | plain / `_rail` | `_rail` **only** if fitting `compute_box_front`; otherwise the plain one, which is bit-identical to the beam already printed. |
+| Handles ×2 | `handle` / `handle_mic` | Two plain ones normally. Swap **one** for `handle_mic` if you want the AT-779UV microphone bracket. |
+| Antenna mounts ×2 | `_bnc` / `_so239` | Two of whichever connector you use — never one of each. Same leg and bolt pattern, so you can swap later. |
+| Compute module | `_inline` / `_front` + cover / none | `_front` needs the `_rail` bottom beam **and** its cover. `_inline` stacks under the frame instead. Most builds need neither. |
+
 Largest part is 164 mm — **16 mm of bed margin**. All seventeen meshes verified
 watertight, single-shell, and bed-legal.
 
@@ -104,6 +117,8 @@ the slicer's perimeters and infill dominate. If mass matters, the base plate is
 the obvious place to add a lightening window.
 
 ### 1 — `side_panel` ×2
+
+![side_panel](img/side_panel.png)
 
 A plain flat plate. It carries **only** the ported radio mount plus through-holes
 for the beams and handle. No feet, no handle, no antenna mount, and **no heat-set
@@ -142,6 +157,8 @@ Extra insert faces by position:
   **undersides** for the base plate.
 
 ### 6 — `handle` ×2
+
+![handle](img/handle.png)
 
 An arch, not the reference's squared loop. It still laps 48 mm down the panel's
 outer face on four M4 bolts, and the panel's top edge still forms the aperture
@@ -197,6 +214,8 @@ Note this part renders through an `offset()` plus `minkowski()` and takes ~65 s 
 export, against well under a second for everything else.
 
 #### 2.6.1 — `handle_mic`, the microphone-bracket variant
+
+![handle_mic](img/handle_mic.png)
 
 The AT-779UV ships with its own microphone bracket — **55 H × 35 W × 10 D mm, two
 M3 holes 45 mm apart vertically**. So this variant does not capture the mic at
@@ -254,6 +273,10 @@ the plate left in front came out 3.5 mm, and it still caught the disc by only
 
 ### 7–8 — `antenna_mount_bnc` / `antenna_mount_so239`
 
+| BNC | SO-239 |
+| --- | ------ |
+| ![antenna_mount_bnc](img/antenna_mount_bnc.png) | ![antenna_mount_so239](img/antenna_mount_so239.png) |
+
 The reference ear, made modular and offered in two connector variants. Both share
 an identical leg, gusset ribs and M4 bolt pattern, so either bolts to the same
 inserts in the top-front crossbeam — you can swap connector type later without
@@ -308,6 +331,8 @@ spacing drops from 89.25 mm to **77.25 mm**.
 
 ### 9 — `base_plate`
 
+![base_plate](img/base_plate.png)
+
 The modular bottom interface. Bolts up into the two bottom crossbeams on four
 M4 bolts. Its **four bosses are simultaneously the frame's feet and the M4
 attachment grid** that future modules (battery, tuner, ATU) bolt up into — one
@@ -348,6 +373,8 @@ locating lips for the panel bottom edges; they made the part unprintable (see
 lips were redundant.
 
 ### 10 — `battery_box`
+
+![battery_box](img/battery_box.png)
 
 An **open frame** — not a box — for a **TalentCell LF4011 12 V 6 Ah LiFePO4**
 pack lying flat on its largest face (**132 × 75.8 × 37.3 mm**, measured).
@@ -399,6 +426,10 @@ Windowing still nearly halves it: 103.3 cm³ against ~190 cm³ for the equivalen
 closed box.
 
 ### 11 — the top-front crossbeam: three layouts
+
+| `_dual` | `_triple` | `_grid` |
+| --- | --- | --- |
+| ![dual](img/crossbeam_top_front_dual.png) | ![triple](img/crossbeam_top_front_triple.png) | ![grid](img/crossbeam_top_front_grid.png) |
 
 All three use the **same station pattern** — a copy of the antenna mount's own
 four bolts, two M4 columns 14 mm apart and two rows 10 mm apart at Z 162 / 172.
@@ -484,6 +515,10 @@ with; it also moves the antenna brackets to that layout's outer stations.
 ---
 
 ### 12 — `compute_box`, two variants
+
+| `_inline` | `_front` (cover off) |
+| --- | --- |
+| ![inline](img/compute_box_inline.png) | ![front](img/compute_box_front.png) |
 
 Carries a **Libre Computer La Frite** (64 × 55 mm, Raspberry Pi Model A mounting
 pattern — M3 on 58 × 49.5) with its 128 GB eMMC, plus a CM108/CM119 USB audio
@@ -621,6 +656,8 @@ for **one** antenna mount on columns 1–2 (X 18.6–53.6) with a 9.5 mm gap. At
 original 80 mm there was no room for one at all.
 
 #### 11c — `compute_box_front_cover`
+
+![cover](img/compute_box_front_cover.png)
 
 A flat 3 mm panel with a locating rim nesting inside the opening, on six M3
 screws at Z 15 / 120 / 152 — the three bands clear of the board footprint at
