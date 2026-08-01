@@ -20,7 +20,7 @@ $fa = 2;
 $fs = 0.4;
 
 /* [Output] */
-part = "assembly"; // [assembly, exploded, side_panel, crossbeam_top_front_dual, crossbeam_top_front_grid, crossbeam_top_back, crossbeam_bottom_front, crossbeam_bottom_back, crossbeam_top_front_triple, handle, antenna_mount_bnc, antenna_mount_so239, base_plate, battery_box]
+part = "assembly"; // [assembly, exploded, side_panel, crossbeam_top_front_dual, crossbeam_top_front_grid, crossbeam_top_back, crossbeam_bottom_front, crossbeam_bottom_front_rail, crossbeam_bottom_back, crossbeam_top_front_triple, compute_box_inline, compute_box_front, compute_box_front_cover, handle, handle_mic, antenna_mount_bnc, antenna_mount_so239, base_plate, battery_box]
 
 // which top-front crossbeam the assembly is built with
 top_front = "grid"; // [grid, triple, dual]
@@ -206,8 +206,50 @@ handle_z0 = z_tb1 - handle_lap;               // 132
 handle_bz = [handle_z0 + 8, handle_z0 + 20];  // 140, 152
 grip_y0   = (frame_d - grip_ap_len) / 2;      // 18.125
 grip_y1   = grip_y0 + grip_ap_len;            // 51.875
-handle_z1 = z_tb1 + grip_ap_h;                // 198.5
-handle_z2 = handle_z1 + grip_bar_h;           // 210
+handle_z1 = z_tb1 + grip_ap_h;                // 193
+handle_z2 = handle_z1 + grip_bar_h;           // 200
+
+// --- microphone hanger, handle_mic variant only ---
+//  A cross bar thrown across the U, low down, with a knob-type stud on its outer
+//  face.  Low rather than high for two reasons: the arch is what the hand grips,
+//  so the bar must stay out of it, and a mic hung at Z 146 rides down the flank
+//  of the pack instead of swinging across the radio.  The bar is backed by the
+//  side panel over its whole length, so it is in shear against the panel rather
+//  than cantilevered.
+//  The AT-779UV ships with its own bracket -- 55 H x 35 W x 10 D, two M3 holes
+//  45 mm apart vertically -- so the handle does not have to capture the mic at
+//  all.  It only has to present two flat, coplanar landings with an M3 insert in
+//  each.  That is two cross beams rather than a plate, which is both less
+//  filament and far more of the U left open than any keyhole allowed.
+//
+//  Trying to receive the knob directly was a dead end: a 20 mm disc needs a
+//  pocket 29 mm tall, and the plate left in front of it came out 3.5 mm -- too
+//  thin to trust, and it still only caught the disc by 1.9 mm because the neck
+//  could never drop clear of the entry hole in a 61 mm opening.
+//
+//  Both landings sit on the outer face at X = handle_t, where the minkowski
+//  leaves a genuinely flat region; the perimeter fillet curves away from it, so
+//  the bracket seats on two coplanar strips and cannot rock.
+//  The bracket has to sit ENTIRELY BELOW the grip aperture, or it spans the
+//  opening and there is nowhere to put a hand.  55 mm of bracket will not fit
+//  below a usable grip inside the original 61 mm U -- that leaves 6 mm -- so the
+//  handle grows DOWNWARD onto the panel it already lies against.  It gains two
+//  new cross beams below the original aperture, with an open window between them
+//  so the extension is a frame rather than a slab.
+mic_bracket   = [35, 55, 10];    // bracket W x H x D, for clash checks
+mic_bolt_dz   = 45;              // M3 hole spacing, vertical -- MEASURED
+mic_bolt_z    = [105, 105 + mic_bolt_dz];   // 105 / 150, insert centres
+mic_beam_lo   = [99, 111];       // lower new beam; also the new handle base
+mic_beam_hi   = [144, 156];      // upper new beam, directly under the grip
+mic_win       = [111, 144];      // open window between them -- saves filament and
+                                 //   leaves the mic lead somewhere to run
+mic_grip_z0   = 156;             // grip aperture floor, raised off the old 132 so
+                                 //   the bracket clears it.  Top still follows the
+                                 //   arch, so the grip band is untouched at 7 mm.
+mic_bar_ext   = 4;               // how far each beam runs into the legs to fuse
+mic_fillet    = 3;               // concave fillet at each beam/leg joint: these
+                                 //   are the joints that must not read as notches
+mic_bolt_y    = frame_d / 2;     // 35, centred in the U
 
 rail_z = [z_tb0 + 6, z_tb0 + 16];                               // 162, 172
 
@@ -372,8 +414,14 @@ module window_x(t, w, r = 4) {
         translate([0, y, z]) rotate([0, 90, 0]) cylinder(r = r, h = t);
 }
 
-// Box with every edge rounded.
+// Box with every edge rounded.  The radius must not exceed half the smallest
+// side: past that the sphere centres cross over and the hull comes out LARGER
+// than the box asked for, silently.  That is how the compute box's 3 mm back
+// wall became 5 mm thick.
 module rbox(dx, dy, dz, r = 1.5) {
+    assert(r <= min(dx, dy, dz) / 2 + 1e-9,
+           str("rbox radius ", r, " exceeds half the smallest side of ",
+               dx, " x ", dy, " x ", dz));
     hull() for (x = [r, dx - r], y = [r, dy - r], z = [r, dz - r])
         translate([x, y, z]) sphere(r = r);
 }
@@ -528,7 +576,50 @@ module handle_profile() {
     }
 }
 
-module handle() {
+// handle_profile() plus the cross bar.  The bar is unioned into the PROFILE, so
+// it goes through the same minkowski and comes out with the same 2.5 mm edge
+// round and the same flat mating face as the rest of the handle.
+//
+// offset(r=+f) then offset(r=-f) fills concave corners with radius f and leaves
+// convex ones alone, which puts a real fillet where the bar lands on each leg.
+// Butting a square bar into the leg would have left a sharp internal corner in
+// exactly the place the last handle was criticised for -- a re-entrant corner at
+// a load path is a notch whether it is cut or grown.
+// Built from handle_outer() rather than by patching handle_profile(), because the
+// grip aperture no longer runs out through the bottom edge -- it now has a floor.
+module handle_profile_mic() {
+    ext_v = mic_beam_lo[0] - handle_z0;          // -33, how far the body drops
+    offset(r = -mic_fillet) offset(r = mic_fillet)
+    difference() {
+        union() {
+            handle_outer();
+            translate([0, ext_v]) square([frame_d, -ext_v]);
+        }
+        // grip aperture: floor raised to mic_grip_z0, top still the offset arch
+        round2d(4) intersection() {
+            translate([grip_y0, mic_grip_z0 - handle_z0])
+                square([grip_ap_len, 400]);
+            offset(r = -grip_bar_h) handle_outer(extend = 40);
+        }
+        // window between the two new beams
+        round2d(4) translate([grip_y0, mic_win[0] - handle_z0])
+            square([grip_ap_len, mic_win[1] - mic_win[0]]);
+    }
+}
+
+// M3 heat-set pockets for the bracket, opening onto the OUTER face and running
+// inward.  M3 here, M4 everywhere the handle meets the frame -- the two must not
+// be confused at assembly, and they open on opposite faces, which helps.
+module mic_bracket_inserts() {
+    for (z = mic_bolt_z)
+        translate([handle_t + 0.1, mic_bolt_y, z]) rotate([0, -90, 0]) {
+            cylinder(d = m3_ins_d, h = m3_ins_h + 0.1);
+            cylinder(d = m3_ins_d + 0.8, h = 1.0);      // lead-in at the mouth
+        }
+}
+
+module handle(mic = false) {
+    union() {
     difference() {
         translate([0, 0, handle_z0]) rotate([90, 0, 90])
             difference() {
@@ -539,7 +630,8 @@ module handle() {
                 // and the whole perimeter stay rounded.
                 minkowski() {
                     linear_extrude(height = handle_t - handle_fill)
-                        offset(r = -handle_fill) handle_profile();
+                        offset(r = -handle_fill)
+                            if (mic) handle_profile_mic(); else handle_profile();
                     sphere(r = handle_fill, $fn = 16);
                 }
                 translate([-60, -60, -2 * handle_fill])
@@ -548,6 +640,8 @@ module handle() {
         // insert pockets, axis along X, opening onto the mating face
         for (y = [beam_cy_f, beam_cy_b], z = handle_bz)
             translate([0, y, z]) rotate([0, 90, 0]) m4_insert();
+        if (mic) mic_bracket_inserts();
+    }
     }
 }
 
@@ -782,6 +876,286 @@ assert(bb_out_x <= BED && bb_tot_z <= BED && bb_out_y <= BED,
 assert(bb_cav_x >= batt_x && bb_cav_z >= batt_z, "cavity smaller than the pack");
 
 // =============================================================================
+//  PART 12 -- compute_box, two variants
+// -----------------------------------------------------------------------------
+//  Carries a Libre Computer La Frite (64 x 55 mm, Raspberry Pi Model A mounting
+//  pattern -- M3 on 58 x 49.5) plus a CM108/CM119 USB audio fob, a PTT board and
+//  a GPS module, for onboard logging over WiFi to a tablet.
+//
+//  Only the SBC gets a dedicated mount, because it is the only one of the four
+//  whose footprint is fixed and known.  Everything else lands on a generic M3
+//  through-hole grid at 10 mm pitch plus zip-tie slots, so swapping a CM108 for
+//  a CM119 -- or changing the PTT board entirely -- costs nothing here.  The grid
+//  holes double as ventilation.
+//
+//    inline : sits in the module stack, above the battery box.  Bolts up into
+//             the plate above and presents the same four feet below, so the
+//             battery box hangs off it unchanged.  SBC lies flat.
+//    front  : bolts to the top-front crossbeam's accessory columns and hangs
+//             down the front of the frame.  At 50 mm deep the interior is 44 mm
+//             and the board's smallest dimension is 55, so here the SBC stands
+//             on the BACK wall with its ports facing forward, and the three
+//             small boards layer in front of it.
+// =============================================================================
+sbc_l     = 64;      // La Frite board outline
+sbc_w     = 55;
+sbc_hx    = 58;      // its mounting pattern.  M3 CONFIRMED on the board itself by
+sbc_hy    = 49.5;    //   test-fitting an M3 bolt -- worth checking, because the Pi
+                     //   footprint La Frite copies uses M2.5.  The 58 x 49.5 pitch
+                     //   is still the published Pi Model A figure rather than a
+                     //   measurement; sources vary by 0.5 mm (49 vs 49.5), which an
+                     //   M3 in the board's own clearance hole absorbs.
+sbc_stand = 5;       // standoff height under the board
+sbc_clear = 22;      // clear height above the standoff for connectors + eMMC
+m3_ins_d  = 4.0;     // M3 heat-set insert pilot
+m3_ins_h  = 5.0;
+m3_clear  = 3.4;     // M3 clearance hole for the generic grid
+cm_grid   = 10;      // generic mounting grid pitch
+cm_wall   = 3;
+cm_floor  = 4;
+cm_port_h = 16;      // port cutout height
+cm_tie    = [3, 12]; // zip-tie slot section
+
+// --- inline variant ---
+cmi_cav_z = sbc_stand + sbc_clear + 2;                   // 29, +2 so the
+                     //   board clears the top flanges
+cmi_z     = box_boss + cmi_cav_z + cm_floor + foot_h;    // 49, the stack pitch
+
+// --- front variant ---
+//  Usable envelope on the front of the frame is 160 H x 80 W x 50 D.  At that
+//  size all four boards lie FLAT on the back wall (74 x 154 interior = 11396 mm2
+//  against ~6684 mm2 of boards), so nothing has to layer and the depth is set
+//  purely by the tallest component rather than by the budget: 5 mm standoff plus
+//  ~22 mm of board and connectors plus slack = 30 interior.  17 mm of the depth
+//  allowance goes unused, which is the point.
+cmf_x     = 72;      // outer width -- 72 not 80, so ONE antenna mount still
+                     //   fits beside it on the rail (9.5 mm gap).  Affordable only
+                     //   because the SBC now lies 55 across instead of 64.
+cmf_z     = 160;     // outer height
+cmf_y     = 33;      // outer depth -- only what the SBC needs, not the 50 budget
+cmf_bolt  = 28;      // bolt column spacing = grid columns 5 and 7 (85.125 and
+                     //   113.125), the pair that lands inside a 72 mm box sitting
+                     //   right of an antenna mount
+cmf_boss  = 8;       // local back-wall thickness at the bolts, so an M4 counter-
+                     //   bore has material to seat in (3 mm wall alone does not)
+// --- port cluster, measured off the board ---
+//  44 wide along the board edge x 15 through the box depth, the 15 centred on the
+//  top of the standoffs (= the board plane).  That depth reference proves the
+//  connectors open in the PLANE of the board, so once the board is rotated they
+//  face up and down inside the box and no wall needs a cutout for them.
+//  The board is rotated 90 degrees from my first attempt: USB edge UP toward the
+//  radio, power and Ethernet edge DOWN toward the battery.  So the 44 x 15 cluster
+//  opens along Z inside the box, not through a side wall, and both downward ports
+//  are connect-before-closing -- there is no insertion access once the cover is on.
+//  Consequence: 49.5 of the hole pattern runs across X, 58 up Z.
+//  The board sits 5 mm lower than it first did.  Dropping the buck flat onto the
+//  floor (Z 3..17 instead of 8..22 on ribs) freed 5 mm, and spending it by moving
+//  the board down rather than by widening the connector gap keeps that gap at
+//  exactly 22 mm while handing the 5 mm to the USB bay, where it is scarce.
+cmf_bay_buck  = [3, 17];     // bottom bay: buck converter, flat on the floor
+cmf_bay_sbc   = [39, 103];   // the board itself, 64 tall in this orientation
+cmf_bay_usb   = [107, 157];  // top bay: USB devices, plugged into the upward ports
+// --- cover ---
+// --- buck converter, measured 1.81 x 1.10 x 0.55 in ---
+cmf_buck     = [46, 28, 14];
+cmf_grom     = 12;   // grommeted power entry through the floor, replacing the old
+                     //   30 x 14 slot.  A solid floor is what lets the converter
+                     //   bolt down here instead of floating on its own leads.
+cmf_buck_x   = [13, 59];  // buck footprint across the floor, centred
+cmf_notch    = [12, 60];  // the cover's locating rim used to run unbroken across
+                     //   the bottom, projecting 2 mm in over Z 3..7 and leaving a
+                     //   floor-flat part only 28 mm of depth against the buck's
+                     //   27.9.  Notching the rim over the buck footprint restores
+                     //   the full 30 mm and lets the converter sit right on the
+                     //   floor, which is 5 mm better than standing it on ribs.
+                     //   46 mm out of 154 mm of rim; the six screws carry it.
+cmf_cov_t    = 3;    // cover panel thickness
+cmf_cov_lip  = 2;    // locating lip that nests inside the opening
+cmf_cov_z    = [15, 120, 152]; // screw rows; all clear of the SBC footprint,
+                              //   which now spans Z 44..108
+cmf_cov_bx   = 6;    // insert centre, inboard of each side wall
+cmf_cov_boss = 12;   // how far the screw boss reaches in from the wall
+
+// 4 x M3 bosses on the SBC pattern, standing sbc_stand tall from Z=0
+// Sunk 1 mm into whatever they stand on: butting them at exactly Z=0 left the
+// pads sharing only a plane with the floor, which printed the inline box as five
+// separate shells.
+module sbc_pads() {
+    for (dx = [-sbc_hx/2, sbc_hx/2], dy = [-sbc_hy/2, sbc_hy/2])
+        translate([dx, dy, -1]) cylinder(d = 8, h = sbc_stand + 1);
+}
+module sbc_pad_pockets() {
+    for (dx = [-sbc_hx/2, sbc_hx/2], dy = [-sbc_hy/2, sbc_hy/2])
+        translate([dx, dy, sbc_stand - m3_ins_h])
+            cylinder(d = m3_ins_d, h = m3_ins_h + 0.1);
+}
+// generic M3 grid over a rectangle, as through-holes (nuts or nylon standoffs
+// underneath) -- they also ventilate
+module cm_grid_holes(x0, y0, x1, y1, t) {
+    for (x = [x0 : cm_grid : x1], y = [y0 : cm_grid : y1])
+        translate([x, y, -1]) cylinder(d = m3_clear, h = t + 2);
+}
+
+// Topology deliberately mirrors battery_box, which is the one shape already
+// proven to print on this frame: back wall, two end walls, a floor, full-length
+// top flanges carrying the M4s, feet below, and open at the FRONT and TOP.
+// Floor-down would put the feet on the bed under a full-width floor -- the same
+// mid-air failure the base plate had -- and a closed front would become a
+// 142 x 49 ceiling in the back-down pose.  Open front doubles as the port
+// access: the SBC sits with its connector edge facing out of it.
+module compute_box_inline() {
+    cz1 = -box_boss;                         // flange underside
+    cz0 = cz1 - cmi_cav_z;                   // floor top
+    fz  = cz0 - cm_floor;                    // floor underside
+    fl  = 24;                                // flange reach inboard from each end
+    // The SBC does NOT have to dodge the flanges: it tops out 1 mm below their
+    // underside, so the whole floor width is usable.  Sit it against the left
+    // wall and give the rest of the floor to the grid.
+    sbc_cx = cm_wall + 6 + sbc_l/2;          // 41
+    sbc_cy = frame_d/2;
+    difference() {
+        union() {
+            // end walls and back wall
+            for (wx = [0, frame_w - cm_wall])
+                translate([wx, 0, fz]) rbox(cm_wall, frame_d, cmi_cav_z + cm_floor, 1.5);
+            translate([0, frame_d - cm_wall, fz])
+                rbox(frame_w, cm_wall, cmi_cav_z + cm_floor, 1.5);
+            // floor
+            translate([0, 0, fz]) rbox(frame_w, frame_d, cm_floor, 1.5);
+            // top flanges along both end walls, carrying the four M4s.
+            // Sunk 1 mm into the wall tops -- butting them at exactly cz1 left
+            // each flange as its own shell.
+            for (fx = [0, frame_w - fl])
+                translate([fx, 0, cz1 - 1]) rbox(fl, frame_d, box_boss + 1, 1.5);
+            // stacking feet, the same interface the base plate presents
+            for (x = foot_x, y = foot_y)
+                translate([x, y, fz - foot_h]) cylinder(d = foot_d, h = foot_h + 1);
+            // SBC standoffs
+            translate([sbc_cx, sbc_cy, cz0]) sbc_pads();
+        }
+        translate([sbc_cx, sbc_cy, cz0]) sbc_pad_pockets();
+        // generic M3 grid over the rest of the floor
+        translate([0, 0, fz])
+            cm_grid_holes(sbc_cx + sbc_l/2 + 8, 12, frame_w - cm_wall - 6,
+                          frame_d - 12, cm_floor);
+        // M4 up into the plate above, and inserts down for the next module
+        for (x = foot_x, y = foot_y) {
+            translate([x, y, cz1]) m4_bolt_hole(box_boss);
+            translate([x, y, fz - foot_h]) m4_insert();
+        }
+        // zip-tie slots through the floor beside the grid
+        for (x = [sbc_cx + sbc_l/2 + 4, frame_w - cm_wall - 4], y = [16, frame_d - 16])
+            translate([x, y, fz - 1]) rbox(cm_tie[0], cm_tie[1], cm_floor + 2, 1);
+    }
+}
+
+module compute_box_front() {
+    // local frame: X 0..cmf_x, Y -cmf_y..0 (0 = frame front face), Z 0..cmf_z
+    // with Z 0 at the box bottom.  Fitted so its top sits at the crossbeam top.
+    bz  = [cmf_z - 18, cmf_z - 8];          // bolt rows, = global Z 162 / 172
+    bx  = [cmf_x/2 - cmf_bolt/2, cmf_x/2 + cmf_bolt/2];
+    scz = (cmf_bay_sbc[0] + cmf_bay_sbc[1]) / 2;   // 76
+    difference() {
+        union() {
+            translate([0, -cm_wall, 0]) rbox(cmf_x, cm_wall, cmf_z, 1.5);
+            for (wx = [0, cmf_x - cm_wall])
+                translate([wx, -cmf_y, 0]) rbox(cm_wall, cmf_y, cmf_z, 1.5);
+            translate([0, -cmf_y, 0]) rbox(cmf_x, cmf_y, cm_wall, 1.5);
+            translate([0, -cmf_y, cmf_z - cm_wall]) rbox(cmf_x, cmf_y, cm_wall, 1.5);
+            // Local thickening so the M4 counterbores have something to seat in
+            // -- a 3 mm wall cannot hold a 4 mm counterbore.  One pad per column
+            // spanning both rows: separate pads per bolt overran the box top.
+            for (x = bx)
+                translate([x - 8.5, -cmf_boss, bz[0] - 8.5])
+                    rbox(17, cmf_boss, bz[1] - bz[0] + 16, 1.5);
+            // SBC standoffs.  The extra rotate([0,0,90]) is the 90 degree board
+            // turn: it puts 49.5 of the pattern across X and 58 up Z, which is
+            // what points the USB edge up and the power/Ethernet edge down.
+            translate([cmf_x/2, -cm_wall, scz])
+                rotate([90, 0, 0]) rotate([0, 0, 90]) sbc_pads();
+        }
+        translate([cmf_x/2, -cm_wall, scz])
+            rotate([90, 0, 0]) rotate([0, 0, 90]) sbc_pad_pockets();
+        // M4 into the crossbeam's accessory columns
+        for (x = bx, z = bz)
+            translate([x, -cmf_boss, z]) rotate([-90, 0, 0]) m4_bolt_hole(cmf_boss);
+        // --- cable entries ---
+        // Both are rim slots.  The back wall is deliberately solid: it faces the
+        // crossbeam, so anything routed through it would have to turn immediately,
+        // and the two rim slots already reach both ends of the box.
+        // TOP RIM: audio, PTT and the GPS lead come off the radio's control face,
+        // which points up at Z 179.5.  They pass over the top crossbeam and drop
+        // straight in here.
+        translate([15, -24, cmf_z - cm_wall - 1]) rbox(30, 14, cm_wall + 2, 1.4);
+        // BOTTOM: power up from the battery box.  Now a single grommeted hole
+        // rather than a 30 x 14 slot -- the slot was most of the floor, and
+        // keeping the floor solid is what turns it into a mounting surface.
+        translate([cmf_x/2, -17, -1]) cylinder(d = cmf_grom, h = cm_wall + 2);
+        // zip-tie slots either side of the buck footprint (X 13..59): the tie
+        // goes up through one, over the converter, down the other.
+        for (sx = [8, cmf_x - 11])
+            translate([sx, -22, -1]) rbox(3, 12, cm_wall + 2, 1);
+        // cover screw inserts, M3, opening onto the front face
+        for (wx = [cm_wall + cmf_cov_bx, cmf_x - cm_wall - cmf_cov_bx], cz = cmf_cov_z)
+            translate([wx, -cmf_y - 0.01, cz]) rotate([-90, 0, 0])
+                cylinder(d = m3_ins_d, h = m3_ins_h + 0.01);
+        // zip-tie slots up both side walls
+        for (sx = [-1, cmf_x - cm_wall - 1], sz = [24, 48, 140])
+            translate([sx, -cmf_y + 8, sz]) rbox(cm_wall + 2, cm_tie[1], cm_tie[0], 1);
+    }
+}
+
+// -----------------------------------------------------------------------------
+//  compute_box_front_cover
+// -----------------------------------------------------------------------------
+//  Full cover.  With the board rotated, its ports open along the board plane --
+//  upward for USB, downward for power and Ethernet -- so nothing needs to pass
+//  through this face and it can be solid.  Power and Ethernet are therefore
+//  connect-before-closing.
+//
+//  A flat panel with a locating rim that nests inside the box opening, on six M3
+//  screws.  The screw rows sit at Z 15 / 120 / 152, clear of the board footprint
+//  at Z 44..108.
+// -----------------------------------------------------------------------------
+module compute_box_front_cover() {
+    difference() {
+        union() {
+            rbox(cmf_x, cmf_z, cmf_cov_t, 1.4);
+            // Locating RIM nesting inside the 74 x 154 opening -- a rim, not a
+            // slab: a solid plate here cost 22 cm3 and stole 2 mm of interior
+            // depth from a box with only 1 mm to spare over the SBC.  Sunk 1 mm
+            // into the panel so it fuses instead of meeting it on a plane, which
+            // left it as a separate shell.
+            translate([cm_wall, cm_wall, cmf_cov_t - 1]) difference() {
+                rbox(cmf_x - 2*cm_wall - 0.4, cmf_z - 2*cm_wall - 0.4,
+                     cmf_cov_lip + 1, 0.8);
+                translate([4, 4, -1])
+                    rbox(cmf_x - 2*cm_wall - 8.4, cmf_z - 2*cm_wall - 8.4,
+                         cmf_cov_lip + 3, 0.8);
+            }
+        }
+        // Notch the rim's bottom band over the buck footprint so the converter can
+        // sit flat on the floor.  Cut starts at Z = cmf_cov_t so the panel itself
+        // stays intact -- only the 2 mm of rim standing proud of it is removed.
+        translate([cmf_notch[0], cm_wall - 1, cmf_cov_t])
+            cube([cmf_notch[1] - cmf_notch[0], 6, cmf_cov_lip + 2]);
+        // six M3 screws, heads counterbored flush in the outer face
+        for (cx = [cm_wall + cmf_cov_bx, cmf_x - cm_wall - cmf_cov_bx],
+             cz = cmf_cov_z) {
+            translate([cx, cz, -0.01]) cylinder(d = 6.2, h = 1.2 + 0.01);   // shallow:
+            //   a 2 mm counterbore in a 3 mm panel left only 1 mm under the head
+            translate([cx, cz, -0.01]) cylinder(d = m3_clear, h = cmf_cov_t + 0.02);
+        }
+        // ventilation: the SBC is an enclosed SoC in a padded bag.  With the grid
+        // and the back-wall cutout gone these slots are the box's main breathing,
+        // working with the two rim slots top and bottom.  Kept out of the lip and
+        // off the screw rows.
+        for (vz = [26, 38, 88, 100, 112, 124], vx = [22, 40, 58])
+            translate([vx - 6, vz - 2, -1]) rbox(12, 4, cmf_cov_t + 2, 1.2);
+    }
+}
+
+// =============================================================================
 //  ASSEMBLY
 // =============================================================================
 module radio_proxy() {
@@ -833,12 +1207,28 @@ else if (part == "crossbeam_top_front_triple") crossbeam(front_cols = triple_col
 else if (part == "crossbeam_top_front_grid")   crossbeam(front_cols = grid_cols);
 else if (part == "crossbeam_top_back")     crossbeam();
 else if (part == "crossbeam_bottom_front") crossbeam(base_face = true);
+// Same beam with a single row of accessory columns in its front face, so a tall
+// front module (the compute box) bolts at the bottom as well as the top.  ONE
+// row, not two: this beam's underside already carries the base-plate inserts
+// over beam-local Z 0..9, and a second row at 6 would run straight into them.
+// A row at 16 leaves 4.15 mm between the two sets of pockets.
+else if (part == "crossbeam_bottom_front_rail")
+    crossbeam(front_cols = grid_cols, front_rows = [16], base_face = true);
 else if (part == "crossbeam_bottom_back")  crossbeam(base_face = true);
 
 // flat on the bed, 70 x 78 x 12; one bridge over the grip aperture
 else if (part == "handle")
     translate([handle_z2 - handle_z0, 0, 0]) rotate([0, -90, 0])
         translate([0, 0, -handle_z0]) handle();
+else if (part == "handle_mic")
+    // Same pose as `handle`: mating face DOWN.  The flip was only needed while
+    // this part had a pocket opening onto the mating face; with the bracket doing
+    // the capturing there is no pocket, so the sliced-flat mating face goes back
+    // to being the best first layer available.  It also puts the M3 bracket
+    // pockets face-up, where they are blind holes drilled downward rather than
+    // bridged ceilings.
+    translate([handle_z2 - handle_z0, 0, 0]) rotate([0, -90, 0])
+        translate([0, 0, -handle_z0]) handle(mic = true);
 
 // On its back: every layer is smaller than the one below it, so the ribs and pad
 // print with no supports and the bolt holes come out vertical.
@@ -862,5 +1252,10 @@ else if (part == "base_plate")
 // 19.5 mm along the whole length of each end wall.  Stood on its back the
 // flanges become vertical ribs growing off the back wall, supported the whole
 // way, and the open front simply faces up.
+else if (part == "compute_box_inline")
+    translate([0, cmi_z, frame_d]) rotate([-90, 0, 0]) compute_box_inline();
+else if (part == "compute_box_front")
+    rotate([-90, 0, 0]) compute_box_front();
+else if (part == "compute_box_front_cover") compute_box_front_cover();
 else if (part == "battery_box")
     translate([-bb_x0, bb_tot_z, frame_d]) rotate([-90, 0, 0]) battery_box();
