@@ -20,7 +20,7 @@ $fa = 2;
 $fs = 0.4;
 
 /* [Output] */
-part = "assembly"; // [assembly, exploded, side_panel, crossbeam_top_front_dual, crossbeam_top_front_grid, crossbeam_top_back, crossbeam_bottom_front, crossbeam_bottom_front_rail, crossbeam_bottom_back, crossbeam_top_front_triple, compute_box_inline, compute_box_front, compute_box_front_cover, handle, handle_mic, antenna_mount_bnc, antenna_mount_so239, base_plate, battery_box]
+part = "assembly"; // [assembly, exploded, side_panel, crossbeam_top_front_dual, crossbeam_top_front_grid, crossbeam_top_back, crossbeam_bottom_front, crossbeam_bottom_front_rail, crossbeam_bottom_back, crossbeam_top_front_triple, compute_box_inline, compute_box_front, compute_box_front_cover, compute_box_front_populated, handle, handle_mic, antenna_mount_bnc, antenna_mount_so239, base_plate, battery_box]
 
 // which top-front crossbeam the assembly is built with
 top_front = "grid"; // [grid, triple, dual]
@@ -898,14 +898,20 @@ assert(bb_cav_x >= batt_x && bb_cav_z >= batt_z, "cavity smaller than the pack")
 //             small boards layer in front of it.
 // =============================================================================
 sbc_l     = 64;      // La Frite board outline
-sbc_w     = 55;
-sbc_hx    = 58;      // its mounting pattern.  M3 CONFIRMED on the board itself by
-sbc_hy    = 49.5;    //   test-fitting an M3 bolt -- worth checking, because the Pi
-                     //   footprint La Frite copies uses M2.5.  The 58 x 49.5 pitch
-                     //   is still the published Pi Model A figure rather than a
-                     //   measurement; sources vary by 0.5 mm (49 vs 49.5), which an
-                     //   M3 in the board's own clearance hole absorbs.
-sbc_stand = 5;       // standoff height under the board
+sbc_w     = 56;      // measured; was 55 from the published figure
+//  Mounting pattern.  M3 CONFIRMED by test-fitting a bolt in the board.
+//  sbc_hx was the published Pi Model A figure of 58, and a PRINTED TEST FIT showed
+//  it short: with the pair nearest the converter seated, the pair at the USB end
+//  missed by 0.5-1 mm.  58.75 is the midpoint of that observed range.  This axis
+//  runs UP Z in the fitted orientation, so it is the board's long 64 mm side.
+//  If it is still tight, this is the one number to move.
+sbc_hx    = 58.75;   // was 58 -- corrected against the printed part
+sbc_hy    = 49.5;    //   across X; this pair fitted and is left alone
+sbc_stand = 6;       // standoff height, was 5.  Raised with the pocket below so
+                     //   the heat-set insert has somewhere to go.
+sbc_ins_h = 6;       // M3 pocket depth in the standoff, was m3_ins_h = 5.  The
+                     //   insert was bottoming out; +1 mm gives it room and still
+                     //   leaves 1 mm of pad under it, plus 2 mm of back wall.
 sbc_clear = 22;      // clear height above the standoff for connectors + eMMC
 m3_ins_d  = 4.0;     // M3 heat-set insert pilot
 m3_ins_h  = 5.0;
@@ -928,11 +934,15 @@ cmi_z     = box_boss + cmi_cav_z + cm_floor + foot_h;    // 49, the stack pitch
 //  purely by the tallest component rather than by the budget: 5 mm standoff plus
 //  ~22 mm of board and connectors plus slack = 30 interior.  17 mm of the depth
 //  allowance goes unused, which is the point.
-cmf_x     = 72;      // outer width -- 72 not 80, so ONE antenna mount still
-                     //   fits beside it on the rail (9.5 mm gap).  Affordable only
-                     //   because the SBC now lies 55 across instead of 64.
+cmf_x     = 72;      // outer width -- 72 not 80, so ONE antenna mount still fits
+                     //   beside it on the rail (9.5 mm gap).  Width is set by the
+                     //   rail, not by the contents: the SBC needs 56 across and
+                     //   the converter 65, both inside the 66 mm interior.
 cmf_z     = 160;     // outer height
-cmf_y     = 33;      // outer depth -- only what the SBC needs, not the 50 budget
+cmf_y     = 40;      // outer depth.  Was 33 -- only what the SBC needed -- but the
+                     //   converter lies flat with its 35 mm dimension running
+                     //   front-to-back, so interior depth had to reach 37.
+                     //   Still inside the 50 mm envelope.
 cmf_bolt  = 28;      // bolt column spacing = grid columns 5 and 7 (85.125 and
                      //   113.125), the pair that lands inside a 72 mm box sitting
                      //   right of an antenna mount
@@ -952,23 +962,67 @@ cmf_boss  = 8;       // local back-wall thickness at the bolts, so an M4 counter
 //  floor (Z 3..17 instead of 8..22 on ribs) freed 5 mm, and spending it by moving
 //  the board down rather than by widening the connector gap keeps that gap at
 //  exactly 22 mm while handing the 5 mm to the USB bay, where it is scarce.
-cmf_bay_buck  = [3, 17];     // bottom bay: buck converter, flat on the floor
+cmf_bay_buck  = [3, 18];     // bottom bay: buck converter, flat on the floor
 cmf_bay_sbc   = [39, 103];   // the board itself, 64 tall in this orientation
 cmf_bay_usb   = [107, 157];  // top bay: USB devices, plugged into the upward ports
 // --- cover ---
-// --- buck converter, measured 1.81 x 1.10 x 0.55 in ---
-cmf_buck     = [46, 28, 14];
-cmf_grom     = 12;   // grommeted power entry through the floor, replacing the old
-                     //   30 x 14 slot.  A solid floor is what lets the converter
-                     //   bolt down here instead of floating on its own leads.
-cmf_buck_x   = [13, 59];  // buck footprint across the floor, centred
-cmf_notch    = [12, 60];  // the cover's locating rim used to run unbroken across
-                     //   the bottom, projecting 2 mm in over Z 3..7 and leaving a
-                     //   floor-flat part only 28 mm of depth against the buck's
-                     //   27.9.  Notching the rim over the buck footprint restores
-                     //   the full 30 mm and lets the converter sit right on the
-                     //   floor, which is 5 mm better than standing it on ribs.
-                     //   46 mm out of 154 mm of rim; the six screws carry it.
+// --- buck converter, MEASURED 35 H x 65 W x 15 D, wires off the 35 mm end ---
+//  It lies flat on the floor: 65 across X, 35 front-to-back, 15 tall.  That is
+//  the pose that costs the least height, which is what the connector gap above it
+//  is short of.  65 is the OVERALL width including its mounting ears, and it goes
+//  into the 66 mm interior as-is -- the box does not widen for it.  Depth is the
+//  one dimension that had to give: 35 front-to-back needs 37 of interior.
+cmf_buck     = [65, 35, 15];             // W x D(front-to-back) x H
+cmf_buck_x   = [(cmf_x - 2*cm_wall - 65)/2 + cm_wall,
+                (cmf_x - 2*cm_wall + 65)/2 + cm_wall];   // 3.5 .. 68.5
+//  Mounting: the LY-KREE XS120503 has a slotted fork tab at each end, so two
+//  fixings, not four.  MEASURED 54 mm apart and 13.5 mm in from the back.
+//  The 65 mm overall is across the tabs, so the holes land 5.5 mm inboard of each
+//  end -- which is consistent, and is why the datum below is read as the INSIDE
+//  face of the back wall rather than the outside: the converter registers against
+//  that face, and 13.5 from it falls inside the 35 mm footprint.
+cmf_buck_dx  = 54;                       // hole spacing across the box
+cmf_buck_by  = 13.5;                     // holes, back from the inside face
+cmf_buck_bd  = m3_clear;                 // 3.4, M3 clearance -- plain through
+                                         //   holes, screw from underneath.  The
+                                         //   tabs are slotted, so they absorb the
+                                         //   tolerance a round hole does not.
+//  Power now enters through the BACK WALL rather than the floor -- the converter
+//  is sitting where the floor hole used to be, and coming in at the back lets the
+//  12 V leads turn once into the frame instead of doubling back under the module.
+cmf_grom     = 12;   // grommeted power entry, now in the back wall
+cmf_grom_x   = 12;   // Moved off centre into the FIRST QUARTER (X 0..18) to keep
+                     //   the 12 V run away from the Ethernet and HDMI adapters,
+                     //   which hang off the board's downward edge.  Left/right is
+                     //   as seen looking INTO the opening with the M4 pads at top:
+                     //   in that view low X is screen-left.  Ø12 at X 12 spans
+                     //   6..18 -- inside the first quarter, 3 mm off the interior
+                     //   wall at X 3.
+cmf_grom_z   = 28;   // its centre.  HARD CONSTRAINT: the bottom-front crossbeam
+                     //   occupies global Z 16..40 = box-local -4..20, so the back
+                     //   wall is flat against beam material below box-local 20 and
+                     //   a hole there would open into the beam, not the frame.
+                     //   Ø12 at 28 spans 22..34: 2 mm clear of the beam, 5 mm
+                     //   below the board edge at 39.
+cmf_notch    = [cm_wall, cmf_x - cm_wall];  // the cover's locating rim runs unbroken
+                     //   around the opening, projecting 2 mm in over Z 3..7.  With
+                     //   a 35 mm converter in a 37 mm interior there is nothing to
+                     //   give, so the bottom rim is now notched over its whole
+                     //   width.  Three sides still locate the cover; six screws
+                     //   hold it.
+// --- power switch in the TOP wall ---
+//  Ø12 barrel through a 20 x 32 bezel, long side running front-to-back along the
+//  box depth.  The top wall is 72 x 40, and the rim slot used to sit at X 15..45 --
+//  squarely where the bezel wants to go -- so the slot moved left to X 6..36 and
+//  the switch took the right-hand end.  That gives 12 mm between them and 4 mm to
+//  the outer edge, against 2 mm if the slot had stayed put.
+cmf_sw_fp    = [20, 32];  // bezel footprint, W x D.  Not cut -- it is the keep-out
+                          //   that positions the hole, and must clear the rim slot
+                          //   and both box edges.
+cmf_sw_d     = 12;        // panel hole for the barrel
+cmf_sw_x     = 58;        // bezel spans X 48..68
+cmf_sw_y     = -20;       // bezel spans Y -4..-36, centred in the depth
+cmf_rim_x    = 6;         // top rim slot, moved left from 15 to clear the bezel
 cmf_cov_t    = 3;    // cover panel thickness
 cmf_cov_lip  = 2;    // locating lip that nests inside the opening
 cmf_cov_z    = [15, 120, 152]; // screw rows; all clear of the SBC footprint,
@@ -986,8 +1040,8 @@ module sbc_pads() {
 }
 module sbc_pad_pockets() {
     for (dx = [-sbc_hx/2, sbc_hx/2], dy = [-sbc_hy/2, sbc_hy/2])
-        translate([dx, dy, sbc_stand - m3_ins_h])
-            cylinder(d = m3_ins_d, h = m3_ins_h + 0.1);
+        translate([dx, dy, sbc_stand - sbc_ins_h])
+            cylinder(d = m3_ins_d, h = sbc_ins_h + 0.1);
 }
 // generic M3 grid over a rectangle, as through-holes (nuts or nylon standoffs
 // underneath) -- they also ventilate
@@ -1086,15 +1140,24 @@ module compute_box_front() {
         // TOP RIM: audio, PTT and the GPS lead come off the radio's control face,
         // which points up at Z 179.5.  They pass over the top crossbeam and drop
         // straight in here.
-        translate([15, -24, cmf_z - cm_wall - 1]) rbox(30, 14, cm_wall + 2, 1.4);
-        // BOTTOM: power up from the battery box.  Now a single grommeted hole
-        // rather than a 30 x 14 slot -- the slot was most of the floor, and
-        // keeping the floor solid is what turns it into a mounting surface.
-        translate([cmf_x/2, -17, -1]) cylinder(d = cmf_grom, h = cm_wall + 2);
-        // zip-tie slots either side of the buck footprint (X 13..59): the tie
-        // goes up through one, over the converter, down the other.
-        for (sx = [8, cmf_x - 11])
-            translate([sx, -22, -1]) rbox(3, 12, cm_wall + 2, 1);
+        translate([cmf_rim_x, -24, cmf_z - cm_wall - 1]) rbox(30, 14, cm_wall + 2, 1.4);
+        // POWER SWITCH: Ø12 barrel through the top wall, beside the rim slot.
+        translate([cmf_sw_x, cmf_sw_y, cmf_z - cm_wall - 1])
+            cylinder(d = cmf_sw_d, h = cm_wall + 2);
+        // BACK WALL: power in from the battery.  Moved off the floor because the
+        // converter now covers it, and placed above box-local Z 20 so it opens
+        // into the gap between the two front crossbeams rather than into the
+        // bottom beam itself.  The leads turn once here instead of doubling back
+        // underneath the converter, which is the point.
+        translate([cmf_grom_x, -cm_wall - 1, cmf_grom_z]) rotate([-90, 0, 0])
+            cylinder(d = cmf_grom, h = cm_wall + 2);
+        // Buck converter fixings: two M3 clearance holes through the floor, taking
+        // its slotted end tabs.  These replace the zip-tie slots that used to live
+        // here -- a 65 mm converter in a 66 mm interior leaves 0.5 mm a side, so
+        // nothing could have been tied around it anyway.
+        for (dx = [-cmf_buck_dx/2, cmf_buck_dx/2])
+            translate([cmf_x/2 + dx, -cm_wall - cmf_buck_by, -1])
+                cylinder(d = cmf_buck_bd, h = cm_wall + 2);
         // cover screw inserts, M3, opening onto the front face
         for (wx = [cm_wall + cmf_cov_bx, cmf_x - cm_wall - cmf_cov_bx], cz = cmf_cov_z)
             translate([wx, -cmf_y - 0.01, cz]) rotate([-90, 0, 0])
@@ -1103,6 +1166,86 @@ module compute_box_front() {
         for (sx = [-1, cmf_x - cm_wall - 1], sz = [24, 48, 140])
             translate([sx, -cmf_y + 8, sz]) rbox(cm_wall + 2, cm_tie[1], cm_tie[0], 1);
     }
+}
+
+// -----------------------------------------------------------------------------
+//  compute_box_front_populated  -- a LAYOUT AID, not a printable part
+// -----------------------------------------------------------------------------
+//  The box seen through its own opening with representative blocks where the
+//  electronics go, so cable runs and free space can be judged before wiring.
+//  Render in PREVIEW (no --render) so the colours survive.
+//
+//  MEASURED: the buck converter (65 x 35 x 15) and the La Frite outline (64 x 56)
+//  and its M3 pattern.  Everything else is a plausible placeholder -- the fob,
+//  PTT board, GPS module and the two right-angle adapters are sized from typical
+//  parts, not from yours.  Move them by editing the table below.
+//
+//  Devices are drawn in the positions the geometry forces, not arbitrary ones:
+//  the converter fills the floor, the board's M3 pattern fixes its position, and
+//  the adapters have to live in the 21 mm between the board edge and the
+//  converter.  The top bay is the only place with genuine freedom.
+// -----------------------------------------------------------------------------
+cmf_dev_fob  = [18, 52, 8];    // CM108/CM119 audio fob        W x H x D
+cmf_dev_ptt  = [40, 22, 10];   // PTT board.  22 not 25: at 25 it fouls the
+                               //   switch by 2 mm -- see below.
+cmf_dev_gps  = [25, 25, 8];    // GPS module
+cmf_dev_rj45 = [20, 18, 16];   // right-angle Ethernet adapter
+cmf_dev_hdmi = [22, 16, 12];   // right-angle HDMI adapter
+cmf_sw_body  = 30;             // MEASURED, with its cables connected.  This is
+                               //   the number that fills the top bay: it puts the
+                               //   switch body at Z 127..157, leaving only 24 mm
+                               //   of height beneath it.  A PTT board taller than
+                               //   ~23 mm will not pass under, and there is
+                               //   nowhere else 40 mm wide for it to go.
+
+module cmf_dev(pos, size, col) {
+    color(col) translate([pos[0], pos[1], pos[2]])
+        cube([size[0], size[2], size[1]]);   // W, D(into Y), H
+}
+
+module compute_box_front_populated() {
+    %compute_box_front();                       // shell, ghosted
+
+    // --- bottom bay: the converter, flat on the floor, filling it ---
+    cmf_dev([cmf_buck_x[0], -cm_wall - cmf_buck[1], cmf_bay_buck[0]],
+            [cmf_buck[0], cmf_buck[2], cmf_buck[1]], [0.85, 0.25, 0.20]);
+
+    // --- the La Frite, on its four standoffs ---
+    bz = cmf_bay_sbc[0];
+    color([0.15, 0.55, 0.25])
+        translate([cmf_x/2 - sbc_w/2, -cm_wall - sbc_stand - 1.6, bz])
+            cube([sbc_w, 1.6, sbc_l]);
+    // its connectors and eMMC, forward of the board
+    color([0.20, 0.35, 0.20, 0.55])
+        translate([cmf_x/2 - sbc_w/2 + 3, -cm_wall - sbc_stand - 1.6 - 14, bz + 3])
+            cube([sbc_w - 6, 14, sbc_l - 6]);
+
+    // --- the two right-angle adapters, in the 21 mm below the board edge ---
+    cmf_dev([12, -cm_wall - sbc_stand - 14, bz - cmf_dev_rj45[1] - 1],
+            cmf_dev_rj45, [0.90, 0.75, 0.15]);
+    cmf_dev([40, -cm_wall - sbc_stand - 12, bz - cmf_dev_hdmi[1] - 1],
+            cmf_dev_hdmi, [0.95, 0.60, 0.10]);
+
+    // --- top bay: the only place with real freedom, and the switch takes some ---
+    // Drawn standing 1 mm forward of the M4 bolt pads, which reach Y -8 across
+    // Z 133.5..158.5.  Sitting a device flat on the back wall here overlaps them
+    // by 2 mm; that is accepted rather than designed around, since the box is
+    // bolted up once and not routinely removed.
+    //
+    // The switch body hangs into this bay from the top wall, so the devices are
+    // arranged around it: the fob up the left edge, the PTT board low enough to
+    // pass under the switch, the GPS beside it.  Body depth is a PLACEHOLDER --
+    // only the bezel and barrel were given.
+    // Fob rises off the board's USB ports, so its 52 mm is forced up the left
+    // edge.  That leaves 24 mm of width beside it -- narrower than the PTT board --
+    // so the PTT can only go UNDER the switch, and the GPS beside it.
+    cmf_dev([4,  -cmf_boss - 1, 104], cmf_dev_fob, [0.20, 0.40, 0.85]);
+    cmf_dev([23, -cmf_boss - 1, 104], cmf_dev_ptt, [0.95, 0.55, 0.15]);
+    cmf_dev([22, -cmf_boss - 1, 130], cmf_dev_gps, [0.55, 0.30, 0.75]);
+    color([0.30, 0.30, 0.33])
+        translate([cmf_sw_x - cmf_sw_fp[0]/2, cmf_sw_y - cmf_sw_fp[1]/2,
+                   cmf_z - cm_wall - cmf_sw_body])
+            cube([cmf_sw_fp[0], cmf_sw_fp[1], cmf_sw_body]);
 }
 
 // -----------------------------------------------------------------------------
@@ -1257,5 +1400,8 @@ else if (part == "compute_box_inline")
 else if (part == "compute_box_front")
     rotate([-90, 0, 0]) compute_box_front();
 else if (part == "compute_box_front_cover") compute_box_front_cover();
+// Layout aid, not printable.  Left in its own local frame so a front view looks
+// straight into the opening; render in PREVIEW so the colours survive.
+else if (part == "compute_box_front_populated") compute_box_front_populated();
 else if (part == "battery_box")
     translate([-bb_x0, bb_tot_z, frame_d]) rotate([-90, 0, 0]) battery_box();

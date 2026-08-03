@@ -69,8 +69,8 @@ Two measurements drove real design decisions and are worth calling out:
 | 8   | `antenna_mount_so239`      | 2\*   | 35 × 24 × 38      | 11.6 cm³  | —       |
 | 9   | `base_plate`               | 1     | 142.25 × 70 × 16  | 55.9 cm³  | 4       |
 | 11a | `compute_box_inline`     | 1\*\*\* | 142.25 × 49 × 70  | 95.7 cm³  | 4       |
-| 11b | `compute_box_front`      | 1\*\*\* | 72 × 160 × 33     | 75.1 cm³  | 4 M3    |
-| 11c | `compute_box_front_cover`| 1\*\*\* | 72 × 160 × 5      | 34.0 cm³  | —       |
+| 11b | `compute_box_front`      | 1\*\*\* | 72 × 160 × 40     | 84.8 cm³  | 4 M3    |
+| 11c | `compute_box_front_cover`| 1\*\*\* | 72 × 160 × 5      | 33.8 cm³  | —       |
 | 10  | `battery_box`              | 1     | 143 × 59.8 × 94.8 | 103.3 cm³ | 4       |
 
 \*\* Parts 2a–2c are alternatives — the three top-front layouts (§2.11). Print one.
@@ -520,8 +520,8 @@ with; it also moves the antenna brackets to that layout's outer stations.
 | --- | --- |
 | ![inline](img/compute_box_inline.png) | ![front](img/compute_box_front.png) |
 
-Carries a **Libre Computer La Frite** (64 × 55 mm, Raspberry Pi Model A mounting
-pattern — M3 on 58 × 49.5) with its 128 GB eMMC, plus a CM108/CM119 USB audio
+Carries a **Libre Computer La Frite** (AML-S805X-AC, 64 × 56 mm, M3 mounting on
+**58.75 × 49.5**) with its 128 GB eMMC, plus a CM108/CM119 USB audio
 fob, a PTT board and a GPS module, for onboard logging over WiFi to a tablet.
 
 **Only the SBC gets a dedicated mount**, because it is the only one of the four
@@ -537,10 +537,22 @@ to line up. Ventilation there is now the cover's slots plus the two rim slots,
 which draw better than the grid did — the grid only breathed sideways into the
 crossbeam.
 
-**M3 is confirmed** — test-fitted against the board itself, which was worth doing
-because the Raspberry Pi footprint La Frite copies uses M2.5. The 58 × 49.5 pitch
-is still the published Pi Model A figure rather than a measurement; sources vary by
-0.5 mm (49 vs 49.5), which an M3 bolt in the board's own clearance hole absorbs.
+**The mounting pattern is now measured, not published — and the published figure
+was wrong.** M3 was confirmed early by test-fitting a bolt. The pitch was carried
+as the Raspberry Pi Model A figure of 58 × 49.5 until a **printed test fit** showed
+it short: with the pair nearest the converter seated, the pair at the USB end
+missed by 0.5–1 mm. Calipers on the board put that dimension at **58.5–59 mm**, so
+the model now uses **58.75**, the midpoint. 49.5 fitted and is unchanged.
+
+Residual uncertainty is ±0.25 mm against roughly ±0.1 mm of slack from an M3 in the
+board's ~3.2 mm hole, so **start all four screws before tightening any of them** —
+the board will pull into place across four fixings but binds if one corner is fully
+seated first. That is most likely what made the USB-end pair read as clearly wrong
+rather than merely tight. If a later measurement lands nearer one end of the range,
+`sbc_hx` is the single number to move.
+
+This is the second assumption in the project that only a printed part could
+retire — the first was the antenna bracket's sealed counterbores.
 
 |                   | `_inline`                     | `_front`                        |
 | ----------------- | ----------------------------- | ------------------------------- |
@@ -548,8 +560,9 @@ is still the published Pi Model A figure rather than a measurement; sources vary
 | Outer             | 142.25 × 70 × 49 mm           | **72** × 160 × **33** mm        |
 | SBC orientation   | lying flat on the floor       | flat on the back wall, **turned 90°** |
 | Grid positions    | 30 (6 × 5)                    | none — see above                |
-| Cover             | open front                    | `compute_box_front_cover`, 34.0 cm³ |
-| Volume            | 95.7 cm³                      | 75.1 cm³                        |
+| Outer depth       | 49 mm                         | **40 mm** (was 33; the converter forced it) |
+| Cover             | open front                    | `compute_box_front_cover`, 33.8 cm³ |
+| Volume            | 95.7 cm³                      | 84.8 cm³                        |
 
 **`_inline`** bolts up into the plate above and presents the same four feet
 below, so the battery box hangs off it unchanged — stack pitch **49 mm**. Its
@@ -564,18 +577,18 @@ so USB, Ethernet, DC and the GPS lead are all reachable.
 The SBC does not have to dodge the top flanges: it tops out 1 mm below their
 underside, so the whole floor width is usable and the grid gets the rest.
 
-**`_front`** hangs off the crossbeam, sized to the 160 H × 80 W × 50 D envelope
-available on the front of the frame. At that size the back wall gives 74 × 154 =
-11 396 mm² against roughly 6 684 mm² of boards, so **all four lie flat on it** —
-nothing layers, and the depth stops being set by the budget and starts being set
-by the tallest component: 5 mm standoff + ~22 mm of board and connectors + slack
-= 30 interior, **33 outer. 17 mm of the depth allowance goes unused.**
+**`_front`** hangs off the crossbeam, inside the 160 H × 80 W × 50 D envelope
+available on the front of the frame. **Width is set by the rail, not by the
+contents**: 72 mm is what leaves one antenna mount beside it with a 9.5 mm gap,
+and both the board (56 across) and the converter (65) fit the 66 mm interior
+without it growing. **Depth is set by the converter** — 35 mm front-to-back needs
+37 of interior, so 40 outer.
 
 **The board is turned 90°, and that turn is what makes the box work.** With the
 La Frite's 58 mm hole axis vertical, the **USB edge points up toward the radio and
 the power/Ethernet edge points down toward the battery** — the ports are reachable
 in the orientation the box is actually used in. It also means the board needs
-55 mm across instead of 64, which is what let the box narrow from 80 to 72.
+56 mm across instead of 64, which is what let the box narrow from 80 to 72.
 
 Three bays, top to bottom:
 
@@ -583,15 +596,34 @@ Three bays, top to bottom:
 | ------------- | ------ | ------------------------------------------- |
 | 107 – 157     | 54 mm  | USB devices, plugged into the upward ports  |
 | 39 – 103      | 64 mm  | the La Frite                                |
-| 3 – 17        | 14 mm  | buck converter, flat on the floor           |
+| 3 – 18        | 15 mm  | buck converter, flat on the floor           |
 
-Standoffs measure at X 11.25 / 60.75 and Z 42 / 100 — 49.5 across, 58 up.
+Standoffs measure at X 11.25 / 60.75 and Z 41.65 / 100.35 — 49.5 across,
+**58.75 up**. They stand **6 mm** off the back wall (was 5) with a **6 mm** insert
+pocket (was 5): the heat-set inserts were bottoming out. The pocket now ends
+exactly at the wall's inner face, leaving 1 mm of pad beside it and 2 mm of wall
+behind.
+
+Measured clear interior, which is what the electronics actually get:
+
+| | clear | contents | spare |
+| --- | --- | --- | --- |
+| Width, bottom bay | **66.05 mm** | converter 65 | **1.05 mm total — 0.5 a side** |
+| Depth | **37.05 mm** | converter 35 | 2.05 mm |
+| Floor to board edge | 42.00 mm | converter 15 + gap | — |
+| Top bay depth | 31 mm clear of the M4 pads | — | 37 mm if a device straddles them |
+
+**That 0.5 mm per side on the width is the tightest fit in the project.** It is a
+print-tolerance judgement, not a clash: a Mini typically holds internal dimensions
+within ±0.15 mm and the converter has its own tolerance, so it should go in, but
+there is no room to be wrong and none for a zip tie beside it. If it binds, scrape
+the wall rather than reprint.
 
 **The board sits 5 mm lower than it first did**, which is worth understanding
 because it is free height. Dropping the converter flat onto the floor freed 5 mm;
-spending it on the board position rather than on the connector gap keeps that gap
-at exactly 22 mm while handing the 5 mm to the USB bay, where it is scarce. A
-CM108/CM119 fob runs ~50–52 mm: at the old 49 mm it did not fit, at 54 it does.
+spending it on the board position rather than on the connector gap handed the 5 mm
+to the USB bay, where it is scarce. A CM108/CM119 fob runs ~50–52 mm: at the old
+49 mm it did not fit, at 54 it does.
 
 Its four M4s want two accessory columns **28 mm apart** — on the `_grid` beam,
 columns 85.125 and 113.125, the pair that lands inside a 72 mm box sitting to the
@@ -608,12 +640,12 @@ already carries the base-plate inserts over beam-local Z 0–9, and a second row
 the two sets of pockets and keeps all seven columns usable. It also lands 12 mm up
 the box's back wall, clear of its bottom rim.
 
-**Cable entries on `_front`.** Two rim slots and a grommet — the back wall is
-deliberately solid:
+**Cable entries on `_front`.** One top-rim slot and a back-wall grommet — the
+floor is solid, because the converter sits on it:
 
 | connection | route |
 | --- | --- |
-| DC power from the battery | **Ø12 grommet in the floor**, run up the outside of the frame |
+| DC power from the battery | **Ø12 grommet in the back wall, X 12 / Z 28** |
 | Audio to/from the radio | top-rim slot |
 | PTT | top-rim slot, alongside the audio |
 | Ethernet, HDMI | right-angle adapters inside the box — see below |
@@ -624,32 +656,49 @@ The top-rim slot (30 × 14 mm) exists because the AT-779UV's control face points
 **up** at Z 179.5: audio, PTT and a frame-mounted GPS lead all come off the top of
 the radio, pass over the top crossbeam and drop straight in.
 
-The old back-wall slot is gone. The back wall faces the crossbeam, so anything
-routed through it had to turn immediately; the two rim slots reach both ends of
-the box and sit 160 mm apart, which also draws better for ventilation.
+**Power moved from the floor to the back wall, and its height is constrained.**
+The converter now covers the floor where the grommet used to be, and entering at
+the back lets the 12 V leads turn once into the frame instead of doubling back
+underneath the module. But the **bottom-front crossbeam occupies global Z 16–40 =
+box-local −4 to 20**, so the back wall is flat against beam material below
+box-local 20 and a hole there would open into the beam, not the frame. Ø12 centred
+at Z 28 spans 22–34: verified open across that band, **2 mm clear of the beam** and
+5 mm below the board edge at 39.
 
-**The floor is a mounting surface.** The old 30 × 14 bottom slot was most of the
-usable floor; replacing it with a Ø12 grommeted hole lets the buck converter bolt
-down there. Two zip-tie slots at X 8–11 and 61–64 straddle the converter's 13–59
-footprint — the tie goes up through one, over the converter, down the other.
+**The converter bolts to the floor.** It is an **LY-KREE XS120503** — 12 V in,
+5 V 3 A / 15 W out — with a slotted fork tab at each end, so **two** fixings, not
+four. Two M3 clearance holes (Ø3.4) through the floor, **54.00 mm apart** and
+**13.50 mm back from the inside face of the back wall**, both measured off the
+mesh. Plain through-holes: the floor is only 3 mm, and a counterbore deep enough
+for an M3 cap head would leave under 1.5 mm. Screw from underneath, or use a
+countersunk screw. The tabs being slotted absorbs positional error a round hole
+would not.
 
-**The cover's rim is notched over the converter.** It otherwise runs unbroken
-around the opening, projecting 2 mm in across Z 3–7, which left a floor-flat part
-only 28 mm of depth against the converter's 27.9 — not a fit. Notching 46 mm of
-the 154 mm bottom rim restores the full 30 mm; the six screws carry it.
+These replaced the zip-tie slots that used to be here. A 65 mm converter in a
+66 mm interior leaves 0.5 mm a side — nothing would have passed a tie anyway.
+
+**The datum matters:** 13.5 mm is from the **inside** face of the back wall, not
+the outside. The wall is 3 mm, so reading it the other way moves the holes 3 mm.
+The inside face is what the converter registers against, and the 65 mm overall is
+measured across the tabs — which puts the holes 5.5 mm inboard of each end and
+lands them inside the 35 mm footprint, as they must be.
+
+**The cover's bottom rim is gone entirely**, not merely notched. The rim projects
+2 mm into the opening across Z 3–7, and a 35 mm converter in a 37 mm interior has
+nothing to give. Three sides still locate the cover; the six screws hold it.
 
 **Ports are connect-before-closing.** With the board turned, the ports open in the
 plane of the board — up and down *inside* the box — so no wall needs a cutout and
 the cover can be solid. Ethernet and HDMI use right-angle adapters, which is not
 optional: a straight RJ45 plug needs ~40 mm below the board edge and the converter
-is at 22 mm.
+top is at 18.
 
-**The 22 mm budget.** Below the board edge (Z 39) down to the converter top
-(Z 17) there is 22 mm, across X 13–59. Outside that span it is 41 mm to the floor,
-but the La Frite spans X 8.5–63.5, so only 4.5 mm of board overhangs the free
-columns on each side. Treat 22 mm as the hard limit on how far any adapter may
-project downward. Pick the variant whose socket faces the **cover**, since that is
-the direction you are coming from when the box is open.
+**The 21 mm budget.** Below the board edge (Z 39) down to the converter top
+(Z 18) there is 21 mm, across the converter's full width. Treat it as the hard
+limit on how far any adapter may project downward, and pick the variant whose
+socket faces the **cover**, since that is the direction you are coming from when
+the box is open. Note this moved the wrong way: it was 22 mm against the previous,
+smaller converter.
 
 One thing to weigh: at 72 mm wide the box spans X 63.1–135.1, which leaves room
 for **one** antenna mount on columns 1–2 (X 18.6–53.6) with a 9.5 mm gap. At the
@@ -667,9 +716,45 @@ left only 1 mm under the head.
 The rim is a **4 mm rim, not a slab**. A solid plate here cost 22 cm³ and stole
 2 mm of interior depth from a box with 1 mm to spare over the SBC.
 
-Eighteen vent slots, kept out of the rim and off the screw rows. With the grid and
-the back-wall cutout gone these are the box's main breathing, working with the two
-rim slots 160 mm apart.
+Eighteen vent slots, kept out of the rim and off the screw rows. With the grid
+gone these are the box's main breathing, working with the top-rim slot.
+
+#### `compute_box_front_populated` — a layout aid, not a printable part
+
+![populated](img/compute_box_front_populated.png)
+
+The box seen straight through its opening with representative blocks where the
+electronics go, for planning cable runs and judging free space before wiring.
+
+| colour | component | source |
+| --- | --- | --- |
+| red | buck converter, 65 × 35 × 15 | **measured** |
+| green | La Frite, 64 × 56 (dark = connectors and eMMC) | **measured**, with its M3 pattern |
+| yellow / amber | right-angle Ethernet / HDMI adapters | placeholder |
+| blue | CM108/CM119 audio fob | placeholder |
+| orange | PTT board | placeholder |
+| purple | GPS module | placeholder |
+
+**Only the converter and the board are real measurements.** The other five are
+typical parts, not the ones you will fit — correct them by editing `cmf_dev_fob`,
+`_ptt`, `_gps`, `_rj45` and `_hdmi`.
+
+Two things to know about using it:
+
+- **Render in PREVIEW, not `--render`.** CGAL discards `color()`, so a full render
+  comes out monochrome and useless for this purpose. The shell is drawn with `%`
+  so it ghosts.
+- The layout is only free in the **top bay**. Everything else is forced: the
+  converter fills the floor, the M3 pattern fixes the board, and the two adapters
+  have to live in the 21 mm between the board edge and the converter — which is
+  why they are drawn crowding that gap.
+
+The first version of this drawing put the top-bay devices flat on the back wall
+and they fouled the M4 bolt pads — 2 mm deep over 22.5 mm of height, confirmed by
+a clash check rather than by eye. They are now drawn 1 mm forward of the pads.
+**That overlap is accepted rather than designed around**, since the box is bolted
+up once and not routinely removed; the drawing simply shows where it happens.
+Depth in that bay is 31 mm clear of the pads, 37 mm if a device straddles them.
 
 ---
 
@@ -764,7 +849,8 @@ and 8.5 mm into the radio.
 | `crossbeam` ×4     | long axis on the bed, 24 mm tall  | end **and** front-face inserts both come out in-plane                                                                         |
 | `handle`           | flat, mating face down            | one bridge over the grip aperture; flattest face becomes the lap joint                                                        |
 | `handle_mic`       | flat, mating face down            | same pose; puts the M3 bracket pockets face-up as blind holes rather than bridged ceilings                                     |
-| `compute_box_front`| back wall down, open front up     | standoffs and all pockets open upward; the floor ribs are gone, so the floor is flat                                          |
+| `compute_box_front`| back wall down, open front up     | standoffs and all pockets open upward; the floor is flat and unbroken                                                         |
+| `compute_box_front_populated` | — | **not printable.** Layout aid; render in preview so `color()` survives |
 | `compute_box_front_cover` | flat, rim up               | panel face on the bed; counterbores and vents open upward                                                                     |
 | `antenna_mount` ×2 | on its back                       | every layer smaller than the one below — no supports; one symmetric part, print two                                           |
 | `base_plate`       | upside down, flat top face on bed | feet and every insert mouth point upward; fully self-supporting                                                               |
@@ -807,9 +893,10 @@ heads, so the top beams go on first.
    pack in from the front and strap it.
 8. If fitting `compute_box_front`, populate it **before** the cover goes on —
    the downward-facing power and Ethernet connections are not reachable once it
-   is closed. Order inside the box: buck converter onto the floor first (zip-tie
-   through the two floor slots, power in through the grommet), then the La Frite
-   on its four M3 standoffs, then the right-angle adapters, then USB devices in
+   is closed. Order inside the box: converter onto the floor first (two M3 through
+   the floor into its slotted tabs, 12 V in through the back-wall grommet), then
+   the La Frite on its four M3 standoffs — **start all four screws before
+   tightening any of them** — then the right-angle adapters, then USB devices in
    the top bay. Cover last, six M3.
 9. The microphone bracket mounts to `handle_mic` last, and comes off again for
    storage — it projects 10 mm outboard and the mic well beyond that.
@@ -860,22 +947,37 @@ Not just rendered — checked:
   insert shear 13.6 N each, lap peel 13.6 N/bolt, lateral across layers 3.3 MPa.
   The handle prints flat so arch bending runs along the filaments, not across
   layer bonds.
-- Compute boxes: SBC envelope (64 × 55 board + 22 mm of connectors) traced clear
+- Compute boxes: SBC envelope (64 × 56 board + 22 mm of connectors) traced clear
   of the walls and top flanges, both variants single-shell with zero enclosed
   voids, inline verified to bolt up into the plate above and accept a module on
   its own feet below.
 - `compute_box_front` after the rework: all four standoffs located by **counting
   solid islands standing proud of the back wall**, not by point-probing — four at
-  X 11.25 / 60.75 × Z 42 / 100, each 37.0 mm², which is a Ø8 pad minus its Ø4
-  insert pocket to the decimal. This was the check that finally settled the board
-  rotation; three earlier point-probes of the same feature were wrong (see below).
+  X 11.25 / 60.75 × Z 41.65 / 100.35, each 38.0 mm², which is a Ø8 pad minus its
+  Ø4 insert pocket to the decimal. This was the check that finally settled the
+  board rotation; three earlier point-probes of the same feature were wrong (see
+  below). Spacing re-measured after the correction: 58.70 on a 0.5 mm grid against
+  the 58.75 modelled, and 49.50 across.
+- Standoff height and pocket depth traced through the thickness: pad solid to
+  bedZ 8.95 (6 mm proud of a 3 mm wall) with the pocket open from 2.95, i.e. the
+  full 6 mm.
+- Converter fixings swept across the floor: two Ø3.40 holes at X 9.03 / 63.03 —
+  **54.00 mm apart**, symmetric about the box centre at 36.03 — and 13.50 mm back
+  from the inside face, through the full floor thickness.
+- Back-wall power entry after moving it left: open X 6.05–18.00, Ø12.00, centred
+  12.03 and wholly inside the first quarter; the old centred position at X 36
+  re-probed solid, confirming it moved rather than gained a second hole.
 - Back wall re-swept after removing the grid and the cutout: 2146 points, exactly
   four voids remaining, all four on the M4 clearance holes.
-- Buck converter (46 × 28 × 14, from the measured 1.81 × 1.10 × 0.55 in) traced
-  clear sitting flat on the floor, and the cover rim's 2 mm intrusion across
-  Z 3–7 measured — it is what forced the rim notch.
-- Cover rim notch verified open over X 12–60, rim intact on all three other sides,
-  and the panel **not** holed beneath it.
+- Buck converter (65 × 35 × 15, measured) traced clear sitting flat on the floor,
+  and the clear interior measured by contiguous-run sweep at five heights:
+  **66.05 mm wide, constant the full height of the bay** — no fillet loss — and
+  37.05 deep.
+- Back-wall power entry traced against the bottom-front crossbeam: open across
+  box-local Z 22–34, solid again at Z 19 and Z 37, so it opens into the gap
+  between the beams rather than into beam material.
+- Cover rim: bottom band verified gone across the full width, the other three
+  bands intact, and the panel **not** holed beneath it.
 - `handle_mic`: M3 insert axes measured at Z 105.00 / 150.00 — 45.00 apart —
   scanned strictly inside each beam, and both apertures confirmed by a centreline
   sweep that finds exactly two runs (37 mm grip, 33 mm window). The plain `handle`
@@ -907,6 +1009,8 @@ failed in ways that looked exactly like real defects:
 | pad walls, as a ring with `.all()` | the ring straddled a slot, so one open point failed the whole test |
 | a point "inside the bar" | box-local coordinates against an STL exported in its print pose |
 | M3 insert spacing | the scan window ran past the beam into the finger opening and averaged two voids |
+| clear interior width | took `min`/`max` of all free points instead of the largest contiguous run, so one ambiguous point exactly on the boundary stretched the span by 3 mm and implied a missing wall |
+| cover rim, top band | probed at Y 157, past the rim's own end at 156.6 |
 
 The habits that catch these: probe a **control** you know the answer to in the
 same run, prefer **cross-sections and island counts** over point sampling for
@@ -971,22 +1075,27 @@ panel under M5 recess = 3.5 mm of material carrying the radio
    the top hole and 5 below the bottom; if they sit off-centre, `mic_bolt_z`
    moves and the two beams move with it.
 
-8. **`compute_box_front`: the buck converter's footprint is from the listing, not
-   measured.** 46 × 28 × 14 mm, converted from 1.81 × 1.10 × 0.55 in. The bay has
-   20 mm to spare across and 27 mm of headroom, so it is unlikely to bite, but
-   check yours against 60 × 32 × 18 before assuming.
+8. **`compute_box_front`: the converter fits with 0.5 mm a side on width.**
+   65 × 35 × 15 measured, into a 66.05 mm interior. That is the tightest fit in
+   the project and it is a print-tolerance call, not a clash — see §2.12. Also
+   resolved: it is an LY-KREE XS120503 and its leads exit one end. The Ø12
+   back-wall entry now sits at **X 12**, in the first quarter, chosen to keep the
+   12 V run away from the Ethernet and HDMI adapters on the board's downward edge.
+   Note this puts power and the Ethernet lead in the same corner; if the intent is
+   to separate power from *both* port leads, the right-hand quarter would do it
+   better, and `cmf_grom_x` is a one-line change.
 
 9. **Right-angle Ethernet and HDMI adapters are required, not optional**, and
    neither has been dimensioned. A straight RJ45 plug needs ~40 mm below the
    board edge; the converter is at 22 mm. The hard limit on any adapter's
-   downward projection is **22 mm** across X 13–59. Measure from the plug's
-   mating face to the back of the housing. If it exceeds 22 mm, the levers are a
-   local rim notch and dropping the converter (+5 mm), or moving the converter to
-   the top bay (+19 mm).
+   downward projection is **21 mm**, across the converter's full width. Measure
+   from the plug's mating face to the back of the housing. If it exceeds 21 mm the
+   only real lever left is moving the converter out of the bottom bay — the rim
+   notch and the floor drop have both already been spent.
 
 10. **La Frite port positions along the board edge are not modelled.** The box is
     sized to the board outline and its M3 pattern; which port sits where along the
-    now-downward edge is unverified, so the 22 mm budget is assumed to apply to
+    now-downward edge is unverified, so the 21 mm budget is assumed to apply to
     all of them equally.
 
 ---
@@ -1286,7 +1395,7 @@ A full set is five plates. Footprints verified against the bed:
 | 4     | 2 × `handle`, side by side in X              | 142 × 70 mm  | 38 / 110 mm |
 | 4b    | `handle_mic` + 1 × `handle`, side by side    | 175 × 70 mm  | 5 / 110 mm  |
 | 5     | `battery_box` (only if you build it)         | 143 × 60 mm  | 37 / 120 mm |
-| 6     | `compute_box_front` + its cover, side by side | 150 × 160 mm | 30 / 20 mm |
+| 6     | `compute_box_front` + its cover, side by side | 150 × 160 mm | 30 / 20 mm (box is 40 tall in this pose) |
 
 Plate 4b is the tightest of all at **5 mm of X margin** — `handle_mic` is 101 mm
 long against the plain handle's 68. If that is too close for your Mini, print them
