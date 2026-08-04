@@ -1025,10 +1025,17 @@ cmf_sw_y     = -20;       // bezel spans Y -4..-36, centred in the depth
 cmf_rim_x    = 6;         // top rim slot, moved left from 15 to clear the bezel
 cmf_cov_t    = 3;    // cover panel thickness
 cmf_cov_lip  = 2;    // locating lip that nests inside the opening
-cmf_cov_z    = [15, 120, 152]; // screw rows; all clear of the SBC footprint,
-                              //   which now spans Z 44..108
-cmf_cov_bx   = 6;    // insert centre, inboard of each side wall
-cmf_cov_boss = 12;   // how far the screw boss reaches in from the wall
+//  NO SCREWS.  The cover is held on with velcro tape -- lighter, and it removes
+//  the six brass inserts and six M3 screws along with the bosses that carried
+//  them.  Those bosses were the part of this box that never worked: their pockets
+//  were cut at X 9 and 63 with the walls only at X 0..3 and 69..72, so for several
+//  revisions the cover had six holes and nothing behind them.
+//
+//  The locating RIM now does all the alignment, which makes it load-bearing rather
+//  than a nicety.  Note it is absent along the bottom edge -- notched full width so
+//  the converter could sit flat -- so the cover is located on three sides only.
+cmf_cov_z    = [];            // retained empty: no screw rows
+
 
 // 4 x M3 bosses on the SBC pattern, standing sbc_stand tall from Z=0
 // Sunk 1 mm into whatever they stand on: butting them at exactly Z=0 left the
@@ -1158,10 +1165,6 @@ module compute_box_front() {
         for (dx = [-cmf_buck_dx/2, cmf_buck_dx/2])
             translate([cmf_x/2 + dx, -cm_wall - cmf_buck_by, -1])
                 cylinder(d = cmf_buck_bd, h = cm_wall + 2);
-        // cover screw inserts, M3, opening onto the front face
-        for (wx = [cm_wall + cmf_cov_bx, cmf_x - cm_wall - cmf_cov_bx], cz = cmf_cov_z)
-            translate([wx, -cmf_y - 0.01, cz]) rotate([-90, 0, 0])
-                cylinder(d = m3_ins_d, h = m3_ins_h + 0.01);
         // zip-tie slots up both side walls
         for (sx = [-1, cmf_x - cm_wall - 1], sz = [24, 48, 140])
             translate([sx, -cmf_y + 8, sz]) rbox(cm_wall + 2, cm_tie[1], cm_tie[0], 1);
@@ -1282,19 +1285,11 @@ module compute_box_front_cover() {
         // stays intact -- only the 2 mm of rim standing proud of it is removed.
         translate([cmf_notch[0], cm_wall - 1, cmf_cov_t])
             cube([cmf_notch[1] - cmf_notch[0], 6, cmf_cov_lip + 2]);
-        // six M3 screws, heads counterbored flush in the outer face
-        for (cx = [cm_wall + cmf_cov_bx, cmf_x - cm_wall - cmf_cov_bx],
-             cz = cmf_cov_z) {
-            translate([cx, cz, -0.01]) cylinder(d = 6.2, h = 1.2 + 0.01);   // shallow:
-            //   a 2 mm counterbore in a 3 mm panel left only 1 mm under the head
-            translate([cx, cz, -0.01]) cylinder(d = m3_clear, h = cmf_cov_t + 0.02);
-        }
-        // ventilation: the SBC is an enclosed SoC in a padded bag.  With the grid
-        // and the back-wall cutout gone these slots are the box's main breathing,
-        // working with the two rim slots top and bottom.  Kept out of the lip and
-        // off the screw rows.
-        for (vz = [26, 38, 88, 100, 112, 124], vx = [22, 40, 58])
-            translate([vx - 6, vz - 2, -1]) rbox(12, 4, cmf_cov_t + 2, 1.2);
+        // No vent slots.  Eighteen 12 x 4 slots were judged of little practical
+        // value in a bag-carried box, and they were sized back when the box also
+        // breathed through a grid that no longer exists.  The cover is solid.
+        // If an SDR goes inside, revisit airflow deliberately rather than by
+        // reinstating these.
     }
 }
 

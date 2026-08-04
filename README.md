@@ -69,7 +69,7 @@ Two measurements drove real design decisions and are worth calling out:
 | 8   | `antenna_mount_so239`      | 2\*   | 35 × 24 × 38      | 11.6 cm³  | —       |
 | 9   | `base_plate`               | 1     | 142.25 × 70 × 16  | 55.9 cm³  | 4       |
 | 11a | `compute_box_inline`     | 1\*\*\* | 142.25 × 49 × 70  | 95.7 cm³  | 4       |
-| 11b | `compute_box_front`      | 1\*\*\* | 72 × 160 × 40     | 84.8 cm³  | 4 M3    |
+| 11b | `compute_box_front`      | 1\*\*\* | 72 × 160 × 40     | 84.4 cm³  | 4 M3    |
 | 11c | `compute_box_front_cover`| 1\*\*\* | 72 × 160 × 5      | 33.8 cm³  | —       |
 | 10  | `battery_box`              | 1     | 143 × 59.8 × 94.8 | 103.3 cm³ | 4       |
 
@@ -562,7 +562,7 @@ retire — the first was the antenna bracket's sealed counterbores.
 | Grid positions    | 30 (6 × 5)                    | none — see above                |
 | Outer depth       | 49 mm                         | **40 mm** (was 33; the converter forced it) |
 | Cover             | open front                    | `compute_box_front_cover`, 33.8 cm³ |
-| Volume            | 95.7 cm³                      | 84.8 cm³                        |
+| Volume            | 95.7 cm³                      | 84.4 cm³                        |
 
 **`_inline`** bolts up into the plate above and presents the same four feet
 below, so the battery box hangs off it unchanged — stack pitch **49 mm**. Its
@@ -654,7 +654,30 @@ floor is solid, because the converter sits on it:
 
 The top-rim slot (30 × 14 mm) exists because the AT-779UV's control face points
 **up** at Z 179.5: audio, PTT and a frame-mounted GPS lead all come off the top of
-the radio, pass over the top crossbeam and drop straight in.
+the radio, pass over the top crossbeam and drop straight in. It sits at **X 6–36**,
+moved left from 15–45 to make room for the power switch.
+
+**Power switch in the top wall.** A Ø12 barrel through a 20 × 32 bezel, long side
+running front-to-back along the box depth, centred at **X 58 / Y −20**. Measured
+Ø12.00 across and Ø11.95 fore-and-aft. The bezel keep-out spans X 48–68 and
+Y −4 to −36, leaving 12 mm to the rim slot and 4 mm to the outer edge — which is
+why the rim slot moved; at its old position the gap would have been 2 mm.
+
+**The switch protrudes 30 mm into the box with its cables on**, and that fills the
+top bay:
+
+```
+top bay      X 3..69  x  Z 103..157     66 x 54
+switch       X 48..68 x  Z 127..157     20 x 30
+  region A   X 3..47  x  Z 103..157     44 x 54
+  region B   X 48..68 x  Z 103..127     20 x 24   (under the switch)
+```
+
+The audio fob is ~52 mm and rises off the board's USB ports, so its height is
+forced: it takes the left edge of region A and leaves only **24 mm of width**
+beside it. Anything wider than that can only go **under the switch**, where the
+clear height is **24 mm**. So there is now a hard limit — **a PTT board taller than
+about 23 mm does not fit anywhere in this box.**
 
 **Power moved from the floor to the back wall, and its height is constrained.**
 The converter now covers the floor where the grommet used to be, and entering at
@@ -707,6 +730,15 @@ original 80 mm there was no room for one at all.
 #### 11c — `compute_box_front_cover`
 
 ![cover](img/compute_box_front_cover.png)
+
+> **DEFECTIVE — DO NOT PRINT YET.** The six cover screws have nothing to screw
+> into. The box cuts their M3 insert pockets at X 9 and 63, but its side walls only
+> exist at X 0–3 and 69–72, so every cut lands in open air and removes nothing.
+> `cmf_cov_boss = 12` — the boss that was meant to carry them inboard from the wall
+> — is defined in the model and **never referenced**. Confirmed on the mesh: all
+> six sites probe empty. The cover panel itself is sound; it is the box side that
+> is missing the material. Found on a printed part, not by any mesh check, because
+> a subtraction that removes nothing leaves a perfectly valid single-shell mesh.
 
 A flat 3 mm panel with a locating rim nesting inside the opening, on six M3
 screws at Z 15 / 120 / 152 — the three bands clear of the board footprint at
@@ -999,6 +1031,16 @@ Not just rendered — checked:
   span exceeds the bed, `frame_d` is too small to clear the control panel,
   `bay_h` is too small for the radio, or the M5 recess leaves < 3 mm of panel.
 
+**A subtraction that removes nothing is invisible to every check here.** The
+cover's six screw bosses were never built, and the model still exported watertight,
+single-shell, void-free, with correct bounds and volume — because cutting a
+cylinder out of empty space is a no-op, not an error. No mesh property distinguishes
+"this feature was made correctly" from "this feature was never made". The check that
+would have caught it is the one already used for bolt axes elsewhere: **trace every
+fastener from its clearance hole into the material that is supposed to receive it,
+and assert that material exists.** That check was applied to the M4 frame joints and
+not to the M3 cover screws.
+
 **Point-probes lie more often than the geometry does.** Every false alarm during
 the compute-box and handle work was a bad measurement, not a bad part, and they
 failed in ways that looked exactly like real defects:
@@ -1093,7 +1135,15 @@ panel under M5 recess = 3.5 mm of material carrying the radio
    only real lever left is moving the converter out of the bottom bay — the rim
    notch and the floor drop have both already been spent.
 
-10. **La Frite port positions along the board edge are not modelled.** The box is
+10. **The cover cannot be fitted as shipped** — see §11c. Its six screws have no
+    bosses to land in. This is the next thing to fix on this part, together with
+    the vent slots, which have been judged of little practical value in use.
+
+11. **The switch body depth (30 mm, measured with cables) leaves 24 mm under it.**
+    That is now the binding constraint on the top bay, not the bay's 54 mm height.
+    Check any PTT board against ~23 mm before assuming it fits.
+
+12. **La Frite port positions along the board edge are not modelled.** The box is
     sized to the board outline and its M3 pattern; which port sits where along the
     now-downward edge is unverified, so the 21 mm budget is assumed to apply to
     all of them equally.
