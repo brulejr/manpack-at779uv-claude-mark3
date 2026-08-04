@@ -20,7 +20,7 @@ $fa = 2;
 $fs = 0.4;
 
 /* [Output] */
-part = "assembly"; // [assembly, exploded, side_panel, crossbeam_top_front_dual, crossbeam_top_front_grid, crossbeam_top_back, crossbeam_bottom_front, crossbeam_bottom_front_rail, crossbeam_bottom_back, crossbeam_top_front_triple, compute_box_inline, compute_box_front, compute_box_front_cover, compute_box_front_populated, handle, handle_mic, antenna_mount_bnc, antenna_mount_so239, base_plate, battery_box]
+part = "assembly"; // [assembly, exploded, side_panel, crossbeam_top_front_dual, crossbeam_top_front_grid, crossbeam_top_back, crossbeam_bottom_front, crossbeam_bottom_front_rail, crossbeam_bottom_back, crossbeam_top_front_triple, compute_box_inline, compute_box_front, compute_box_front_cover, compute_box_front_populated, compute_box_front_slim, compute_box_front_slim_cover, handle, handle_mic, antenna_mount_bnc, antenna_mount_so239, base_plate, battery_box]
 
 // which top-front crossbeam the assembly is built with
 top_front = "grid"; // [grid, triple, dual]
@@ -1041,13 +1041,13 @@ cmf_cov_z    = [];            // retained empty: no screw rows
 // Sunk 1 mm into whatever they stand on: butting them at exactly Z=0 left the
 // pads sharing only a plane with the floor, which printed the inline box as five
 // separate shells.
-module sbc_pads() {
+module sbc_pads(h = sbc_stand) {
     for (dx = [-sbc_hx/2, sbc_hx/2], dy = [-sbc_hy/2, sbc_hy/2])
-        translate([dx, dy, -1]) cylinder(d = 8, h = sbc_stand + 1);
+        translate([dx, dy, -1]) cylinder(d = 8, h = h + 1);
 }
-module sbc_pad_pockets() {
+module sbc_pad_pockets(h = sbc_stand) {
     for (dx = [-sbc_hx/2, sbc_hx/2], dy = [-sbc_hy/2, sbc_hy/2])
-        translate([dx, dy, sbc_stand - sbc_ins_h])
+        translate([dx, dy, h - sbc_ins_h])
             cylinder(d = m3_ins_d, h = sbc_ins_h + 0.1);
 }
 // generic M3 grid over a rectangle, as through-holes (nuts or nylon standoffs
@@ -1168,6 +1168,143 @@ module compute_box_front() {
         // zip-tie slots up both side walls
         for (sx = [-1, cmf_x - cm_wall - 1], sz = [24, 48, 140])
             translate([sx, -cmf_y + 8, sz]) rbox(cm_wall + 2, cm_tie[1], cm_tie[0], 1);
+    }
+}
+
+// =============================================================================
+//  PART 11d -- compute_box_front_slim
+// -----------------------------------------------------------------------------
+//  A stripped variant carrying ONLY the La Frite and its converter.  Nothing is
+//  shared with `compute_box_front` except the rail bolt pattern and the board's
+//  own numbers, so the two can diverge freely and neither file overwrites the
+//  other.
+//
+//  The one idea that makes it flatter: the converter stands against the BACK WALL
+//  instead of lying on the floor.  On the floor it consumed 35 mm of depth and
+//  forced the box to 40; on the wall it consumes 15, and the 35 becomes height --
+//  which this variant has to spare, because the fob, PTT board and GPS module are
+//  all gone.  Depth drops 40 -> 32, and the 10 mm gap under the board becomes the
+//  wiring channel from the converter up to the board.
+//
+//  Consequences worth stating, because they are not obvious:
+//    * The switch bezel had to ROTATE 90 degrees.  At 32 mm along the depth it no
+//      longer fits a 30 mm box; across the width it does.
+//    * The converter stands 5 mm off the wall on two posts rather than flat
+//      against it, so the wiring can pass behind it as well as under the board.
+//    * The power grommet moved ABOVE the converter, into the under-board channel.
+//      On the floor variant it entered behind the converter; here that would put
+//      the lead straight into the converter's back.
+// =============================================================================
+cmf2_x     = 72;     // width unchanged -- set by the rail, not the contents
+cmf2_y     = 32;     // 32, not 30: the taller standoff needs the extra depth.
+                     //   10 + 1.6 board + 15 of connectors = 26.6 off the wall,
+                     //   against 29 interior.
+cmf2_z     = 160;    // unchanged, so the M4 rows still land on the rail
+cmf2_boss  = 8;      // local back-wall thickness at the M4 bolts
+sbc2_stand = 10;     // standoff height HERE, against 6 on the deep variant.  The
+                     //   extra 4 mm is a DC wiring channel under the board, which
+                     //   is the whole point of standing the converter on the wall.
+
+//  Converter FLUSH against the back wall, held by two M3 through-holes rather
+//  than standing on posts.  The heads are countersunk into the OUTER face: the
+//  bottom-front crossbeam lies directly behind this wall over box-local Z -4..20,
+//  so a proud screw head there would stop the box seating on the beam.
+cmf2_buck_z  = [3, 38];   // converter on the wall: 65 across X, 35 UP Z, 15 deep
+cmf2_buck_dx = 54;        // its tab holes, as measured
+cmf2_buck_bz = 16.5;      // 13.5 from its lower edge, which now runs across
+cmf2_buck_cs = 6.0;       // countersink diameter at the outer face
+cmf2_sbc_z   = [55, 119]; // the board, moved up 13 mm to open the 12 V band
+cmf2_wifi_z  = [119, 157];// WiFi dongle, now beside the switch rather than under
+                          //   it: the switch takes X 4..36, the dongle X 40..64
+
+//  12 V entry in the BACK WALL, right of centre, in the band between the
+//  converter and the board.  That band only exists because the board was moved UP
+//  13 mm: at its old height there was nowhere at all for this hole -- Z 20 and
+//  below has the crossbeam behind it, Z 3..38 is covered by the flush converter,
+//  Z 38..42 was a 4 mm gap, and above that is the board.  Ø12 at Z 46 spans
+//  40..52: clear of the beam at 20, the converter at 38 and the board at 55.
+cmf2_grom_x  = 56;
+cmf2_grom_z  = 46;
+
+//  Switch bezel ROTATED 90 deg (32 across X, 20 through the depth) AND moved to
+//  the LEFT, to keep it with the 5 V wiring and away from the 12 V entry on the
+//  right.  It does NOT require the M4 holes to move: the bezel sits at Y -9..-29
+//  and the pads stop at Y -8, so they are on opposite faces and miss entirely.
+cmf2_sw_fp   = [32, 20];
+cmf2_sw_x    = 20;        // bezel X 4..36
+cmf2_sw_y    = -19;
+//  USB-A bulkhead in the top wall, right of the switch.  ASSUMED a common panel
+//  mount: 14 x 8 cutout with two M3 at 24 mm centres.  CONFIRM AGAINST YOURS --
+//  these vary a lot, and the flange must stay inside X 36..72.
+cmf2_usb_cut = [14, 8];
+cmf2_usb_dx  = 24;
+cmf2_usb_x   = 51;        // moved inboard from 54.  At 54 the outer M3 fixing sat
+                          //   3 mm off the interior wall face; at 51 it is 6 mm.
+                          //   It cannot come much further: the switch bezel ends
+                          //   at X 36, and a 30 mm flange centred at 51 already
+                          //   reaches back to 36.
+cmf2_usb_y   = -18;
+
+module compute_box_front_slim() {
+    bz  = [cmf2_z - 18, cmf2_z - 8];             // 142 / 152, the rail rows
+    bx  = [cmf2_x/2 - cmf_bolt/2, cmf2_x/2 + cmf_bolt/2];
+    scz = (cmf2_sbc_z[0] + cmf2_sbc_z[1]) / 2;   // 87
+    difference() {
+        union() {
+            translate([0, -cm_wall, 0]) rbox(cmf2_x, cm_wall, cmf2_z, 1.5);
+            for (wx = [0, cmf2_x - cm_wall])
+                translate([wx, -cmf2_y, 0]) rbox(cm_wall, cmf2_y, cmf2_z, 1.5);
+            translate([0, -cmf2_y, 0]) rbox(cmf2_x, cmf2_y, cm_wall, 1.5);
+            translate([0, -cmf2_y, cmf2_z - cm_wall])
+                rbox(cmf2_x, cmf2_y, cm_wall, 1.5);
+            // M4 pads, as on the deep variant
+            for (x = bx)
+                translate([x - 8.5, -cmf2_boss, bz[0] - 8.5])
+                    rbox(17, cmf2_boss, bz[1] - bz[0] + 16, 1.5);
+            // SBC standoffs, taller here to clear the DC wiring underneath
+            translate([cmf2_x/2, -cm_wall, scz])
+                rotate([90, 0, 0]) rotate([0, 0, 90]) sbc_pads(sbc2_stand);
+        }
+        translate([cmf2_x/2, -cm_wall, scz])
+            rotate([90, 0, 0]) rotate([0, 0, 90]) sbc_pad_pockets(sbc2_stand);
+        // Converter hold-down: M3 clearance straight through the back wall, heads
+        // countersunk flush in the OUTER face so the box still seats on the beam.
+        for (dx = [-cmf2_buck_dx/2, cmf2_buck_dx/2]) {
+            translate([cmf2_x/2 + dx, -cm_wall - 1, cmf2_buck_bz]) rotate([-90, 0, 0])
+                cylinder(d = m3_clear, h = cm_wall + 2);
+            translate([cmf2_x/2 + dx, 0.01, cmf2_buck_bz]) rotate([90, 0, 0])
+                cylinder(d1 = cmf2_buck_cs, d2 = m3_clear, h = 1.6);
+        }
+        // M4 into the crossbeam's accessory columns
+        for (x = bx, z = bz)
+            translate([x, -cmf2_boss, z]) rotate([-90, 0, 0]) m4_bolt_hole(cmf2_boss);
+        // 12 V in through the BACK WALL, right of centre, between converter and board
+        translate([cmf2_grom_x, -cm_wall - 1, cmf2_grom_z]) rotate([-90, 0, 0])
+            cylinder(d = cmf_grom, h = cm_wall + 2);
+        // power switch, top wall, left side
+        translate([cmf2_sw_x, cmf2_sw_y, cmf2_z - cm_wall - 1])
+            cylinder(d = cmf_sw_d, h = cm_wall + 2);
+        // USB-A bulkhead in the top wall: body cutout plus its two M3 fixings
+        translate([cmf2_usb_x - cmf2_usb_cut[0]/2, cmf2_usb_y - cmf2_usb_cut[1]/2,
+                   cmf2_z - cm_wall - 1])
+            rbox(cmf2_usb_cut[0], cmf2_usb_cut[1], cm_wall + 2, 1.2);
+        for (dx = [-cmf2_usb_dx/2, cmf2_usb_dx/2])
+            translate([cmf2_usb_x + dx, cmf2_usb_y, cmf2_z - cm_wall - 1])
+                cylinder(d = m3_clear, h = cm_wall + 2);
+    }
+}
+
+//  Velcro-closed cover for the slim box: panel plus locating rim, no fixings.
+module compute_box_front_slim_cover() {
+    union() {
+        rbox(cmf2_x, cmf2_z, cmf_cov_t, 1.4);
+        translate([cm_wall, cm_wall, cmf_cov_t - 1]) difference() {
+            rbox(cmf2_x - 2*cm_wall - 0.4, cmf2_z - 2*cm_wall - 0.4,
+                 cmf_cov_lip + 1, 0.8);
+            translate([4, 4, -1])
+                rbox(cmf2_x - 2*cm_wall - 8.4, cmf2_z - 2*cm_wall - 8.4,
+                     cmf_cov_lip + 3, 0.8);
+        }
     }
 }
 
@@ -1394,6 +1531,9 @@ else if (part == "compute_box_inline")
     translate([0, cmi_z, frame_d]) rotate([-90, 0, 0]) compute_box_inline();
 else if (part == "compute_box_front")
     rotate([-90, 0, 0]) compute_box_front();
+else if (part == "compute_box_front_slim")
+    rotate([-90, 0, 0]) compute_box_front_slim();
+else if (part == "compute_box_front_slim_cover") compute_box_front_slim_cover();
 else if (part == "compute_box_front_cover") compute_box_front_cover();
 // Layout aid, not printable.  Left in its own local frame so a front view looks
 // straight into the opening; render in PREVIEW so the colours survive.
