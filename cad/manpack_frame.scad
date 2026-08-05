@@ -1226,23 +1226,27 @@ cmf2_wifi_z  = [119, 157];// WiFi dongle, now beside the switch rather than unde
 cmf2_grom_x  = 56;
 cmf2_grom_z  = 46;
 
-//  Switch bezel ROTATED 90 deg (32 across X, 20 through the depth) AND moved to
-//  the LEFT, to keep it with the 5 V wiring and away from the 12 V entry on the
-//  right.  It does NOT require the M4 holes to move: the bezel sits at Y -9..-29
-//  and the pads stop at Y -8, so they are on opposite faces and miss entirely.
+//  Switch bezel ROTATED 90 deg (32 across X, 20 through the depth) and sitting on
+//  the RIGHT, over the 12 V entry at X 56.  The switch breaks the 12 V line, so it
+//  belongs at that end: run and switch stay on one side, and the 5 V output leaves
+//  from the other.  It was briefly on the left, which put a switched 12 V pair
+//  straight across the 5 V side of the box.
+//  It does NOT require the M4 holes to move: the bezel sits at Y -9..-29 and the
+//  pads stop at Y -8, so they are on opposite faces and miss entirely.
 cmf2_sw_fp   = [32, 20];
-cmf2_sw_x    = 20;        // bezel X 4..36
+cmf2_sw_x    = 52;        // bezel X 36..68, 4 mm off the outer edge
 cmf2_sw_y    = -19;
 //  USB-A bulkhead in the top wall, right of the switch.  ASSUMED a common panel
 //  mount: 14 x 8 cutout with two M3 at 24 mm centres.  CONFIRM AGAINST YOURS --
 //  these vary a lot, and the flange must stay inside X 36..72.
 cmf2_usb_cut = [14, 8];
 cmf2_usb_dx  = 24;
-cmf2_usb_x   = 51;        // moved inboard from 54.  At 54 the outer M3 fixing sat
-                          //   3 mm off the interior wall face; at 51 it is 6 mm.
-                          //   It cannot come much further: the switch bezel ends
-                          //   at X 36, and a 30 mm flange centred at 51 already
-                          //   reaches back to 36.
+cmf2_usb_x   = 20;        // LEFT now, swapped with the switch.  Fixings land at
+                          //   X 8 and 32: 5 mm off the interior wall face, and a
+                          //   30 mm flange spans X 5..35, 1 mm short of the switch
+                          //   bezel at 36.  That 1 mm is the whole slack there is
+                          //   -- 32 + 30 across a 72 mm wall leaves 10, and the
+                          //   two outer edges have taken 9 of it.
 cmf2_usb_y   = -18;
 
 module compute_box_front_slim() {
