@@ -909,6 +909,8 @@ sbc_hx    = 58.75;   // was 58 -- corrected against the printed part
 sbc_hy    = 49.5;    //   across X; this pair fitted and is left alone
 sbc_stand = 6;       // standoff height, was 5.  Raised with the pocket below so
                      //   the heat-set insert has somewhere to go.
+sbc_stand_hi = 10;   // the TALL variant, used by both front boxes: the extra 4 mm
+                     //   is a DC wiring channel under the board.
 sbc_ins_h = 6;       // M3 pocket depth in the standoff, was m3_ins_h = 5.  The
                      //   insert was bottoming out; +1 mm gives it room and still
                      //   leaves 1 mm of pad under it, plus 2 mm of back wall.
@@ -1010,19 +1012,45 @@ cmf_notch    = [cm_wall, cmf_x - cm_wall];  // the cover's locating rim runs unb
                      //   give, so the bottom rim is now notched over its whole
                      //   width.  Three sides still locate the cover; six screws
                      //   hold it.
-// --- power switch in the TOP wall ---
-//  Ø12 barrel through a 20 x 32 bezel, long side running front-to-back along the
-//  box depth.  The top wall is 72 x 40, and the rim slot used to sit at X 15..45 --
-//  squarely where the bezel wants to go -- so the slot moved left to X 6..36 and
-//  the switch took the right-hand end.  That gives 12 mm between them and 4 mm to
-//  the outer edge, against 2 mm if the slot had stayed put.
-cmf_sw_fp    = [20, 32];  // bezel footprint, W x D.  Not cut -- it is the keep-out
-                          //   that positions the hole, and must clear the rim slot
-                          //   and both box edges.
+// --- top wall: switch, USB bulkhead, rim slot ---
+//  The missile switch is a Ø12 barrel under a big flip-cover bezel.  It sits on
+//  the LEFT, over the 12 V entry at X 12, so the switched 12 V pair stays on that
+//  side -- the same arrangement as the slim box, where the switch also sits over
+//  its own power entry.  It was previously on the right, 46 mm from its supply.
+//
+//  The bezel is ROTATED from the first attempt: 32 across X and 20 through the
+//  depth, rather than 20 x 32.  At 32 deep it spanned Y -4..-36 and swallowed the
+//  whole depth; at 20 it sits Y -10..-30, genuinely centred, and clears the M4
+//  pads (which stop at Y -8) by 2 mm.
+cmf_sw_fp    = [32, 20];  // bezel footprint, W x D.  Not cut -- it is the keep-out
+                          //   that positions the hole and must clear its neighbours.
 cmf_sw_d     = 12;        // panel hole for the barrel
-cmf_sw_x     = 58;        // bezel spans X 48..68
-cmf_sw_y     = -20;       // bezel spans Y -4..-36, centred in the depth
-cmf_rim_x    = 6;         // top rim slot, moved left from 15 to clear the bezel
+cmf_sw_x     = 20;        // bezel spans X 4..36
+cmf_sw_y     = -20;       // bezel spans Y -10..-30
+//  USB bulkhead: Ø12 with the top and bottom flattened to 11 mm across, which is
+//  the connector's own anti-rotation form.  ASSUMED the flats run across the
+//  DEPTH (11 measured in Y, 12 in X); if the connector keys the other way this
+//  rotates 90 deg and is a one-line change.
+cmf_usb_d    = 12;
+cmf_usb_flat = 11;
+cmf_usb_x    = 54;
+cmf_usb_y    = -20;       // centred in the depth, level with the switch.  Ø12
+                          //   spans Y -14..-26, clear of the M4 pads by 6 mm.
+//  SMA bulkhead in the RIGHT side wall, for a WiFi dongle with an external
+//  antenna.  It goes in the one clear band on that wall: below the M4 pads, which
+//  start at Z 133.5, and above the board, which tops out at Z 103.  Ø6.5 at Z 118
+//  leaves 11.75 mm above the board and 12.25 mm below the pads, and the nearest
+//  zip-tie slot is 22 mm away at Z 140.
+//  Ø6.5 is the usual panel hole for a 1/4-36 SMA bulkhead.  NOTE the wall is 3 mm,
+//  which is at the top of the panel thickness most SMA bulkheads accept -- check
+//  the thread length on yours before printing.
+cmf_sma_d    = 6.5;
+cmf_sma_y    = -20;       // centred in the depth, like the two top-wall holes
+cmf_sma_z    = 118;
+
+//  The 30 x 14 top rim slot is GONE.  It carried the audio, PTT and GPS leads
+//  down from the radio's control face, and it shared this end of the top wall
+//  with the USB hole -- two openings where one will do.
 cmf_cov_t    = 3;    // cover panel thickness
 cmf_cov_lip  = 2;    // locating lip that nests inside the opening
 //  NO SCREWS.  The cover is held on with velcro tape -- lighter, and it removes
@@ -1133,10 +1161,10 @@ module compute_box_front() {
             // turn: it puts 49.5 of the pattern across X and 58 up Z, which is
             // what points the USB edge up and the power/Ethernet edge down.
             translate([cmf_x/2, -cm_wall, scz])
-                rotate([90, 0, 0]) rotate([0, 0, 90]) sbc_pads();
+                rotate([90, 0, 0]) rotate([0, 0, 90]) sbc_pads(sbc_stand_hi);
         }
         translate([cmf_x/2, -cm_wall, scz])
-            rotate([90, 0, 0]) rotate([0, 0, 90]) sbc_pad_pockets();
+            rotate([90, 0, 0]) rotate([0, 0, 90]) sbc_pad_pockets(sbc_stand_hi);
         // M4 into the crossbeam's accessory columns
         for (x = bx, z = bz)
             translate([x, -cmf_boss, z]) rotate([-90, 0, 0]) m4_bolt_hole(cmf_boss);
@@ -1144,13 +1172,21 @@ module compute_box_front() {
         // Both are rim slots.  The back wall is deliberately solid: it faces the
         // crossbeam, so anything routed through it would have to turn immediately,
         // and the two rim slots already reach both ends of the box.
-        // TOP RIM: audio, PTT and the GPS lead come off the radio's control face,
-        // which points up at Z 179.5.  They pass over the top crossbeam and drop
-        // straight in here.
-        translate([cmf_rim_x, -24, cmf_z - cm_wall - 1]) rbox(30, 14, cm_wall + 2, 1.4);
-        // POWER SWITCH: Ø12 barrel through the top wall, beside the rim slot.
+        // POWER SWITCH: Ø12 barrel through the top wall, left end, over the 12 V
+        // entry at X 12.
         translate([cmf_sw_x, cmf_sw_y, cmf_z - cm_wall - 1])
             cylinder(d = cmf_sw_d, h = cm_wall + 2);
+        // SMA BULKHEAD in the right side wall, for the WiFi dongle's antenna
+        translate([cmf_x - cm_wall - 1, cmf_sma_y, cmf_sma_z]) rotate([0, 90, 0])
+            cylinder(d = cmf_sma_d, h = cm_wall + 2);
+        // USB BULKHEAD: Ø12 flattened top and bottom to 11 across -- the
+        // connector's own anti-rotation form, so no separate fixings are needed.
+        translate([cmf_usb_x, cmf_usb_y, cmf_z - cm_wall - 1])
+            intersection() {
+                cylinder(d = cmf_usb_d, h = cm_wall + 2);
+                translate([-cmf_usb_d, -cmf_usb_flat/2, -1])
+                    cube([2*cmf_usb_d, cmf_usb_flat, cm_wall + 4]);
+            }
         // BACK WALL: power in from the battery.  Moved off the floor because the
         // converter now covers it, and placed above box-local Z 20 so it opens
         // into the gap between the two front crossbeams rather than into the
@@ -1201,9 +1237,7 @@ cmf2_y     = 32;     // 32, not 30: the taller standoff needs the extra depth.
                      //   against 29 interior.
 cmf2_z     = 160;    // unchanged, so the M4 rows still land on the rail
 cmf2_boss  = 8;      // local back-wall thickness at the M4 bolts
-sbc2_stand = 10;     // standoff height HERE, against 6 on the deep variant.  The
-                     //   extra 4 mm is a DC wiring channel under the board, which
-                     //   is the whole point of standing the converter on the wall.
+sbc2_stand = sbc_stand_hi;   // shared with the deep box
 
 //  Converter FLUSH against the back wall, held by two M3 through-holes rather
 //  than standing on posts.  The heads are countersunk into the OUTER face: the
@@ -1235,19 +1269,23 @@ cmf2_grom_z  = 46;
 //  pads stop at Y -8, so they are on opposite faces and miss entirely.
 cmf2_sw_fp   = [32, 20];
 cmf2_sw_x    = 52;        // bezel X 36..68, 4 mm off the outer edge
-cmf2_sw_y    = -19;
-//  USB-A bulkhead in the top wall, right of the switch.  ASSUMED a common panel
-//  mount: 14 x 8 cutout with two M3 at 24 mm centres.  CONFIRM AGAINST YOURS --
-//  these vary a lot, and the flange must stay inside X 36..72.
-cmf2_usb_cut = [14, 8];
-cmf2_usb_dx  = 24;
-cmf2_usb_x   = 20;        // LEFT now, swapped with the switch.  Fixings land at
-                          //   X 8 and 32: 5 mm off the interior wall face, and a
-                          //   30 mm flange spans X 5..35, 1 mm short of the switch
-                          //   bezel at 36.  That 1 mm is the whole slack there is
-                          //   -- 32 + 30 across a 72 mm wall leaves 10, and the
-                          //   two outer edges have taken 9 of it.
-cmf2_usb_y   = -18;
+cmf2_sw_y    = -16;       // centred in the depth, on the same line as the USB
+                          //   hole: interior is Y -3..-29, so -16 is the middle.
+                          //   The 20 mm bezel then spans Y -6..-26, clearing the
+                          //   back wall by 3 mm and the front opening by 3.
+//  USB bulkhead, LEFT end of the top wall, opposite the switch.  Same D-form as
+//  the deep box -- Ø12 with the top and bottom flattened to 11 across -- which is
+//  the connector's own anti-rotation shape.  It replaces an assumed 14 x 8 slot
+//  with two M3 at 24 mm centres, which was the wrong shape for this connector and
+//  needed two fixings this one does not.
+//
+//  Losing those fixings is what let it centre properly.  The 24 mm screw span made
+//  the hardware 30 mm wide and left 1 mm to the switch bezel; a bare Ø12 leaves the
+//  left half of the wall almost empty by comparison.
+cmf2_usb_d    = cmf_usb_d;      // 12, shared with the deep box
+cmf2_usb_flat = cmf_usb_flat;   // 11
+cmf2_usb_x    = 20;
+cmf2_usb_y    = -16;      // centred in the depth: interior Y -3..-29
 
 module compute_box_front_slim() {
     bz  = [cmf2_z - 18, cmf2_z - 8];             // 142 / 152, the rail rows
@@ -1288,13 +1326,13 @@ module compute_box_front_slim() {
         // power switch, top wall, left side
         translate([cmf2_sw_x, cmf2_sw_y, cmf2_z - cm_wall - 1])
             cylinder(d = cmf_sw_d, h = cm_wall + 2);
-        // USB-A bulkhead in the top wall: body cutout plus its two M3 fixings
-        translate([cmf2_usb_x - cmf2_usb_cut[0]/2, cmf2_usb_y - cmf2_usb_cut[1]/2,
-                   cmf2_z - cm_wall - 1])
-            rbox(cmf2_usb_cut[0], cmf2_usb_cut[1], cm_wall + 2, 1.2);
-        for (dx = [-cmf2_usb_dx/2, cmf2_usb_dx/2])
-            translate([cmf2_usb_x + dx, cmf2_usb_y, cmf2_z - cm_wall - 1])
-                cylinder(d = m3_clear, h = cm_wall + 2);
+        // USB bulkhead: Ø12 flattened top and bottom to 11 across, no fixings
+        translate([cmf2_usb_x, cmf2_usb_y, cmf2_z - cm_wall - 1])
+            intersection() {
+                cylinder(d = cmf2_usb_d, h = cm_wall + 2);
+                translate([-cmf2_usb_d, -cmf2_usb_flat/2, -1])
+                    cube([2*cmf2_usb_d, cmf2_usb_flat, cm_wall + 4]);
+            }
     }
 }
 
@@ -1380,12 +1418,17 @@ module compute_box_front_populated() {
     // arranged around it: the fob up the left edge, the PTT board low enough to
     // pass under the switch, the GPS beside it.  Body depth is a PLACEHOLDER --
     // only the bezel and barrel were given.
-    // Fob rises off the board's USB ports, so its 52 mm is forced up the left
-    // edge.  That leaves 24 mm of width beside it -- narrower than the PTT board --
-    // so the PTT can only go UNDER the switch, and the GPS beside it.
-    cmf_dev([4,  -cmf_boss - 1, 104], cmf_dev_fob, [0.20, 0.40, 0.85]);
-    cmf_dev([23, -cmf_boss - 1, 104], cmf_dev_ptt, [0.95, 0.55, 0.15]);
-    cmf_dev([22, -cmf_boss - 1, 130], cmf_dev_gps, [0.55, 0.30, 0.75]);
+    // The switch now takes the LEFT end, X 4..36, down to Z 127.  What is left is
+    // a 33 mm full-height strip on the right and a 33 x 24 pocket beneath it.
+    // The fob's 52 mm forces it into the strip; the PTT sits below Z 127 and may
+    // run past X 36 because the switch does not reach that low.
+    //
+    // The GPS module is NOT DRAWN: it no longer fits.  18 (fob) + 25 (GPS) = 43
+    // against a 33 mm strip, and its 25 mm height exceeds the 24 mm under the
+    // switch.  Rotating the bezel to centre it in the depth is what did this --
+    // 20 wide x 32 deep became 32 wide x 20 deep, and the bay lost 12 mm of width.
+    cmf_dev([48, -cmf_boss - 1, 104], cmf_dev_fob, [0.20, 0.40, 0.85]);
+    cmf_dev([4,  -cmf_boss - 1, 104], cmf_dev_ptt, [0.95, 0.55, 0.15]);
     color([0.30, 0.30, 0.33])
         translate([cmf_sw_x - cmf_sw_fp[0]/2, cmf_sw_y - cmf_sw_fp[1]/2,
                    cmf_z - cm_wall - cmf_sw_body])

@@ -69,8 +69,10 @@ Two measurements drove real design decisions and are worth calling out:
 | 8   | `antenna_mount_so239`      | 2\*   | 35 × 24 × 38      | 11.6 cm³  | —       |
 | 9   | `base_plate`               | 1     | 142.25 × 70 × 16  | 55.9 cm³  | 4       |
 | 11a | `compute_box_inline`     | 1\*\*\* | 142.25 × 49 × 70  | 95.7 cm³  | 4       |
-| 11b | `compute_box_front`      | 1\*\*\* | 72 × 160 × 40     | 84.4 cm³  | 4 M3    |
-| 11c | `compute_box_front_cover`| 1\*\*\* | 72 × 160 × 5      | 33.8 cm³  | —       |
+| 11b | `compute_box_front`      | 1\*\*\* | 72 × 160 × 40     | 86.0 cm³  | 4 M3    |
+| 11c | `compute_box_front_cover`| 1\*\*\* | 72 × 160 × 5      | 36.6 cm³  | —       |
+| 11d | `compute_box_front_slim` | 1\*\*\* | 72 × 160 × 32     | 76.0 cm³  | 4 M3    |
+| 11e | `compute_box_front_slim_cover` | 1\*\*\* | 72 × 160 × 5 | 37.1 cm³  | —       |
 | 10  | `battery_box`              | 1     | 143 × 59.8 × 94.8 | 103.3 cm³ | 4       |
 
 \*\* Parts 2a–2c are alternatives — the three top-front layouts (§2.11). Print one.
@@ -80,8 +82,9 @@ Two measurements drove real design decisions and are worth calling out:
 not both. They share an identical leg, rib and bolt pattern, so they are
 interchangeable on the same crossbeam without touching anything else.
 
-\*\*\* Parts 11a and 11b are the two compute-module variants (§2.12) — pick whichever
-suits, or neither. 11c is the cover for 11b and is not optional if you fit it.
+\*\*\* Parts 11a, 11b and 11d are the three compute-module variants (§2.12) — pick
+one, or none. 11c and 11e are the covers for 11b and 11d respectively, and are not
+optional if you fit the box they belong to.
 
 \*\*\*\* Parts 4a and 4b are alternatives. `_rail` adds a row of accessory columns to
 the bottom beam's front face, needed only if you fit `compute_box_front`. The
@@ -102,7 +105,7 @@ frame is **12 parts**; everything else is opt-in.
 | Bottom-front beam | plain / `_rail` | `_rail` **only** if fitting `compute_box_front`; otherwise the plain one, which is bit-identical to the beam already printed. |
 | Handles ×2 | `handle` / `handle_mic` | Two plain ones normally. Swap **one** for `handle_mic` if you want the AT-779UV microphone bracket. |
 | Antenna mounts ×2 | `_bnc` / `_so239` | Two of whichever connector you use — never one of each. Same leg and bolt pattern, so you can swap later. |
-| Compute module | `_inline` / `_front` + cover / none | `_front` needs the `_rail` bottom beam **and** its cover. `_inline` stacks under the frame instead. Most builds need neither. |
+| Compute module | `_inline` / `_front` / `_front_slim` / none | `_front` and `_front_slim` both need the `_rail` bottom beam and their own cover — they are alternatives to each other, not additions. `_inline` stacks under the frame instead. Most builds need none of them. |
 
 Largest part is 164 mm — **16 mm of bed margin**. All seventeen meshes verified
 watertight, single-shell, and bed-legal.
@@ -533,9 +536,10 @@ nothing here. The grid holes double as ventilation.
 `_front` **no longer has the grid.** It was removed along with the back-wall
 cutout: neither earned its place once the board was rotated, and the bays are big
 enough that loose devices are better zip-tied than bolted to a hole that happens
-to line up. Ventilation there is now the cover's slots plus the two rim slots,
-which draw better than the grid did — the grid only breathed sideways into the
-crossbeam.
+to line up. Ventilation is now whatever the openings happen to give: the cover is
+solid and the rim slots are gone, so the box breathes only through its cable
+entries. That is fine for an idling SBC in a padded bag and should be revisited if
+anything warm goes in.
 
 **The mounting pattern is now measured, not published — and the published figure
 was wrong.** M3 was confirmed early by test-fitting a bolt. The pitch was carried
@@ -561,8 +565,8 @@ retire — the first was the antenna bracket's sealed counterbores.
 | SBC orientation   | lying flat on the floor       | flat on the back wall, **turned 90°** |
 | Grid positions    | 30 (6 × 5)                    | none — see above                |
 | Outer depth       | 49 mm                         | **40 mm** (was 33; the converter forced it) |
-| Cover             | open front                    | `compute_box_front_cover`, 33.8 cm³ |
-| Volume            | 95.7 cm³                      | 84.4 cm³                        |
+| Cover             | open front                    | `compute_box_front_cover`, 36.6 cm³ |
+| Volume            | 95.7 cm³                      | 86.0 cm³                        |
 
 **`_inline`** bolts up into the plate above and presents the same four feet
 below, so the battery box hangs off it unchanged — stack pitch **49 mm**. Its
@@ -640,44 +644,71 @@ already carries the base-plate inserts over beam-local Z 0–9, and a second row
 the two sets of pockets and keeps all seven columns usable. It also lands 12 mm up
 the box's back wall, clear of its bottom rim.
 
-**Cable entries on `_front`.** One top-rim slot and a back-wall grommet — the
-floor is solid, because the converter sits on it:
+**Cable entries on `_front`.** A back-wall grommet and two top-wall bulkheads —
+the floor is solid, because the converter sits on it:
 
 | connection | route |
 | --- | --- |
 | DC power from the battery | **Ø12 grommet in the back wall, X 12 / Z 28** |
-| Audio to/from the radio | top-rim slot |
-| PTT | top-rim slot, alongside the audio |
+| Audio to/from the radio | **no entry** — the rim slot was removed |
+| PTT | **no entry** — see above |
 | Ethernet, HDMI | right-angle adapters inside the box — see below |
 | USB (the CM108/CM119 fob) | plugs directly into the upward ports in the top bay |
-| GPS antenna lead | top-rim slot if the antenna is on the frame |
+| WiFi antenna | SMA bulkhead, right side wall, Y −20 / Z 118 |
 
-The top-rim slot (30 × 14 mm) exists because the AT-779UV's control face points
-**up** at Z 179.5: audio, PTT and a frame-mounted GPS lead all come off the top of
-the radio, pass over the top crossbeam and drop straight in. It sits at **X 6–36**,
-moved left from 15–45 to make room for the power switch.
+**The top wall carries exactly two openings**, both on the depth centreline at
+Y −20, and nothing else:
 
-**Power switch in the top wall.** A Ø12 barrel through a 20 × 32 bezel, long side
-running front-to-back along the box depth, centred at **X 58 / Y −20**. Measured
-Ø12.00 across and Ø11.95 fore-and-aft. The bezel keep-out spans X 48–68 and
-Y −4 to −36, leaving 12 mm to the rim slot and 4 mm to the outer edge — which is
-why the rim slot moved; at its old position the gap would have been 2 mm.
+| feature | position | measured |
+| --- | --- | --- |
+| Missile-switch barrel | X 20 | Ø11.95 |
+| USB bulkhead | X 54 | 12.00 across X, **11.05 between the flats** |
+
+The USB hole is a **D-form** — Ø12 with the top and bottom flattened to 11 mm
+across — which is the connector's own anti-rotation shape, so it needs no separate
+fixings. The flats are assumed to run across the *depth*; if the connector keys the
+other way it is a 90° rotation and one line.
+
+**The switch sits on the left, over the 12 V entry at X 12**, so the switched 12 V
+pair stays at that end of the box. It was briefly on the right, 46 mm from its own
+supply, which put a switched pair straight across the 5 V side.
+
+**The 30 × 14 top rim slot is gone.** It used to carry audio, PTT and a GPS lead
+down from the AT-779UV's control face, which points up at Z 179.5 — but it shared
+this end of the top wall with the USB hole, and two openings were doing the work of
+one. Consequence worth stating plainly: **this box now has no cable entry for audio
+or PTT.** The back-wall Ø12 at Z 28 is power only and sits behind the converter.
+If a PTT board stays in this box, it needs an entry adding back.
+
+**SMA bulkhead in the right side wall**, Ø6.5 at Y −20 / Z 118, for a WiFi dongle
+with an external antenna. It goes in the one clear band on that wall — 11.75 mm
+above the board at Z 103 and 12.25 mm below the M4 pads at Z 133.5, with the
+nearest zip-tie slot 22 mm away. Ø6.5 is the usual panel hole for a 1/4-36 SMA
+bulkhead, but **the wall is 3 mm, at the top of what most SMA bulkheads accept** —
+check the thread length before printing. A shallow outside counterbore is the fix
+if it runs short.
 
 **The switch protrudes 30 mm into the box with its cables on**, and that fills the
 top bay:
 
 ```
 top bay      X 3..69  x  Z 103..157     66 x 54
-switch       X 48..68 x  Z 127..157     20 x 30
-  region A   X 3..47  x  Z 103..157     44 x 54
-  region B   X 48..68 x  Z 103..127     20 x 24   (under the switch)
+switch       X 4..36  x  Z 127..157     32 x 30
+  region A   X 36..69 x  Z 103..157     33 x 54
+  region B   X 3..36  x  Z 103..127     33 x 24   (under the switch)
 ```
 
-The audio fob is ~52 mm and rises off the board's USB ports, so its height is
-forced: it takes the left edge of region A and leaves only **24 mm of width**
-beside it. Anything wider than that can only go **under the switch**, where the
-clear height is **24 mm**. So there is now a hard limit — **a PTT board taller than
-about 23 mm does not fit anywhere in this box.**
+**Centring the bezel in the depth cost 12 mm of bay width.** Turning it from
+20 wide × 32 deep to 32 wide × 20 deep is what makes it sit on the centreline
+rather than swallowing the whole depth — but the full-height strip beside it shrank
+from 45 mm to 33 mm. The audio fob is ~52 mm and rises off the board's USB ports,
+so its height forces it into that strip; at 18 mm wide it fits with 15 mm to spare.
+
+**The GPS module no longer fits.** 18 (fob) + 25 (GPS) = 43 mm side by side against
+a 33 mm strip, and its 25 mm height also exceeds the 24 mm clear under the switch.
+It fitted at 45 mm and does not at 33. A PTT board still does, because it sits
+below Z 127 and may run past X 36 where the switch does not reach — but the same
+**~23 mm height limit** applies to anything under the switch.
 
 **Power moved from the floor to the back wall, and its height is constrained.**
 The converter now covers the floor where the grommet used to be, and entering at
@@ -731,25 +762,89 @@ original 80 mm there was no room for one at all.
 
 ![cover](img/compute_box_front_cover.png)
 
-> **DEFECTIVE — DO NOT PRINT YET.** The six cover screws have nothing to screw
-> into. The box cuts their M3 insert pockets at X 9 and 63, but its side walls only
-> exist at X 0–3 and 69–72, so every cut lands in open air and removes nothing.
-> `cmf_cov_boss = 12` — the boss that was meant to carry them inboard from the wall
-> — is defined in the model and **never referenced**. Confirmed on the mesh: all
-> six sites probe empty. The cover panel itself is sound; it is the box side that
-> is missing the material. Found on a printed part, not by any mesh check, because
-> a subtraction that removes nothing leaves a perfectly valid single-shell mesh.
-
-A flat 3 mm panel with a locating rim nesting inside the opening, on six M3
-screws at Z 15 / 120 / 152 — the three bands clear of the board footprint at
-Z 39–103. Counterbores are 1.2 mm deep, not 2: a 2 mm counterbore in a 3 mm panel
-left only 1 mm under the head.
+A plain 3 mm panel with a locating rim nesting inside the opening. **No screws, no
+vents** — it is held on with velcro tape.
 
 The rim is a **4 mm rim, not a slab**. A solid plate here cost 22 cm³ and stole
 2 mm of interior depth from a box with 1 mm to spare over the SBC.
 
-Eighteen vent slots, kept out of the rim and off the screw rows. With the grid
-gone these are the box's main breathing, working with the top-rim slot.
+**Velcro replaced six M3 screws, and that resolved a defect rather than dodging
+one.** For several revisions this cover had six clearance holes with nothing behind
+them: the box cut their insert pockets at X 9 and 63 while its side walls only
+existed at X 0–3 and 69–72, so every cut landed in open air and removed nothing.
+`cmf_cov_boss` was defined in the model and never referenced. No mesh check could
+see it — subtracting from empty space is a no-op, not an error, and the part stayed
+watertight and single-shell throughout. It was found on a printed part. Bosses were
+then built and verified, and dropped again when velcro turned out to be lighter and
+simpler; the box saved ~6 cm³ of plastic and six brass inserts with it.
+
+**Two things follow from having no fixings.** The rim is now the only thing
+aligning the cover, and it is **absent along the bottom edge** — notched full width
+so the converter can sit flat — so the cover is located on three sides only.
+Nothing but the tape resists it sliding downward. And the velcro lands on the box's
+3 mm front edge: 464 mm of perimeter, about 14 cm² of area, but a narrow strip, so
+tape wider than 3 mm will overhang inward and foul the rim.
+
+The eighteen vent slots are gone too. They were sized when the box still breathed
+through an M3 grid that no longer exists, and were judged of little practical value
+in a bag-carried box. **If an SDR or anything else warm goes inside, revisit airflow
+deliberately rather than by reinstating them.**
+
+#### 11d/11e — `compute_box_front_slim` and its cover
+
+![slim box](img/compute_box_front_slim.png)
+
+A stripped alternative to `_front`, carrying **only the La Frite and its
+converter** — no audio fob, no PTT board, no GPS. Nothing is shared with the deep
+box except the rail bolt pattern and the board's own numbers, so the two can
+diverge freely.
+
+|                 | `_front` | `_front_slim` |
+| --------------- | -------- | ------------- |
+| Outer           | 72 × 160 × **40** | 72 × 160 × **32** |
+| Volume          | 86.0 cm³ | **76.0 cm³** |
+| Converter       | flat on the floor | **upright against the back wall** |
+| Standoffs       | 10 mm | 10 mm |
+| 12 V entry      | back wall, X 12 / Z 28 | back wall, X 56 / Z 46 |
+| Switch          | left, X 20 | right, X 52 |
+| Both top holes  | on the depth centreline, Y −20 | on the depth centreline, Y −16 |
+| USB             | D-hole, X 54 | D-hole, X 20 |
+| Also carries    | fob, PTT | — |
+
+**Standing the converter on the back wall is what makes it flatter.** On the floor
+it consumed 35 mm of depth and forced the box to 40; upright it consumes 15, and
+the 35 becomes height — which this variant can spare, because the fob, PTT board
+and GPS are gone. It is held flush by two M3 through the back wall, **countersunk
+in the outer face**: the bottom-front crossbeam lies directly behind that wall over
+box-local Z −4 to 20, so a proud screw head at Z 16.5 would stop the box seating on
+the beam.
+
+**The 12 V entry forced the board upward.** It has to be in the back wall, and at
+the original board height there was nowhere for it: Z ≤ 20 has the crossbeam
+behind it, Z 3–38 is covered by the flush converter, Z 38–42 was a 4 mm gap, and
+above that is the board. Moving the board up 13 mm to Z 55–119 opens a 17 mm band;
+Ø12 at Z 46 clears the beam by 20 mm, the converter by 2 and the board by 3.
+
+**Switch and USB are on opposite sides from the deep box, deliberately.** Here the
+12 V entry is at X 56, so the switch — which breaks the 12 V line — sits at X 52
+beside it, and the 5 V output leaves from the other end. Same principle as the
+deep box, mirrored because the power entry is mirrored.
+
+Clearances are tight at the top: a 30 mm USB flange centred at X 20 and a 32 mm
+switch bezel centred at X 52 leave **1 mm between them**. 62 mm of hardware across
+a 72 mm wall, with 9 mm taken by the two outer edges. **Anything wider than 30 mm
+will not fit beside the switch at any position.**
+
+Its cover is the same plain velcro panel as 11c, sized to the 32 mm depth.
+
+**The USB bulkhead is the same D-form as the deep box** — Ø12 with the top and
+bottom flattened to 11 mm across, measured 12.00 × 11.05. It replaced an assumed
+14 × 8 slot with two M3 at 24 mm centres, which was the wrong shape for this
+connector and needed two fixings it does not use.
+
+Losing those fixings bought back the clearance that was the tightest thing on this
+part. The 24 mm screw span made the hardware 30 mm wide and left **1 mm** to the
+switch bezel; a bare Ø12 leaves **10 mm**.
 
 #### `compute_box_front_populated` — a layout aid, not a printable part
 
@@ -765,7 +860,7 @@ electronics go, for planning cable runs and judging free space before wiring.
 | yellow / amber | right-angle Ethernet / HDMI adapters | placeholder |
 | blue | CM108/CM119 audio fob | placeholder |
 | orange | PTT board | placeholder |
-| purple | GPS module | placeholder |
+| purple | GPS module | **no longer drawn — it does not fit** |
 
 **Only the converter and the board are real measurements.** The other five are
 typical parts, not the ones you will fit — correct them by editing `cmf_dev_fob`,
@@ -858,7 +953,7 @@ pockets Ø4.0 × 5.0 mm. Everything structural stays M4.
 | Compute box (front) → beams     | M4 × 12        | 4 top + 2 bottom         | box back-wall pads / beam front face |
 | SO-239 flange → antenna mount   | M3 × 10 + nut  | 4 per mount              | (through-holes; SO-239 variant only) |
 | La Frite → compute box          | M3 × 8         | 4                        | box standoffs                        |
-| Cover → compute box             | M3 × 10        | 6                        | box side walls                       |
+| Cover → compute box             | *velcro tape*  | —                        | (was 6 × M3; see §11c)               |
 | **Mic bracket → `handle_mic`**  | **M3**         | **2**                    | the two bracket beams                |
 | **Radio → side panels**         | **M5 × 10–12** | **2**                    | the radio's own threaded side holes  |
 |                                 | **M4 total**   | **40 bolts, 44 inserts** | (frame only; compute box adds 6)     |
@@ -883,7 +978,9 @@ and 8.5 mm into the radio.
 | `handle_mic`       | flat, mating face down            | same pose; puts the M3 bracket pockets face-up as blind holes rather than bridged ceilings                                     |
 | `compute_box_front`| back wall down, open front up     | standoffs and all pockets open upward; the floor is flat and unbroken                                                         |
 | `compute_box_front_populated` | — | **not printable.** Layout aid; render in preview so `color()` survives |
-| `compute_box_front_cover` | flat, rim up               | panel face on the bed; counterbores and vents open upward                                                                     |
+| `compute_box_front_cover` | flat, rim up               | panel face on the bed; plain panel, nothing to bridge                                                                         |
+| `compute_box_front_slim`  | back wall down, open front up | same as the deep box; converter posts are gone, so the back wall is flat                                                   |
+| `compute_box_front_slim_cover` | flat, rim up          | as 11c                                                                                                                        |
 | `antenna_mount` ×2 | on its back                       | every layer smaller than the one below — no supports; one symmetric part, print two                                           |
 | `base_plate`       | upside down, flat top face on bed | feet and every insert mouth point upward; fully self-supporting                                                               |
 | `battery_box`      | **back wall down**, open front up | floor-down would cantilever both top flanges 19.5 mm along their whole length; on its back they become ribs off the back wall |
@@ -929,9 +1026,17 @@ heads, so the top beams go on first.
    the floor into its slotted tabs, 12 V in through the back-wall grommet), then
    the La Frite on its four M3 standoffs — **start all four screws before
    tightening any of them** — then the right-angle adapters, then USB devices in
-   the top bay. Cover last, six M3.
+   the top bay. Cover last — velcro, no tools.
 9. The microphone bracket mounts to `handle_mic` last, and comes off again for
    storage — it projects 10 mm outboard and the mic well beyond that.
+
+10. **Bolt either front compute box to the crossbeam BEFORE fitting its switch and
+    USB bulkhead.** Both cover the M4 heads once installed — the switch bezel and
+    the bulkhead sit directly over them, and although neither *touches* the bolt
+    pads, neither leaves a driver anywhere to go. This is deliberate: the top wall
+    is 72 mm and the switch bezel alone is 32, so no arrangement frees both bolt
+    columns. The box is a fit-once item; the cover comes off far more often, and
+    velcro means that needs no tools at all.
 
 ---
 
@@ -1009,7 +1114,17 @@ Not just rendered — checked:
   box-local Z 22–34, solid again at Z 19 and Z 37, so it opens into the gap
   between the beams rather than into beam material.
 - Cover rim: bottom band verified gone across the full width, the other three
-  bands intact, and the panel **not** holed beneath it.
+  bands intact, and the panel **not** holed beneath it. After the switch to velcro,
+  the panel re-checked for zero through-holes.
+- Deep box top wall swept across X at eight depth bands: openings appear **only**
+  at Y −16 to −24, and only two of them — the switch bore and the USB D-form. Every
+  other band solid, which is how the removed rim slot was confirmed gone rather
+  than merely moved.
+- SMA hole traced through the right wall: Ø6.55 at Y −20 / Z 118, wall solid again
+  at Z 108 and Z 128, left wall untouched at the same coordinates.
+- Slim box: seven islands proud of the back wall counted at bedZ 7 — four standoffs
+  at 49.5 × 58.75, two converter posts 54 apart, and the M4 pad slab (posts have
+  since been replaced by countersunk through-holes).
 - `handle_mic`: M3 insert axes measured at Z 105.00 / 150.00 — 45.00 apart —
   scanned strictly inside each beam, and both apertures confirmed by a centreline
   sweep that finds exactly two runs (37 mm grip, 33 mm window). The plain `handle`
@@ -1135,9 +1250,8 @@ panel under M5 recess = 3.5 mm of material carrying the radio
    only real lever left is moving the converter out of the bottom bay — the rim
    notch and the floor drop have both already been spent.
 
-10. **The cover cannot be fitted as shipped** — see §11c. Its six screws have no
-    bosses to land in. This is the next thing to fix on this part, together with
-    the vent slots, which have been judged of little practical value in use.
+10. **RESOLVED — the cover is now velcro-closed** (§11c). It previously had six
+    screws with no bosses to land in. Both the screws and the vent slots are gone.
 
 11. **The switch body depth (30 mm, measured with cables) leaves 24 mm under it.**
     That is now the binding constraint on the top bay, not the bay's 54 mm height.
