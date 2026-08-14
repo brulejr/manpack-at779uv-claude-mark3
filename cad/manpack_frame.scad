@@ -909,11 +909,16 @@ sbc_hx    = 58.75;   // was 58 -- corrected against the printed part
 sbc_hy    = 49.5;    //   across X; this pair fitted and is left alone
 sbc_stand = 6;       // standoff height, was 5.  Raised with the pocket below so
                      //   the heat-set insert has somewhere to go.
-sbc_stand_hi = 10;   // the TALL variant, used by both front boxes: the extra 4 mm
-                     //   is a DC wiring channel under the board.
-sbc_ins_h = 6;       // M3 pocket depth in the standoff, was m3_ins_h = 5.  The
-                     //   insert was bottoming out; +1 mm gives it room and still
-                     //   leaves 1 mm of pad under it, plus 2 mm of back wall.
+sbc_stand_hi = 8;    // used by both front boxes.  8 is the MINIMUM that still
+                     //   houses the insert: pocket 7.5 leaves 0.5 mm of boss above
+                     //   the wall face, with the 3 mm back wall behind that.  Was
+                     //   10, sized to give a generous DC channel under the board;
+                     //   the side cable-tie mounts now carry the long runs, so the
+                     //   channel only has to get power across to the board and
+                     //   8 mm does that.
+sbc_ins_h = 7.5;     // M3 pocket depth: the inserts are 7 mm long, plus 0.5 mm of
+                     //   relief so they can seat flush and displaced material has
+                     //   somewhere to go.  Was 6, which was short of the insert.
 sbc_clear = 22;      // clear height above the standoff for connectors + eMMC
 m3_ins_d  = 4.0;     // M3 heat-set insert pilot
 m3_ins_h  = 5.0;
@@ -922,7 +927,46 @@ cm_grid   = 10;      // generic mounting grid pitch
 cm_wall   = 3;
 cm_floor  = 4;
 cm_port_h = 16;      // port cutout height
-cm_tie    = [3, 12]; // zip-tie slot section
+cm_tie    = [3, 12]; // zip-tie slot section (inline box floor; unchanged)
+
+// --- cable-tie mounts for the two FRONT boxes ---
+//  A PAIR of slots with a ligament between them, not a single slot.  A single
+//  slot does not retain a tie: thread one through, round the bundle and back out
+//  the same opening, and the bight on the outside spans nothing and pulls
+//  straight back through.  The tie has to cross a ligament on the OUTER face --
+//  in one slot, over the bridge, back in the other, then round the bundle.
+//  The earlier single slots were also spaced 24 / 92 mm apart, which left the
+//  whole middle of the box unsupported for a run along its length.
+cmf_tie      = [3, 8];   // each slot, Z tall x Y long
+cmf_tie_lig  = 4;        // wall left between the pair, for the tie to cross
+cmf_tie_z    = [25, 50, 75, 95, 110];    // BOTH walls.  Z 110 is the highest that
+                         //   clears the SMA bulkhead at Z 114.75..121.25, by
+                         //   3.25 mm.
+cmf_tie_z_hi = [130, 150];               // the CLEAR wall only.  The switch body
+                         //   hangs from the panel underside at Z 155 down to
+                         //   Z 125 and leaves 1 mm of side gap next to it, so
+                         //   these two heights are worthless on the switch side --
+                         //   but the opposite wall has 33 mm there and keeps them.
+                         //   (The 2 mm bezel recess pad lowered that underside
+                         //   from 157, so the body reaches 2 mm further down than
+                         //   the bare bezel depth suggests.)
+                         //   Which wall is clear differs between the two boxes:
+                         //   the deep box has its switch on the left, the slim box
+                         //   on the right, so the high mounts mirror.
+//  Deep box only: the mounts sit REARWARD of the depth centre, at Y -15 rather
+//  than -20.  Centred, their near slot stopped at Y -14 and the under-board
+//  channel ends at Y -13, so nothing in that channel could be tied down at all.
+//  At -15 the near slot runs Y -13..-5 and straddles it.  The slim box needs no
+//  such offset -- it is shallow enough that its centreline already reaches.
+cmf_tie_y    = -15;
+
+//  Cut from X -1 running +X, so place it at the wall's INNER face.
+module cm_tie_mount(wall_t) {
+    for (sgn = [-1, 1])
+        translate([-1, sgn * (cmf_tie_lig + cmf_tie[1]) / 2 - cmf_tie[1] / 2,
+                   -cmf_tie[0] / 2])
+            rbox(wall_t + 2, cmf_tie[1], cmf_tie[0], 1);
+}
 
 // --- inline variant ---
 cmi_cav_z = sbc_stand + sbc_clear + 2;                   // 29, +2 so the
@@ -1027,6 +1071,27 @@ cmf_sw_fp    = [32, 20];  // bezel footprint, W x D.  Not cut -- it is the keep-
 cmf_sw_d     = 12;        // panel hole for the barrel
 cmf_sw_x     = 20;        // bezel spans X 4..36
 cmf_sw_y     = -20;       // bezel spans Y -10..-30
+//  The switch cover's base plate sits in a 2 mm RECESS so it finishes flush with
+//  the top face instead of standing proud.  The plate carries a tab that overhangs
+//  the box's top-left corner by ~7 mm and gets folded down the side wall with
+//  pliers, so the recess runs out to the left edge and a matching notch is cut
+//  into the outer face of the left wall to receive the fold.  Both exist to stop
+//  a bare metal corner catching on the bag.
+//
+//  The top wall is only 3 mm, so a 2 mm recess would leave 1 mm.  It is therefore
+//  thickened by 2 mm on the INSIDE over the same footprint, and the recess brings
+//  it back to the original 3 mm.  Cost is 2 mm of top-bay height, taken exactly
+//  where the switch body already sits.
+cmf_sw_inset = 2;         // recess depth in the top face
+cmf_sw_pad   = 2;         // compensating thickening underneath
+//  The side notch is the SAME WIDTH as the top recess -- the folded tab is part of
+//  the same plate, so the two have to line up or the fold sits on a step.  It was
+//  briefly 12 mm against the recess's 20, which left a 4 mm shoulder each side.
+//  Depth into the wall matches the recess at 2 mm; 9 mm down the side gives the
+//  ~7 mm fold some margin.
+cmf_sw_tab_w = cmf_sw_fp[1];   // 20, tracks the recess
+cmf_sw_tab_z = 9;
+
 //  USB bulkhead: Ø12 with the top and bottom flattened to 11 mm across, which is
 //  the connector's own anti-rotation form.  ASSUMED the flats run across the
 //  DEPTH (11 measured in Y, 12 in X); if the connector keys the other way this
@@ -1157,6 +1222,13 @@ module compute_box_front() {
             for (x = bx)
                 translate([x - 8.5, -cmf_boss, bz[0] - 8.5])
                     rbox(17, cmf_boss, bz[1] - bz[0] + 16, 1.5);
+            // Local thickening under the switch recess, so cutting 2 mm out of the
+            // top face still leaves the full 3 mm of wall.  Sunk 1 mm into the
+            // wall so it fuses rather than meeting it on a plane.
+            translate([0, cmf_sw_y - cmf_sw_fp[1]/2 - 2,
+                       cmf_z - cm_wall - cmf_sw_pad])
+                rbox(cmf_sw_x + cmf_sw_fp[0]/2 + 2, cmf_sw_fp[1] + 4,
+                     cmf_sw_pad + 1, 1.0);
             // SBC standoffs.  The extra rotate([0,0,90]) is the 90 degree board
             // turn: it puts 49.5 of the pattern across X and 58 up Z, which is
             // what points the USB edge up and the power/Ethernet edge down.
@@ -1173,9 +1245,17 @@ module compute_box_front() {
         // crossbeam, so anything routed through it would have to turn immediately,
         // and the two rim slots already reach both ends of the box.
         // POWER SWITCH: Ø12 barrel through the top wall, left end, over the 12 V
-        // entry at X 12.
-        translate([cmf_sw_x, cmf_sw_y, cmf_z - cm_wall - 1])
-            cylinder(d = cmf_sw_d, h = cm_wall + 2);
+        // entry at X 12.  Cut deeper now, because the wall is locally 5 mm.
+        translate([cmf_sw_x, cmf_sw_y, cmf_z - cm_wall - cmf_sw_pad - 1])
+            cylinder(d = cmf_sw_d, h = cm_wall + cmf_sw_pad + 2);
+        // Recess for the cover's base plate, running out to the left edge so the
+        // overhanging tab is carried too.
+        translate([-1, cmf_sw_y - cmf_sw_fp[1]/2, cmf_z - cmf_sw_inset])
+            rbox(cmf_sw_x + cmf_sw_fp[0]/2 + 1, cmf_sw_fp[1],
+                 cmf_sw_inset + 1, 1.0);
+        // Notch in the OUTER face of the left wall, for the folded tab
+        translate([-1, cmf_sw_y - cmf_sw_tab_w/2, cmf_z - cmf_sw_tab_z])
+            rbox(cmf_sw_inset + 1, cmf_sw_tab_w, cmf_sw_tab_z + 1, 1.0);
         // SMA BULKHEAD in the right side wall, for the WiFi dongle's antenna
         translate([cmf_x - cm_wall - 1, cmf_sma_y, cmf_sma_z]) rotate([0, 90, 0])
             cylinder(d = cmf_sma_d, h = cm_wall + 2);
@@ -1201,9 +1281,12 @@ module compute_box_front() {
         for (dx = [-cmf_buck_dx/2, cmf_buck_dx/2])
             translate([cmf_x/2 + dx, -cm_wall - cmf_buck_by, -1])
                 cylinder(d = cmf_buck_bd, h = cm_wall + 2);
-        // zip-tie slots up both side walls
-        for (sx = [-1, cmf_x - cm_wall - 1], sz = [24, 48, 140])
-            translate([sx, -cmf_y + 8, sz]) rbox(cm_wall + 2, cm_tie[1], cm_tie[0], 1);
+        // cable-tie mounts up both side walls
+        for (wx = [0, cmf_x - cm_wall], tz = cmf_tie_z)
+            translate([wx, cmf_tie_y, tz]) cm_tie_mount(cm_wall);
+        // plus two high ones on the USB / WiFi side, which the switch does not reach
+        for (tz = cmf_tie_z_hi)
+            translate([cmf_x - cm_wall, cmf_tie_y, tz]) cm_tie_mount(cm_wall);
     }
 }
 
@@ -1326,6 +1409,13 @@ module compute_box_front_slim() {
         // power switch, top wall, left side
         translate([cmf2_sw_x, cmf2_sw_y, cmf2_z - cm_wall - 1])
             cylinder(d = cmf_sw_d, h = cm_wall + 2);
+        // cable-tie mounts up both side walls
+        for (wx = [0, cmf2_x - cm_wall], tz = cmf_tie_z)
+            translate([wx, -cmf2_y/2, tz]) cm_tie_mount(cm_wall);
+        // plus two high ones on the USB side -- MIRRORED from the deep box, because
+        // this variant's switch sits on the right, so here the LEFT wall is clear
+        for (tz = cmf_tie_z_hi)
+            translate([0, -cmf2_y/2, tz]) cm_tie_mount(cm_wall);
         // USB bulkhead: Ø12 flattened top and bottom to 11 across, no fixings
         translate([cmf2_usb_x, cmf2_usb_y, cmf2_z - cm_wall - 1])
             intersection() {

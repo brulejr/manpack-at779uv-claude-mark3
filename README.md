@@ -69,9 +69,9 @@ Two measurements drove real design decisions and are worth calling out:
 | 8   | `antenna_mount_so239`      | 2\*   | 35 × 24 × 38      | 11.6 cm³  | —       |
 | 9   | `base_plate`               | 1     | 142.25 × 70 × 16  | 55.9 cm³  | 4       |
 | 11a | `compute_box_inline`     | 1\*\*\* | 142.25 × 49 × 70  | 95.7 cm³  | 4       |
-| 11b | `compute_box_front`      | 1\*\*\* | 72 × 160 × 40     | 86.0 cm³  | 4 M3    |
+| 11b | `compute_box_front`      | 1\*\*\* | 72 × 160 × 40     | 84.5 cm³  | 4 M3    |
 | 11c | `compute_box_front_cover`| 1\*\*\* | 72 × 160 × 5      | 36.6 cm³  | —       |
-| 11d | `compute_box_front_slim` | 1\*\*\* | 72 × 160 × 32     | 76.0 cm³  | 4 M3    |
+| 11d | `compute_box_front_slim` | 1\*\*\* | 72 × 160 × 32     | 73.9 cm³  | 4 M3    |
 | 11e | `compute_box_front_slim_cover` | 1\*\*\* | 72 × 160 × 5 | 37.1 cm³  | —       |
 | 10  | `battery_box`              | 1     | 143 × 59.8 × 94.8 | 103.3 cm³ | 4       |
 
@@ -156,6 +156,8 @@ Extra insert faces by position:
   **front face**, the accessory stations (§2.11).
 - `crossbeam_bottom_front_rail` — the same beam plus 7 accessory columns in its
   front face, for a tall front module.
+
+  ![bottom front rail](img/crossbeam_bottom_front_rail.png)
 - `crossbeam_bottom_front` / `_bottom_back` — 2 inserts each in their
   **undersides** for the base plate.
 
@@ -603,10 +605,16 @@ Three bays, top to bottom:
 | 3 – 18        | 15 mm  | buck converter, flat on the floor           |
 
 Standoffs measure at X 11.25 / 60.75 and Z 41.65 / 100.35 — 49.5 across,
-**58.75 up**. They stand **6 mm** off the back wall (was 5) with a **6 mm** insert
-pocket (was 5): the heat-set inserts were bottoming out. The pocket now ends
-exactly at the wall's inner face, leaving 1 mm of pad beside it and 2 mm of wall
-behind.
+**58.75 up**. They stand **8 mm** off the back wall with a **7.5 mm** insert
+pocket — 7 mm of insert plus 0.5 mm of relief so it seats flush. Measured: pad top
+at bedZ 10.95, pocket from 3.45, leaving 0.45 mm of boss and then the 3 mm back
+wall behind it.
+
+**8 mm is the minimum that houses the insert.** At 7.5 the pocket bottoms exactly
+on the wall face; at 7 it starts eating the 3 mm wall. It was 10 mm, sized to give
+a generous DC channel under the board — the side cable-tie mounts now carry the
+long runs, so the channel only has to get power across to the board, and 8 mm
+does that.
 
 Measured clear interior, which is what the electronics actually get:
 
@@ -679,6 +687,48 @@ this end of the top wall with the USB hole, and two openings were doing the work
 one. Consequence worth stating plainly: **this box now has no cable entry for audio
 or PTT.** The back-wall Ø12 at Z 28 is power only and sits behind the converter.
 If a PTT board stays in this box, it needs an entry adding back.
+
+**Cable-tie mounts, and the two walls differ.** Both carry five at
+Z 25 / 50 / 75 / 95 / 110; the wall opposite the switch carries **two more at
+Z 130 / 150**, for seven. Each is a **pair** of 8 × 3 mm slots with a **4 mm ligament**
+between them: the tie goes in one slot, across the ligament on the outer face,
+back in the other, then round the bundle.
+
+On the deep box they sit **rearward of the depth centre, at Y −15**. Centred at
+−20 their near slot stopped at Y −14 while the under-board channel ends at −13, so
+nothing in that channel could be tied down at all; at −15 the near slot runs
+Y −13 to −5 and straddles it. The slim box needs no such offset — it is shallow
+enough that its centreline already reaches.
+
+That pairing is the point. The earlier arrangement was three *single* slots per
+wall, and a single slot does not retain a tie — thread one through, round the
+bundle and back out the same opening, and the bight on the outside spans nothing
+and pulls straight back through. They were also spaced 24 mm and then 92 mm apart,
+leaving the whole middle of the box unsupported for any run along its length. Both
+boxes now carry the same five mounts, verified at a 4.10 mm ligament.
+
+**The asymmetry is the switch body.** It hangs from the panel underside at Z 155
+down to **Z 125** and leaves only 1 mm of side gap beside it — so Z 130 and 150 are
+worthless on the switch side, but the opposite wall has 33 mm there and keeps them.
+Note that underside is at 155, not 157: the 2 mm bezel recess pad lowered it, so
+the body reaches 2 mm further down than the bare bezel depth suggests.
+
+**Which wall is the clear one mirrors between the variants** — the deep box has its
+switch on the left, so its seven-mount wall is the right (the USB / WiFi side); the
+slim box has its switch on the right, so its seven-mount wall is the left.
+
+Z 110 is separately the highest position that clears the SMA bulkhead at
+Z 114.75–121.25, by 3.25 mm.
+
+Usable side gap, band by band: 0.5 mm beside the converter (Z 3–18), full width
+Z 18–39, 5 mm beside the board (Z 39–103), full width Z 103–125, then 1 mm left /
+33 mm right in the switch-body band.
+
+The cover plate's tab overhangs the top-left corner by ~7 mm and folds down the
+side wall. It is carried by a **2 mm notch in the outer face of the left wall,
+the same 20 mm width as the top recess** — the tab and the recessed plate are one
+piece, so the two must line up or the fold sits on a step. The notch is 9 mm down
+the side, giving the 7 mm fold some margin.
 
 **SMA bulkhead in the right side wall**, Ø6.5 at Y −20 / Z 118, for a WiFi dongle
 with an external antenna. It goes in the one clear band on that wall — 11.75 mm
@@ -802,9 +852,9 @@ diverge freely.
 |                 | `_front` | `_front_slim` |
 | --------------- | -------- | ------------- |
 | Outer           | 72 × 160 × **40** | 72 × 160 × **32** |
-| Volume          | 86.0 cm³ | **76.0 cm³** |
+| Volume          | 84.5 cm³ | **73.9 cm³** |
 | Converter       | flat on the floor | **upright against the back wall** |
-| Standoffs       | 10 mm | 10 mm |
+| Standoffs       | 8 mm | 8 mm |
 | 12 V entry      | back wall, X 12 / Z 28 | back wall, X 56 / Z 46 |
 | Switch          | left, X 20 | right, X 52 |
 | Both top holes  | on the depth centreline, Y −20 | on the depth centreline, Y −16 |
@@ -836,6 +886,8 @@ a 72 mm wall, with 9 mm taken by the two outer edges. **Anything wider than 30 m
 will not fit beside the switch at any position.**
 
 Its cover is the same plain velcro panel as 11c, sized to the 32 mm depth.
+
+![slim cover](img/compute_box_front_slim_cover.png)
 
 **The USB bulkhead is the same D-form as the deep box** — Ø12 with the top and
 bottom flattened to 11 mm across, measured 12.00 × 11.05. It replaced an assumed
@@ -1253,11 +1305,19 @@ panel under M5 recess = 3.5 mm of material carrying the radio
 10. **RESOLVED — the cover is now velcro-closed** (§11c). It previously had six
     screws with no bosses to land in. Both the screws and the vent slots are gone.
 
-11. **The switch body depth (30 mm, measured with cables) leaves 24 mm under it.**
+11. **The M3 insert pocket diameter is still 4.0 mm and is probably wrong.**
+    `m3_ins_d` was sized for a shorter insert; the SBC standoffs now take a 7 mm
+    insert, and those typically run 4.6–5.0 mm OD. Depth has been corrected to
+    7.5 mm but the diameter has deliberately **not** been guessed — too small
+    splits the boss, too large and the insert spins. Measure the OD before
+    printing. This affects the four SBC standoffs in both front boxes; the cover
+    and mic-bracket inserts are a different, shorter part and keep 4.0.
+
+12. **The switch body depth (30 mm, measured with cables) leaves 24 mm under it.**
     That is now the binding constraint on the top bay, not the bay's 54 mm height.
     Check any PTT board against ~23 mm before assuming it fits.
 
-12. **La Frite port positions along the board edge are not modelled.** The box is
+13. **La Frite port positions along the board edge are not modelled.** The box is
     sized to the board outline and its M3 pattern; which port sits where along the
     now-downward edge is unverified, so the 21 mm budget is assumed to apply to
     all of them equally.
