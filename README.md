@@ -77,8 +77,8 @@ Two measurements drove real design decisions and are worth calling out:
 | 8   | `antenna_mount_so239`      | 2\*   | 35 × 24 × 38      | 11.6 cm³  | —       |
 | 9   | `base_plate`               | 1\*\*\*\*\*\* | 142.25 × 70 × 25  | 112.8 cm³ | 4       |
 | 10  | `battery_box`              | 1     | 143 × 59.8 × 94.8 | 103.3 cm³ | 4       |
-| 11a | `compute_box_inline`       | 1\*\*\* | 143 × 100 × 47 | 119.2 cm³ | 4 + 4 M3 |
-| 11f | `compute_box_inline_cover` | 1\*\*\* | 143 × 100 × 8  | 105.5 cm³ | 6 M3    |
+| 11a | `compute_box_inline`       | 1\*\*\* | 143 × 100 × 47 | 116.7 cm³ | 4 + 4 M3 |
+| 11f | `compute_box_inline_cover` | 1\*\*\* | 143 × 100 × 8  | 104.7 cm³ | —       |
 | 11b | `compute_box_front`      | 1\*\*\* | 72 × 160 × 40     | 84.5 cm³  | 4 M3    |
 | 11c | `compute_box_front_cover`| 1\*\*\* | 72 × 160 × 5      | 36.6 cm³  | —       |
 | 11d | `compute_box_front_slim` | 1\*\*\* | 72 × 160 × 32     | 73.9 cm³  | 4 M3    |
@@ -618,8 +618,8 @@ retire — the first was the antenna bracket's sealed counterbores.
 | SBC orientation   | flat on the floor, long axis **across** the tray | flat on the back wall, **turned 90°** |
 | Converter         | flat on the floor, **behind** the board | flat on the floor, below the board |
 | Opens             | **upward**, cover off              | forward, cover off              |
-| Cover             | `compute_box_inline_cover`, 105.5 cm³ | `compute_box_front_cover`, 36.6 cm³ |
-| Volume, tray      | 119.2 cm³                          | 84.5 cm³                        |
+| Cover             | `compute_box_inline_cover`, 104.7 cm³ | `compute_box_front_cover`, 36.6 cm³ |
+| Volume, tray      | 116.7 cm³                          | 84.5 cm³                        |
 
 #### 11a/11f — `compute_box_inline` and its cover
 
@@ -664,8 +664,13 @@ Measured positions:
 | | X | Y | note |
 | --- | --- | --- | --- |
 | Board | 39.125 … 103.125 | −25.75 … 30.25 | standoffs 58.75 × 49.5, 8 mm tall |
-| Converter | 31.5 … 96.5 | 31.5 … 66.5 | 0.5 mm off the back wall and the raceway wall |
-| Raceway | 100 … 114 | 62 … 70 | 14 × 8, in the back wall |
+| Converter | 31.5 … 96.5 | 31.5 … 66.5 | 0.5 mm off the back wall; 16.75 mm now free to its right |
+| Raceway | 117.5 … 142.625 | 33.25 … 49 | **15.75 wide**, in from the side wall |
+
+The converter kept its old X even though the raceway left the corner beside it,
+so there is now **18.0 mm of free cavity to its right** (X 96.5 to the channel wall
+at 114.5). Moving it right would shorten the 12 V run; it has not been moved,
+because nothing else needs that space and the position is already printed.
 
 The board is at Y −25.75 rather than hard against the front wall at −27: at −27 the
 standoff pads merged 0.75 mm *into* the wall and the board's edge sat dead flush.
@@ -673,32 +678,67 @@ The pads overhang the board by 0.75 mm at each end, so of the 3 mm of slack in t
 direction 1.5 is theirs; the remaining 1.5 is split 0.5 pad-to-wall, 0.5
 pad-to-converter, 0.5 converter-to-back-wall.
 
-**The raceway is external — a notch in the back wall, not a passage through the
-box.** The TalentCell's two leads lay into it from outside and run up past the
-cover to the radio, so nothing routes through the sealed interior and there is no
-hole to seal. It is cut through the feet band as well, so the channel is
-continuous from below the battery to above the frame, and the cover has a matching
-edge notch so the run is unbroken. At 8 mm deep the cables stay inside the box's
-own footprint; nothing protrudes behind the frame.
+**The raceway comes in from the right side wall**, walled off from the electronics
+cavity on its other three sides at 3 mm. The TalentCell's two leads lay into it
+from the side, run inboard past the side panel, and turn up through the cover into
+the frame.
 
-Getting there took two corrections. The first cut went straight through into the
-cavity — a notch with no wall behind it. The fix keeps a block of material inboard
-of the cut. The first version of that block was exactly as wide as the notch, which
-gave it a back wall and no sides; it is now widened by `cmi_wall` at each end, so
-all three inboard faces measure **3.00 mm**, matching the box walls.
+**It took three tries to find the right wall to enter from, and the back wall was
+the wrong one.** The history is worth keeping because it is all one lesson about
+what the channel has to dodge:
 
-It sits in the **back** wall rather than the right wall for the same packing reason
-as everything else: on the right it would have forced the converter 8.6 mm inboard,
-straight off the connector zones (14.7 mm each instead of 19). In the back wall the
-right side stays clear, the converter keeps its full width, and the notch still
-lands beside it on the power side — the converter's leads and the battery's share
-one corner.
+1. A notch confined to Y 62–70. The back bottom crossbeam lands on the cover at
+   **Y 54–70**, so it came up directly underneath the beam and dead-ended — and
+   that beam's own M4 at **(107.25, 62)** sat inside its footprint.
+2. Moved inboard to X 116.25–130.25 and opened through the back face. That put
+   160 mm² of the floor opening straight onto the **battery foot at (128.25, 58)**
+   — the boss the battery bolts up into. Nothing can pass there.
+3. Squeezed between the two: the beam's M4 counterbore reaches X 111.35 and the
+   foot's boss starts at 120.25, leaving 8.90 mm and a **6.90 mm** slot. Clear of
+   everything and too narrow to use.
 
-Tray-to-cover is **six M3** into inserts in the cover, on 12 mm pads at the top of
-the wall, each sat on a 45° cone so nothing overhangs — a continuous inward rim
-would have been an 8 mm unsupported ledge right round the part. Corners plus
-mid-side, all hard against the walls: a mid-*front* pad would land on the board,
-which now runs right up to the front wall.
+**Along the back edge there is simply no room.** The right side wall has far more:
+the only obstructions are the two right-hand feet, at **Y 4–20 and Y 50–66**, with
+**30 mm of clear Y between them**.
+
+So the channel enters from the side, and its width is bounded by what it must not
+touch:
+
+| bound | set by | value |
+| --- | --- | --- |
+| front | the board's Y band ends at 30.25 and its connectors project in ±X across it | wall starts there |
+| back | the right-back foot's boss begins at Y 50, less 1 mm | Y 49 |
+
+That gives **Y 33.25–49, a 15.75 mm channel** — more than double the back-edge
+attempt and wider than the 14 mm it started life as. All of it derived, so it
+tracks `cmi_sbc` and `foot_y` if either moves.
+
+**It also lands entirely between the bottom crossbeams** (Y 0–16 and 54–70), so
+unlike every back-wall version it costs neither beam any bearing on the cover, and
+it leaves the board's right connector zone untouched.
+
+**X differs between the two parts, deliberately.** The tray's channel is open at
+the box's outer side face and runs inboard to **X 117.5**, so its mouth inboard of
+the side panel's inner face at 133.25 is 15.75 mm — exactly as long as the channel
+is wide. The cover's aperture stops at **X 132.25, 10 mm in from the frame edge**:
+the side panel lands on that face at X 133.25–142.25, so an opening that reached
+the edge would undercut it for nothing. The leads lie into the tray from the side,
+under the panel, and turn up through the cover inboard of it.
+
+**The cut stops at the floor's underside** rather than running down through the
+foot band as the old notch did. Below the floor the space between the feet is open
+air, so there is nothing to channel through. All four feet measure intact.
+
+Earlier versions got the walls wrong twice: the first cut went straight into the
+cavity, and the block that fixed it was exactly as wide as the notch, so it had a
+back wall and no sides. Both were caught by measuring the walls rather than
+trusting the parameters.
+
+**Tray-to-cover fixing is currently absent.** The six M3 pads and their inserts
+have been removed: they were placed before the cover inherited the base plate's
+bolt pattern and bore no relation to it. The tray presently just sits under the
+cover. This is a known gap, to be settled once the cover's frame mounting is
+final — see §8.
 
 The cover carries the four M4 clearance holes for the bottom crossbeams on the base
 plate's own bolt pattern, with the heads sunk to 4 mm so an **M4 × 12 still engages
@@ -1134,10 +1174,9 @@ them redundant.
 
 All bolts stainless, socket cap. Structural inserts are brass M4, 6.0 mm OD ×
 8.0 mm long (Ruthex/Bumat type) — pockets Ø5.7 × 9.0 mm with a Ø6.6 lead-in
-chamfer. **M3 inserts appear only in the compute boxes** — the SBC standoffs in all
-three variants, and the six tray-to-cover screws in `compute_box_inline` —
-pockets Ø4.0 × 5.0 mm (the SBC standoffs use 7.5 mm pockets for 7 mm inserts).
-Everything structural stays M4.
+chamfer. **M3 inserts appear only in the compute boxes**, at the SBC standoffs in
+all three variants — pockets Ø4.0 × 5.0 mm, or 7.5 mm at the standoffs, which take
+7 mm inserts. Everything structural stays M4.
 
 | Joint                           | Bolt           | Qty                      | Insert lives in                      |
 | ------------------------------- | -------------- | ------------------------ | ------------------------------------ |
@@ -1146,7 +1185,7 @@ Everything structural stays M4.
 | Base plate → bottom beams       | M4 × 12        | 4                        | bottom beam undersides               |
 | **Battery box → base plate**    | **M4 × 12**    | **4**                    | base plate feet (or the inline tray's) |
 | Inline box cover → bottom beams | M4 × 12        | 4 *(instead of the base plate's)* | bottom beam undersides      |
-| Inline box tray → its cover     | M3 × 10        | 6                        | cover underside                      |
+| Inline box tray → its cover     | *none at present* | —                     | removed; see §8                      |
 | Next module → battery box       | M4 × 12        | 4                        | battery box feet                     |
 | Compute box (front) → beams     | M4 × 12        | 4 top + 2 bottom         | box back-wall pads / beam front face |
 | SO-239 flange → antenna mount   | M3 × 10 + nut  | 4 per mount              | (through-holes; SO-239 variant only) |
@@ -1216,8 +1255,8 @@ constraint from the lap pads is gone.
    lips should capture both panel bottom edges. **If you are fitting
    `compute_box_inline` instead**, populate and close its tray first, then bolt the
    assembled box up into the beams through the cover's four holes — the cover *is*
-   the base plate. Lay the battery leads into the back-wall raceway before the
-   frame goes down on it.
+   the base plate. Lay the battery leads into the raceway from the **right side**
+   before the frame goes down on it.
 4. Drop the radio in and fit the two M5 bolts through the panel recesses into
    the radio's side holes.
 5. *(No handle step — the handles are part of the side panels, fitted in step 2.)*
@@ -1226,7 +1265,7 @@ constraint from the lap pads is gone.
    connectors.
 7. If fitting the battery box: bolt it up into the four feet (4 × M4 × 12),
    route the battery lead up through the base plate's central opening — or, with
-   the inline box, up the external raceway — slide the pack in from the front and
+   the inline box, up the raceway channel — slide the pack in from the front and
    strap it.
 8. If fitting `compute_box_front`, populate it **before** the cover goes on —
    the downward-facing power and Ethernet connections are not reachable once it
@@ -1294,15 +1333,33 @@ Not just rendered — checked:
 - Compute boxes: SBC envelope (64 × 56 board + 22 mm of connectors) traced clear
   of the walls and top flanges, all three variants single-shell with zero enclosed
   voids.
-- `compute_box_inline`: tray 142.98 × 99.98 × 47.00 / 119.20 cm³, cover
-  142.98 × 99.98 × 7.98 / 105.51 cm³, both watertight and single-shell; stacked
+- `compute_box_inline`: tray 142.98 × 99.98 × 46.99 / 116.71 cm³, cover
+  142.98 × 99.98 × 7.98 / 104.73 cm³, both watertight and single-shell; stacked
   height **55.00 mm** against the 55 mm budget. Cavity sectioned at 35.00 mm.
-  Raceway measured 13.98 wide × 8 deep with **3.00 mm** of wall on all three
-  inboard faces — the check that caught two earlier versions, one that cut through
-  into the cavity and one whose kept block was exactly as wide as the notch and so
-  had no side walls at all. Converter and board footprints traced against the
-  interior: 0.5 mm clearance to the back wall and to the raceway wall, 36.5 mm of
-  connector zone at each end of the board, 10.4 mm of headroom over it.
+  Converter and board footprints traced against the interior: 0.5 mm clearance to
+  the back wall, 36.5 mm of connector zone at each end of the board, 10.4 mm of
+  headroom over it.
+- Raceway, traced by largest-contiguous-air run: **Y 33.26–49.00 = 15.76 mm**,
+  identical at the tray's floor, at mid-cavity, at the inboard mouth, and through
+  the cover — four stations agreeing to the 0.02 mm probe step. In X the tray runs
+  117.50 out through the side face; the cover stops at 132.24, i.e. **10.00 mm in
+  from the frame edge**. Walls solid front, back and inboard, each sampled at two
+  X stations.
+- **Floor opening against the battery feet: 0 of 3723 grid samples fall over
+  either**, nearest boss edge 1.00 mm away. This check governs the channel's Y, and
+  it is what condemned the second raceway version — that one put 160 mm² of the
+  opening straight onto the boss the battery bolts into, measured at the time and
+  wrongly accepted.
+- Cover confirmed solid under the side panel at (137, 41) and under both bottom
+  crossbeams at (125, 8) and (125, 62) — the side-wall route costs no bearing
+  anywhere, unlike every back-edge version. Board's right connector zone confirmed
+  still open. All four feet intact (24/24 on an r = 6 ring); all four cover M4s
+  present.
+- This family of checks caught four earlier raceway versions: one that cut through
+  into the cavity, one whose kept block was exactly as wide as the notch and so had
+  no side walls, one that sat on the battery foot, and one squeezed to 6.90 mm
+  between the foot and the beam bolt.
+- Six former tray screw-pad sites re-probed after removal: all six read air.
 - `compute_box_front` after the rework: all four standoffs located by **counting
   solid islands standing proud of the back wall**, not by point-probing — four at
   X 11.25 / 60.75 × Z 41.65 / 100.35, each 38.0 mm², which is a Ø8 pad minus its
@@ -1523,21 +1580,28 @@ are.
 ---
 
 14. **`compute_box_inline`: the buck converter's own 12 V feed has no modelled
-    path.** The raceway is deliberately external and sealed off from the cavity, so
-    the battery leads that lie in it never enter the box — but the converter *inside*
+    path.** The raceway is deliberately sealed off from the cavity, so the battery
+    leads running up it never enter the box — but the converter *inside*
     the box has to be fed from those same leads. Nothing in the model gets them
-    across the 3 mm raceway wall. Either drill that wall on the bench (the converter
-    is 0.5 mm from it, so the run is trivially short), or bring 12 V in through the
-    cover's cable opening with the rest of the wiring. **Decide which before you
+    across the raceway's 3 mm wall. That wall is now the channel's **inboard** face
+    at X 114.5–117.5, and the converter ends at X 96.5, so the run is no longer
+    trivially short — 18 mm of cavity separates them. Either drill the left wall
+    and bridge that gap inside the box, or bring 12 V in through the cover's cable
+    opening with the rest of the wiring. **Decide which before you
     close the box** — the converter's terminals are the least accessible thing in it.
 
-15. **`compute_box_inline` needs supports and should not.** ~13 000 mm² of floor
+15. **`compute_box_inline` has no tray-to-cover fixing.** The six M3 pads were
+    removed because they predated the cover inheriting the base plate's bolt
+    pattern and did not relate to it. Until they are replaced the tray only sits
+    under the cover. Next change to make on this part.
+
+16. **`compute_box_inline` needs supports and should not.** ~13 000 mm² of floor
     prints in mid-air over the four feet (§12). It slices and prints with support
     under the first 8 mm, but the fix — feet as internal bosses, flat underside —
     also takes 8 mm off the stack. Decide before printing it; the change is not
     made yet.
 
-16. **The 15 mm component height over the La Frite is assumed, not measured.** It
+17. **The 15 mm component height over the La Frite is assumed, not measured.** It
     is what gives the inline box its 10.4 mm of headroom in a 35 mm cavity, and the
     tallest thing on the board — a right-angle adapter standing off the connector
     edge, or a USB stick — is exactly what has not been put on a caliper. If it runs

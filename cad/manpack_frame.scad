@@ -1414,7 +1414,6 @@ cmi_top  = z_frame;                    // 25, the face the frame sits on
 cmi_cov_t= 8;                          // cover thickness
 cmi_wall = 3;
 cmi_floor= 4;
-cmi_pad  = 8;                          // screw pad depth at the tray's top
 cmi_z1   = cmi_top - cmi_cov_t;        // 17, tray top
 cmi_z0   = cmi_z1 - 35 - cmi_floor;    // -22, underside of the floor
 
@@ -1436,37 +1435,81 @@ cmi_z0   = cmi_z1 - 35 - cmi_floor;    // -22, underside of the floor
 //  rest is split 0.5 pad-to-wall, 0.5 pad-to-converter, 0.5 converter-to-back.
 cmi_sbc  = [39.125, -25.75, 64, 56];   // La Frite  x0 y0 w d
 cmi_stand = sbc_stand_hi;              // 8
-//  Tucked flush into the back-right corner of the pocket behind the board: 0.5 mm
-//  off the back wall (inner face Y 67) and 0.5 mm off the raceway wall (X 100.05),
-//  so its leads and the battery's share one corner.
-cmi_conv = [31.5, 31.5, 65, 35];       // converter, flat, behind the board.
-                                       //   Shifted 3 mm left when the raceway
-                                       //   gained its side walls: the left one now
-                                       //   starts at X 97.
+//  In the pocket behind the board, 0.5 mm off the back wall (inner face Y 67).
+//  It used to be 0.5 mm off the raceway wall too, back when the raceway was a notch
+//  in the back wall beside it; the raceway has since moved inboard and right, so
+//  there is now 16.75 mm of free cavity to the converter's right (X 96.5 to the
+//  shaft wall at 113.25).  Left where it is -- nothing else needs that space and
+//  the position is already printed.
+cmi_conv = [31.5, 31.5, 65, 35];       // converter, flat, behind the board
 cmi_conv_dy = 54;                      // its tab holes, 54 apart along its length
 cmi_conv_dx = 13.5;                    //   and 13.5 in from one edge
-//  RACEWAY: an EXTERNAL notch in the right-hand wall, not a passage through the
-//  box.  The battery's two leads lay into it from outside and run up past the
-//  cover, so nothing routes through the sealed interior.
+//  RACEWAY: a walled vertical SHAFT through the tray and cover, isolated from the
+//  electronics cavity by 3 mm on every inboard face.  It was a notch in the back
+//  wall, which does not survive the cover taking over the base plate's job:
 //
-//  It only fits because the converter moved under the board.  Flat, the converter
-//  had to sit against this wall to leave connector room, which is exactly where
-//  the notch goes; every flat rearrangement dropped a connector zone below 10 mm.
-//  It is in the BACK wall, not the right wall.  On the right it would have forced
-//  the converter 8.6 mm inboard, and that comes straight off the connector zones:
-//  14.7 mm each instead of 19.  In the back wall the right side stays clear, the
-//  converter keeps its full width, and the notch still lands beside it on the
-//  power side.  8 mm deep, so the cables sit inside the footprint and nothing
-//  protrudes behind the frame.
-cmi_notch_x = [100, 114];              // 14 wide, for two TalentCell leads
-cmi_notch_d = 8;                       // how far it bites into the back wall
-//  Tray -> cover screws.  Local pads at the top of the wall, each on a 45 degree
-//  cone so nothing overhangs -- a continuous inward rim would have been an 8 mm
-//  unsupported ledge right round the part.
-//  Corners plus mid-side, all hard against the walls: a mid-FRONT pad would land
-//  on the board, which now runs right up to the front wall.
-cmi_screws = [[6.625,-23],[135.625,-23],[6.625,20],[135.625,20],
-              [6.625,63],[135.625,63]];
+//    - the back bottom crossbeam lands on the cover at Y 54..70, so a channel at
+//      Y 62..70 emerged directly underneath it and dead-ended;
+//    - that beam's own M4 at (107.25, 62) sat inside the old notch footprint.
+//
+//  It comes in from the RIGHT SIDE WALL, not the back.  The back edge is the worst
+//  place for it: there the channel is trapped between the cover's M4 into the back
+//  crossbeam (Ø8.2 counterbore reaching X 111.35) and the tray's battery foot (Ø16
+//  boss starting at X 120.25), which leaves 8.90 mm and yields a 6.9 mm slot --
+//  unusable.  Along the RIGHT wall the only obstructions are the two right-hand
+//  feet, at Y 4..20 and Y 50..66, and between them is 30 mm of clear Y.
+//
+//  Y is bounded by what it must not touch, so it is derived, not chosen:
+//    front  -- the board's Y band ends at 30.25 and its connectors project in +/-X
+//              across that band, so the channel's wall starts there;
+//    back   -- the right-back foot's boss begins at Y 50, less 1 mm of wall.
+//  That gives Y 33.25..49, a 15.75 mm channel -- and it lands entirely between the
+//  bottom crossbeams (Y 0..16 and 54..70), so unlike the back-wall versions it
+//  costs neither beam any bearing on the cover.
+//
+//  X: open at the box's outer side face in BOTH parts, running inboard to 117.5 --
+//  far enough that the mouth inboard of the side panel's inner face at 133.25 is
+//  exactly as long as the channel is wide.
+//
+//  The cover's aperture used to stop 10 mm in from the frame edge so as not to
+//  undercut the side panel, which lands on that face at X 133.25..142.25.  That
+//  made it a closed slot, and a closed slot can only be threaded: the leads would
+//  have to come off their connectors to fit the cover.  Running it out to the edge
+//  lets them slide in and out sideways instead.  The panel gives up 15.75 mm of
+//  its 70 mm of bearing on this face for that, which it can afford -- it hangs on
+//  twelve M4s into the crossbeams and does not rely on the cover to locate it.
+cmi_notch_edge = 10;                   // the mouth must still reach this far in
+cmi_notch_y0   = cmi_sbc[1] + cmi_sbc[3] + cmi_wall;   // 33.25
+cmi_notch_y1   = foot_y[1] - foot_d/2 - 1;             // 49
+cmi_notch_w    = cmi_notch_y1 - cmi_notch_y0;          // 15.75
+cmi_notch_x1   = cmi_x0 + cmi_w;                       // 142.625, open at the wall
+cmi_notch_x0   = frame_w - panel_t - cmi_notch_w;      // 117.50
+assert(cmi_notch_y1 <= foot_y[1] - foot_d/2,
+       "inline raceway runs over the battery foot");
+assert(cmi_notch_y0 >= cmi_sbc[1] + cmi_sbc[3],
+       "inline raceway eats into the board's connector band");
+assert(cmi_notch_y0 >= beam_y_f + beam_d && cmi_notch_y1 <= beam_y_b,
+       "inline raceway runs under a bottom crossbeam");
+assert(cmi_notch_x0 <= frame_w - cmi_notch_edge,
+       "inline raceway has no mouth inboard of the side panel");
+//  GROMMET NOTCH.  The raceway carries the battery's leads; the buck converter is
+//  inside the sealed cavity, so the 12 V feed needs one way across the raceway's
+//  inboard wall.  It is a U-notch cut DOWN from the tray's top face -- open at the
+//  top, so it prints with no ceiling and the lead drops in rather than threading.
+//  The round seats the grommet with its top flush at cmi_z1, where the cover comes
+//  down on it and caps it.  Same Ø12 grommet the front box's power entry uses.
+cmi_grom       = cmf_grom;             // 12
+cmi_grom_y     = (cmi_notch_y0 + cmi_notch_y1) / 2;  // 41.125, centred in the wall
+assert(cmi_grom_y - cmi_grom/2 >= cmi_notch_y0 &&
+       cmi_grom_y + cmi_grom/2 <= cmi_notch_y1,
+       "grommet notch runs past the raceway wall it sits in");
+//  The cut stops at the floor's underside instead of running on through the foot
+//  band.  Below the floor the space between the feet is open air, so there is
+//  nothing to channel through.  The floor opening is clear of both right-hand feet
+//  for its whole area.
+//
+//  Tray -> cover screws REMOVED pending the cover's frame mounting being settled.
+//  The six pads bore no relation to the bolt pattern the cover now has to carry.
 
 module compute_box_inline_cover() {
     difference() {
@@ -1482,13 +1525,11 @@ module compute_box_inline_cover() {
         // stadium.  Must stay inside Y 16..54 -- the bottom crossbeams sit on this
         // face at Y 0..16 and 54..70.
         translate([6, 20, cmi_z1 - 1]) rbox(24, 30, cmi_cov_t + 2, 3);
-        // matching edge notch, so the cables run up the outside continuously
-        translate([cmi_notch_x[0], cmi_y0 + cmi_d - cmi_notch_d, cmi_z1 - 1])
-            rbox(cmi_notch_x[1] - cmi_notch_x[0], cmi_notch_d + 1, cmi_cov_t + 2, 2);
-        // M3 inserts for the tray, opening downward
-        for (q = cmi_screws)
-            translate([q[0], q[1], cmi_z1 - 0.01])
-                cylinder(d = m3_ins_d, h = m3_ins_h + 0.01);
+        // raceway aperture -- square over the tray's channel and open through the
+        // same side face, so the leads slide in and out without coming off their
+        // connectors
+        translate([cmi_notch_x0, cmi_notch_y0, cmi_z1 - 1])
+            cube([cmi_notch_x1 - cmi_notch_x0 + 1, cmi_notch_w, cmi_cov_t + 2]);
     }
 }
 
@@ -1500,28 +1541,34 @@ module compute_box_inline() {
             for (x = foot_x, y = foot_y)
                 translate([x, y, cmi_z0 - foot_h]) cylinder(d = foot_d, h = foot_h + 1);
         }
-        // Cavity, less a local block behind the raceway.  Without that block the
-        // notch would open straight into the interior; the raceway has to have a
-        // wall behind it or it is a hole, not a channel.
+        // Cavity, less the block the raceway shaft is bored through.  Without
+        // that block the shaft would be open to the interior on all four sides,
+        // i.e. not a shaft at all.
         difference() {
             translate([cmi_x0 + cmi_wall, cmi_y0 + cmi_wall, cmi_z0 + cmi_floor])
                 rbox(cmi_w - 2*cmi_wall, cmi_d - 2*cmi_wall,
                      cmi_z1 - cmi_z0 - cmi_floor + 1, 1.5);
-            // WIDER than the notch by a wall each side, or the notch eats the
-            // whole block and the raceway ends up open to the cavity on both
-            // flanks -- only the back wall survives.  Side walls now match it at
-            // cmi_wall.
-            translate([cmi_notch_x[0] - cmi_wall,
-                       cmi_y0 + cmi_d - cmi_wall - cmi_notch_d,
+            // cmi_wall on the front, back and inboard end; open at the side.  It
+            // runs out to the cavity's right edge so the channel can breach the
+            // side wall without breaching the cavity.
+            translate([cmi_notch_x0 - cmi_wall, cmi_notch_y0 - cmi_wall,
                        cmi_z0 + cmi_floor - 1])
-                cube([cmi_notch_x[1] - cmi_notch_x[0] + 2*cmi_wall, cmi_notch_d,
+                cube([cmi_x0 + cmi_w - cmi_wall - (cmi_notch_x0 - cmi_wall),
+                      cmi_notch_w + 2*cmi_wall,
                       cmi_z1 - cmi_z0 + 2]);
         }
-        // external raceway notch, BACK wall, full height
-        translate([cmi_notch_x[0], cmi_y0 + cmi_d - cmi_notch_d,
-                   cmi_z0 - foot_h - 1])
-            rbox(cmi_notch_x[1] - cmi_notch_x[0], cmi_notch_d + 1,
-                 cmi_z1 - cmi_z0 + foot_h + 2, 2);
+        // the channel -- floor to top, out through the side face, NOT down
+        // through the foot band
+        translate([cmi_notch_x0, cmi_notch_y0, cmi_z0 - 1])
+            cube([cmi_notch_x1 - cmi_notch_x0 + 1, cmi_notch_w,
+                  cmi_z1 - cmi_z0 + 2]);
+        // grommet notch through the raceway's inboard wall: Ø12 round seated with
+        // its top at cmi_z1, opened straight up so nothing overhangs
+        translate([cmi_notch_x0 - cmi_wall - 1, cmi_grom_y, cmi_z1 - cmi_grom/2])
+            rotate([0, 90, 0]) cylinder(d = cmi_grom, h = cmi_wall + 2);
+        translate([cmi_notch_x0 - cmi_wall - 1, cmi_grom_y - cmi_grom/2,
+                   cmi_z1 - cmi_grom/2])
+            cube([cmi_wall + 2, cmi_grom, cmi_grom/2 + 1]);
         // converter hold-down: two M3 through the floor into its slotted tabs
         for (dx = [0, cmi_conv_dy])
             translate([cmi_conv[0] + (cmi_conv[2] - cmi_conv_dy)/2 + dx,
@@ -1531,20 +1578,6 @@ module compute_box_inline() {
         for (x = foot_x, y = foot_y)
             translate([x, y, cmi_z0 - foot_h]) m4_insert();
     }
-    // screw pads, each on a 45 degree cone
-    for (q = cmi_screws)
-        difference() {
-            union() {
-                translate([q[0], q[1], cmi_z1 - cmi_pad])
-                    cylinder(d = 12, h = cmi_pad);
-                translate([q[0], q[1], cmi_z1 - cmi_pad - 5])
-                    cylinder(d1 = 2, d2 = 12, h = 5);
-            }
-            translate([q[0], q[1], cmi_z1 - cmi_pad - 0.01])
-                cylinder(d = 6.2, h = 3);
-            translate([q[0], q[1], cmi_z1 - cmi_pad - 0.01])
-                cylinder(d = m3_clear, h = cmi_pad + 0.02);
-        }
     // SBC standoffs -- 58.75 across X, 49.5 in Y, following the board
     for (dx = [-sbc_hx/2, sbc_hx/2], dy = [-sbc_hy/2, sbc_hy/2])
         translate([cmi_sbc[0] + cmi_sbc[2]/2 + dx, cmi_sbc[1] + cmi_sbc[3]/2 + dy,
