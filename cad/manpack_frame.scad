@@ -20,7 +20,7 @@ $fa = 2;
 $fs = 0.4;
 
 /* [Output] */
-part = "assembly"; // [assembly, exploded, side_panel, crossbeam_top_front_dual, crossbeam_top_front_grid, crossbeam_top_back, crossbeam_bottom_front, crossbeam_bottom_front_rail, crossbeam_bottom_back, crossbeam_top_front_triple, compute_box_inline, compute_box_front, compute_box_front_cover, compute_box_front_populated, compute_box_front_slim, compute_box_front_slim_cover, antenna_mount_bnc, antenna_mount_so239, base_plate, battery_box, handle_fit]
+part = "assembly"; // [assembly, exploded, side_panel, crossbeam_top_front_dual, crossbeam_top_front_grid, crossbeam_top_back, crossbeam_bottom_front, crossbeam_bottom_front_rail, crossbeam_bottom_back, crossbeam_top_front_triple, compute_box_inline, compute_box_inline_cover, compute_box_front, compute_box_front_cover, compute_box_front_populated, compute_box_front_slim, compute_box_front_slim_cover, antenna_mount_bnc, antenna_mount_so239, base_plate, battery_box, handle_fit]
 
 // which top-front crossbeam the assembly is built with
 top_front = "grid"; // [grid, triple, dual]
@@ -851,9 +851,17 @@ module base_plate() {
             // them.  The side panels are located by their 16 bolts into the
             // crossbeams, so the lips were redundant anyway.
         }
-        // bolts up into the bottom crossbeams (heads flush in the underside)
-        for (x = base_bolt_x, y = base_bolt_y)
-            translate([x, y, foot_h]) m4_bolt_hole(base_t);
+        // Bolts up into the bottom crossbeams, heads recessed in the underside.
+        // The counterbore is sunk to base_t - 4 rather than the usual 4: at 17 mm
+        // thick this plate would otherwise need a 20 mm shank (M4 x 24).  Sinking
+        // the head leaves the same 4 mm of plate under it as the original 8 mm
+        // plate had, and keeps M4 x 12 correct throughout the project.
+        for (x = base_bolt_x, y = base_bolt_y) {
+            translate([x, y, foot_h - 0.01])
+                cylinder(d = m4_cb_d, h = base_t - 4 + 0.01);
+            translate([x, y, foot_h - 0.01])
+                cylinder(d = m4_clear, h = base_t + 0.02);
+        }
         // future-module inserts, opening downward through the feet
         for (x = foot_x, y = foot_y)
             translate([x, y, 0]) m4_insert();
@@ -1275,55 +1283,8 @@ module cm_grid_holes(x0, y0, x1, y1, t) {
 // mid-air failure the base plate had -- and a closed front would become a
 // 142 x 49 ceiling in the back-down pose.  Open front doubles as the port
 // access: the SBC sits with its connector edge facing out of it.
-module compute_box_inline() {
-    cz1 = -box_boss;                         // flange underside
-    cz0 = cz1 - cmi_cav_z;                   // floor top
-    fz  = cz0 - cm_floor;                    // floor underside
-    fl  = 24;                                // flange reach inboard from each end
-    // The SBC does NOT have to dodge the flanges: it tops out 1 mm below their
-    // underside, so the whole floor width is usable.  Sit it against the left
-    // wall and give the rest of the floor to the grid.
-    sbc_cx = cm_wall + 6 + sbc_l/2;          // 41
-    sbc_cy = frame_d/2;
-    difference() {
-        union() {
-            // end walls and back wall
-            for (wx = [0, frame_w - cm_wall])
-                translate([wx, 0, fz]) rbox(cm_wall, frame_d, cmi_cav_z + cm_floor, 1.5);
-            translate([0, frame_d - cm_wall, fz])
-                rbox(frame_w, cm_wall, cmi_cav_z + cm_floor, 1.5);
-            // floor
-            translate([0, 0, fz]) rbox(frame_w, frame_d, cm_floor, 1.5);
-            // top flanges along both end walls, carrying the four M4s.
-            // Sunk 1 mm into the wall tops -- butting them at exactly cz1 left
-            // each flange as its own shell.
-            for (fx = [0, frame_w - fl])
-                translate([fx, 0, cz1 - 1]) rbox(fl, frame_d, box_boss + 1, 1.5);
-            // stacking feet, the same interface the base plate presents
-            for (x = foot_x, y = foot_y)
-                translate([x, y, fz - foot_h]) cylinder(d = foot_d, h = foot_h + 1);
-            // SBC standoffs
-            // 8 mm standoffs, same as the front boxes: with sbc_ins_h at 7.5 a
-            // 6 mm pad would put the insert 1.5 mm into the floor rather than in
-            // the pad.  It still works there -- 2.5 mm of floor is left beneath --
-            // but the pad should hold its own insert.
-            translate([sbc_cx, sbc_cy, cz0]) sbc_pads(sbc_stand_hi);
-        }
-        translate([sbc_cx, sbc_cy, cz0]) sbc_pad_pockets(sbc_stand_hi);
-        // generic M3 grid over the rest of the floor
-        translate([0, 0, fz])
-            cm_grid_holes(sbc_cx + sbc_l/2 + 8, 12, frame_w - cm_wall - 6,
-                          frame_d - 12, cm_floor);
-        // M4 up into the plate above, and inserts down for the next module
-        for (x = foot_x, y = foot_y) {
-            translate([x, y, cz1]) m4_bolt_hole(box_boss);
-            translate([x, y, fz - foot_h]) m4_insert();
-        }
-        // zip-tie slots through the floor beside the grid
-        for (x = [sbc_cx + sbc_l/2 + 4, frame_w - cm_wall - 4], y = [16, frame_d - 16])
-            translate([x, y, fz - 1]) rbox(cm_tie[0], cm_tie[1], cm_floor + 2, 1);
-    }
-}
+// (compute_box_inline is redefined below -- see PART 11a)
+
 
 module compute_box_front() {
     // local frame: X 0..cmf_x, Y -cmf_y..0 (0 = frame front face), Z 0..cmf_z
@@ -1410,6 +1371,184 @@ module compute_box_front() {
         for (tz = cmf_tie_z_hi)
             translate([cmf_x - cm_wall, cmf_tie_y, tz]) cm_tie_mount(cm_wall);
     }
+}
+
+// =============================================================================
+//  PART 11a -- compute_box_inline + compute_box_inline_cover
+// -----------------------------------------------------------------------------
+//  A stack module carrying the La Frite and its converter, on the battery box's
+//  footprint.  It ABSORBS THE BASE PLATE: the cover is what bolts up into the two
+//  bottom crossbeams, and the tray's underside presents the four stacking feet, so
+//  the battery box hangs off it exactly as it hangs off the base plate today.
+//  Fit this INSTEAD OF `base_plate`, not as well as.
+//
+//  Two parts, because the cover's rear bolts at Y 62 end up enclosed by the tray:
+//  bolt the cover to the frame first, then screw the tray up onto it.  The tray
+//  then drops off for servicing without disturbing the frame or the battery.
+//
+//  55 mm overall, from the frame's underside at Z 25 down to Z -30:
+//      cover   8   Z  17..25   4 x M4 into the crossbeams
+//      cavity 35   Z -18..17   contents need 24.6
+//      floor   4   Z -22..-18
+//      feet    8   Z -30..-22  M4 inserts for the module below
+// =============================================================================
+cmi_w    = bb_out_x;                   // 143, the battery box's width
+cmi_d    = 100;                        // 5.2 mm DEEPER than the battery box's
+                                       //   94.8.  That is what lets the converter
+                                       //   sit BEHIND the board rather than beside
+                                       //   it, freeing the board's whole X band:
+                                       //   connector zones go 19 -> 36.5 mm each.
+                                       //   The board's connectors are on its two
+                                       //   short edges, so anything sharing that
+                                       //   band comes straight off them.  Cost: it
+                                       //   reaches 30 mm forward of the frame
+                                       //   instead of 24.8.
+cmi_x0   = bb_x0;                      // -0.375
+cmi_y0   = frame_d - cmi_d;            // -30, back flush with the frame
+cmi_top  = z_frame;                    // 25, the face the frame sits on
+cmi_cov_t= 8;                          // cover thickness
+cmi_wall = 3;
+cmi_floor= 4;
+cmi_pad  = 8;                          // screw pad depth at the tray's top
+cmi_z1   = cmi_top - cmi_cov_t;        // 17, tray top
+cmi_z0   = cmi_z1 - 35 - cmi_floor;    // -22, underside of the floor
+
+//  The board lies with its LONG axis ACROSS the tray.  Front-to-back does not
+//  work: its connectors are on both 56 mm edges -- USB one end, Ethernet/HDMI the
+//  other -- and 64 of board plus 20 of clearance at each end is 104 against only
+//  88.8 mm of depth.  Across the tray the same 104 fits in 137 with room to spare.
+//
+//  The converter cannot stack behind the board either: 56 + 35 = 91, again past
+//  88.8.  It therefore sits beside the board, and 64 + 35 = 99 leaves 38 mm to
+//  split between the two connector zones -- about 19 mm each.  That is the whole
+//  packing problem in one line.
+//  Board hard against the FRONT wall, centred across; converter BEHIND it, biased
+//  toward the notch so the power wiring stays on one side.
+//  Y -25.75, not -27: hard against the front wall the standoff pads merged 0.75 mm
+//  INTO it and the board's edge was dead flush.  The pads overhang the board by
+//  0.75 each end, so of the 3 mm of slack in this direction 1.5 is theirs; the
+//  rest is split 0.5 pad-to-wall, 0.5 pad-to-converter, 0.5 converter-to-back.
+cmi_sbc  = [39.125, -25.75, 64, 56];   // La Frite  x0 y0 w d
+cmi_stand = sbc_stand_hi;              // 8
+//  Tucked flush into the back-right corner of the pocket behind the board: 0.5 mm
+//  off the back wall (inner face Y 67) and 0.5 mm off the raceway wall (X 100.05),
+//  so its leads and the battery's share one corner.
+cmi_conv = [31.5, 31.5, 65, 35];       // converter, flat, behind the board.
+                                       //   Shifted 3 mm left when the raceway
+                                       //   gained its side walls: the left one now
+                                       //   starts at X 97.
+cmi_conv_dy = 54;                      // its tab holes, 54 apart along its length
+cmi_conv_dx = 13.5;                    //   and 13.5 in from one edge
+//  RACEWAY: an EXTERNAL notch in the right-hand wall, not a passage through the
+//  box.  The battery's two leads lay into it from outside and run up past the
+//  cover, so nothing routes through the sealed interior.  Centred 35 mm in from
+//  the back wall at Y 70.
+//
+//  It only fits because the converter moved under the board.  Flat, the converter
+//  had to sit against this wall to leave connector room, which is exactly where
+//  the notch goes; every flat rearrangement dropped a connector zone below 10 mm.
+//  It is in the BACK wall, not the right wall.  On the right it would have forced
+//  the converter 8.6 mm inboard, and that comes straight off the connector zones:
+//  14.7 mm each instead of 19.  In the back wall the right side stays clear, the
+//  converter keeps its full width, and the notch still lands beside it on the
+//  power side.  8 mm deep, so the cables sit inside the footprint and nothing
+//  protrudes behind the frame.
+cmi_notch_x = [100, 114];              // 14 wide, for two TalentCell leads
+cmi_notch_d = 8;                       // how far it bites into the back wall
+//  Tray -> cover screws.  Local pads at the top of the wall, each on a 45 degree
+//  cone so nothing overhangs -- a continuous inward rim would have been an 8 mm
+//  unsupported ledge right round the part.
+//  Corners plus mid-side, all hard against the walls: a mid-FRONT pad would land
+//  on the board, which now runs right up to the front wall.
+cmi_screws = [[6.625,-23],[135.625,-23],[6.625,20],[135.625,20],
+              [6.625,63],[135.625,63]];
+
+module compute_box_inline_cover() {
+    difference() {
+        translate([cmi_x0, cmi_y0, cmi_z1]) rbox(cmi_w, cmi_d, cmi_cov_t, 2);
+        // up into the bottom crossbeams; head sunk so M4 x 12 still engages 7 mm
+        for (x = base_bolt_x, y = base_bolt_y) {
+            translate([x, y, cmi_z1 - 0.01])
+                cylinder(d = m4_cb_d, h = cmi_cov_t - 4 + 0.01);
+            translate([x, y, cmi_z1 - 0.01])
+                cylinder(d = m4_clear, h = cmi_cov_t + 0.02);
+        }
+        // Cable opening: sized to the raceway below it, not the base plate's full
+        // stadium.  Must stay inside Y 16..54 -- the bottom crossbeams sit on this
+        // face at Y 0..16 and 54..70.
+        translate([6, 20, cmi_z1 - 1]) rbox(24, 30, cmi_cov_t + 2, 3);
+        // matching edge notch, so the cables run up the outside continuously
+        translate([cmi_notch_x[0], cmi_y0 + cmi_d - cmi_notch_d, cmi_z1 - 1])
+            rbox(cmi_notch_x[1] - cmi_notch_x[0], cmi_notch_d + 1, cmi_cov_t + 2, 2);
+        // M3 inserts for the tray, opening downward
+        for (q = cmi_screws)
+            translate([q[0], q[1], cmi_z1 - 0.01])
+                cylinder(d = m3_ins_d, h = m3_ins_h + 0.01);
+    }
+}
+
+module compute_box_inline() {
+    difference() {
+        union() {
+            translate([cmi_x0, cmi_y0, cmi_z0])
+                rbox(cmi_w, cmi_d, cmi_z1 - cmi_z0, 2);
+            for (x = foot_x, y = foot_y)
+                translate([x, y, cmi_z0 - foot_h]) cylinder(d = foot_d, h = foot_h + 1);
+        }
+        // Cavity, less a local block behind the raceway.  Without that block the
+        // notch would open straight into the interior; the raceway has to have a
+        // wall behind it or it is a hole, not a channel.
+        difference() {
+            translate([cmi_x0 + cmi_wall, cmi_y0 + cmi_wall, cmi_z0 + cmi_floor])
+                rbox(cmi_w - 2*cmi_wall, cmi_d - 2*cmi_wall,
+                     cmi_z1 - cmi_z0 - cmi_floor + 1, 1.5);
+            // WIDER than the notch by a wall each side, or the notch eats the
+            // whole block and the raceway ends up open to the cavity on both
+            // flanks -- only the back wall survives.  Side walls now match it at
+            // cmi_wall.
+            translate([cmi_notch_x[0] - cmi_wall,
+                       cmi_y0 + cmi_d - cmi_wall - cmi_notch_d,
+                       cmi_z0 + cmi_floor - 1])
+                cube([cmi_notch_x[1] - cmi_notch_x[0] + 2*cmi_wall, cmi_notch_d,
+                      cmi_z1 - cmi_z0 + 2]);
+        }
+        // external raceway notch, BACK wall, full height
+        translate([cmi_notch_x[0], cmi_y0 + cmi_d - cmi_notch_d,
+                   cmi_z0 - foot_h - 1])
+            rbox(cmi_notch_x[1] - cmi_notch_x[0], cmi_notch_d + 1,
+                 cmi_z1 - cmi_z0 + foot_h + 2, 2);
+        // converter hold-down: two M3 through the floor into its slotted tabs
+        for (dx = [0, cmi_conv_dy])
+            translate([cmi_conv[0] + (cmi_conv[2] - cmi_conv_dy)/2 + dx,
+                       cmi_conv[1] + cmi_conv_dx, cmi_z0 - 1])
+                cylinder(d = m3_clear, h = cmi_floor + 2);
+        // M4 inserts in the feet, opening downward
+        for (x = foot_x, y = foot_y)
+            translate([x, y, cmi_z0 - foot_h]) m4_insert();
+    }
+    // screw pads, each on a 45 degree cone
+    for (q = cmi_screws)
+        difference() {
+            union() {
+                translate([q[0], q[1], cmi_z1 - cmi_pad])
+                    cylinder(d = 12, h = cmi_pad);
+                translate([q[0], q[1], cmi_z1 - cmi_pad - 5])
+                    cylinder(d1 = 2, d2 = 12, h = 5);
+            }
+            translate([q[0], q[1], cmi_z1 - cmi_pad - 0.01])
+                cylinder(d = 6.2, h = 3);
+            translate([q[0], q[1], cmi_z1 - cmi_pad - 0.01])
+                cylinder(d = m3_clear, h = cmi_pad + 0.02);
+        }
+    // SBC standoffs -- 58.75 across X, 49.5 in Y, following the board
+    for (dx = [-sbc_hx/2, sbc_hx/2], dy = [-sbc_hy/2, sbc_hy/2])
+        translate([cmi_sbc[0] + cmi_sbc[2]/2 + dx, cmi_sbc[1] + cmi_sbc[3]/2 + dy,
+                   cmi_z0 + cmi_floor - 1])
+            difference() {
+                cylinder(d = 8, h = cmi_stand + 1);
+                translate([0, 0, cmi_stand + 1 - sbc_ins_h])
+                    cylinder(d = m3_ins_d, h = sbc_ins_h + 0.1);
+            }
 }
 
 // =============================================================================
@@ -1787,8 +1926,13 @@ else if (part == "base_plate")
 // 19.5 mm along the whole length of each end wall.  Stood on its back the
 // flanges become vertical ribs growing off the back wall, supported the whole
 // way, and the open front simply faces up.
+// Tray: floor down, open side up.  The only overhangs are the four foot insert
+// mouths, and the screw pads sit on 45 degree cones.
 else if (part == "compute_box_inline")
-    translate([0, cmi_z, frame_d]) rotate([-90, 0, 0]) compute_box_inline();
+    translate([-cmi_x0, -cmi_y0, -(cmi_z0 - foot_h)]) compute_box_inline();
+// Cover: flat, bolt counterbores opening upward.
+else if (part == "compute_box_inline_cover")
+    translate([-cmi_x0, -cmi_y0, -cmi_z1]) compute_box_inline_cover();
 else if (part == "compute_box_front")
     rotate([-90, 0, 0]) compute_box_front();
 else if (part == "compute_box_front_slim")
