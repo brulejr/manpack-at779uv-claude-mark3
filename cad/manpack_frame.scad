@@ -20,7 +20,7 @@ $fa = 2;
 $fs = 0.4;
 
 /* [Output] */
-part = "assembly"; // [assembly, exploded, side_panel, crossbeam_top_front_dual, crossbeam_top_front_grid, crossbeam_top_back, crossbeam_bottom_front, crossbeam_bottom_front_rail, crossbeam_bottom_back, crossbeam_top_front_triple, compute_box_inline, compute_box_front, compute_box_front_cover, compute_box_front_populated, compute_box_front_slim, compute_box_front_slim_cover, handle, handle_mic, antenna_mount_bnc, antenna_mount_so239, base_plate, battery_box]
+part = "assembly"; // [assembly, exploded, side_panel, crossbeam_top_front_dual, crossbeam_top_front_grid, crossbeam_top_back, crossbeam_bottom_front, crossbeam_bottom_front_rail, crossbeam_bottom_back, crossbeam_top_front_triple, compute_box_inline, compute_box_front, compute_box_front_cover, compute_box_front_populated, compute_box_front_slim, compute_box_front_slim_cover, antenna_mount_bnc, antenna_mount_so239, base_plate, battery_box, handle_fit]
 
 // which top-front crossbeam the assembly is built with
 top_front = "grid"; // [grid, triple, dual]
@@ -67,8 +67,16 @@ frame_d  = 70;     // frame depth in Y       (ref 60; +10 so the four-beam box
                    //                         clears the upward-facing control panel)
 beam_d   = 16;     // crossbeam depth  (Y)
 beam_h   = 24;     // crossbeam height (Z)
-bay_h    = 116;    // clear Z between the bottom and top crossbeams
-base_t   = 8;      // bottom interface plate thickness
+//  bay_h and base_t together decide where the bottom crossbeams sit.  Raising them
+//  is what makes the unified panel+handle printable: the panel starts where the
+//  beams start, so the PART gets shorter while the frame's overall height, the top
+//  beams, the accessory rail, the radio and everything above stay exactly put.
+//  116 / 8 put the panel at Z 16 and the part at 184 mm -- 4 mm over the bed.
+//  107 / 17 put it at Z 25 and the part at 175 mm, with 5 mm of margin.
+//  The 9 mm comes out of the 38.5 mm of dead space under the radio, which still
+//  leaves 29.5 mm there for the DC harness.
+bay_h    = 107;    // clear Z between the bottom and top crossbeams
+base_t   = 17;     // bottom interface plate thickness
 foot_h   = 8;      // foot / module-boss height
 foot_d   = 16;     // foot boss diameter
 corner_r = 4;      // cosmetic corner radius
@@ -160,6 +168,25 @@ grip_ap_h   = 13;    // hand aperture height (Z)   (ref 18.5)
 grip_bar_h  = 7;     // grip bar section height    (ref 11.5)
 handle_t    = 12;    // handle thickness (ref 8.25; +3.75 to seat axial M4 inserts)
 handle_lap  = 48;    // lap length onto the panel's outer face
+// --- unified side panel + handle ---
+//  The handle is no longer a separate part lapping the panel's outer face; it is
+//  the same 9 mm plate, continuing up past the frame top into an arch.  That
+//  removes 12 mm per side from the assembled width: 166.25 -> 142.25.
+//
+//  The part is 175 mm tall, and getting under the Mini's 180 bed is what sets its
+//  bottom edge.  The grip aperture floor cannot drop below the radio top at
+//  Z 179.5 -- lower than that and fingers are inside the radio -- so the 20 mm of
+//  grip above the frame is fixed and the height had to come off the bottom.
+//  All four beams keep their original insert rows -- 22.5 / 33.5 bottom and
+//  162.5 / 173.5 top -- so no crossbeam changes and nothing already printed needs
+//  reprinting.  The panel carries all eight bolts as before.    // the handle sits in a POCKET in the panel's outer face, so
+                     //   it stands 8 mm proud instead of 12.  That is 8 mm off the
+                     //   assembled width, 166.25 -> 158.25.
+                     //   It also forces the handle's own bolts to go: their heads
+                     //   were counterbored 4 mm into the INNER face, and 9 - 4
+                     //   recess - 4 counterbore leaves 1 mm of panel under a bolt
+                     //   head.  So the handle now SHARES the top-crossbeam bolts
+                     //   instead -- same Y, and tb_z already falls inside the lap.
 handle_fill = 2.5;   // 3D edge fillet on every face except the mating face
 
 // =============================================================================
@@ -167,6 +194,9 @@ handle_fill = 2.5;   // 3D edge fillet on every face except the mating face
 // =============================================================================
 frame_w = radio_w + 2 * panel_t;      // 142.25
 z_frame = foot_h + base_t;            // 16   panel & beam bottoms
+panel_z0 = z_frame;                   // The panel must cover the bottom crossbeams,
+                     //   which span Z 16..40.  Trimming it leaves them protruding
+                     //   and puts the bolt holes off the beams' insert rows.
 z_bb0   = z_frame;                    // 16   bottom beams
 z_bb1   = z_bb0 + beam_h;             // 40
 z_tb0   = z_bb1 + bay_h;              // 156  top beams
@@ -180,7 +210,8 @@ beam_cy_b = frame_d - beam_d / 2;     // 62
 
 // beam-end bolts: two per end, stacked in Z so the joint cannot rotate
 beam_dz = 5.5;
-bb_z = [z_bb0 + beam_h/2 - beam_dz, z_bb0 + beam_h/2 + beam_dz]; // 22.5, 33.5
+bb_rows = [beam_h/2 - beam_dz, beam_h/2 + beam_dz];        // 6.5, 17.5 beam-local
+bb_z = [z_bb0 + bb_rows[0], z_bb0 + bb_rows[1]];          // 22.5, 33.5 -- UNCHANGED
 tb_z = [z_tb0 + beam_h/2 - beam_dz, z_tb0 + beam_h/2 + beam_dz]; // 162.5, 173.5
 
 // Radio side bolts.  Y is the bay centre for both radios, exactly as the
@@ -194,8 +225,12 @@ tb_z = [z_tb0 + beam_h/2 - beam_dz, z_tb0 + beam_h/2 + beam_dz]; // 162.5, 173.5
 //
 // Both hole sets are cut in every panel; use whichever pair suits the radio.
 radio_by      = frame_d / 2;                        // 35
-radio_bz_rt95 = (z_bb1 + z_tb0) / 2;                // 98
-radio_bz_at779= radio_bz_rt95 + (rt95_d - at779_d) / 2;  // 129
+//  Set by the FRAME TOP, not the bay centre: the radio's control face sits 0.5 mm
+//  below z_tb1 in both cases.  The old form centred the RT-95 in the bay and only
+//  coincidentally landed there, so it moved whenever bay_h changed.  Both
+//  expressions give the same numbers as before, 98 and 129.
+radio_bz_rt95 = z_tb1 - 0.5 - rt95_d / 2;           // 98
+radio_bz_at779= z_tb1 - 0.5 - at779_d / 2;          // 129
 radio_bz_all  = [radio_bz_rt95, radio_bz_at779];
 radio_bz = (radio == "rt95") ? radio_bz_rt95 : radio_bz_at779;
 radio_z0 = radio_bz - radio_d / 2;
@@ -203,7 +238,10 @@ radio_z1 = radio_bz + radio_d / 2;
 
 // handle
 handle_z0 = z_tb1 - handle_lap;               // 132
-handle_bz = [handle_z0 + 8, handle_z0 + 20];  // 140, 152
+handle_bz = tb_z;    // 162.5 / 173.5 -- the top-crossbeam rows.  One bolt now
+                     //   runs handle -> panel -> beam insert, head countersunk in
+                     //   the handle.  Was [140, 152] with the handle bolted to the
+                     //   panel and the panel separately bolted to the beam.
 grip_y0   = (frame_d - grip_ap_len) / 2;      // 18.125
 grip_y1   = grip_y0 + grip_ap_len;            // 51.875
 handle_z1 = z_tb1 + grip_ap_h;                // 193
@@ -329,8 +367,21 @@ base_open_gap = sqrt(pow(base_open_x0 + base_open_r - foot_x[0], 2) +
 // Panel windows.  The upper one used to sit at Z 118..132, which the new
 // AT-779UV recess (Z 115.8..142.2) runs straight through, so it moves above both
 // recesses into the clear band between the recess top and the panel top.
-win_a = [16, 44, 54, 74];    // y0 z0 y1 z1
-win_b = [16, 150, 54, 172];
+//  Floor dropped to Z 32, which leaves a 7 mm band along the panel's bottom edge --
+//  the same section as the arch band at its apex, so the part is evenly loaded top
+//  and bottom.  Nothing stops it going this low: Y 16..54 is the gap BETWEEN the
+//  two bottom crossbeams, and the beam bolts sit at Y 8 / 62 with 3.9 mm of
+//  material between their counterbores and the window edge.
+win_a = [16, 32, 54, 74];    // y0 z0 y1 z1
+//  win_b is GONE.  The grip aperture now runs down to Z 150 in its place, so the
+//  band of panel that used to sit above the top crossbeam screws -- tying the
+//  front and back legs together -- is removed.  The arch does that job.
+//  The screws never constrained this: they sit at Y 8 / 62 and the aperture spans
+//  Y 18..52, so the two do not overlap at all.
+grip_floor = 150;
+grip_round = 2;      // edge radius on the arch, through the plate's 9 mm.  2 rather
+                     //   than the old handle's 2.5, because the bar is 9 mm thick
+                     //   now instead of 12 -- this still leaves 5 mm of flat.
 
 // =============================================================================
 //  DERIVED-DIMENSION REPORT
@@ -340,15 +391,16 @@ win_b = [16, 150, 54, 172];
 // =============================================================================
 BED = 180;
 echo(str("frame body            = ", frame_w, " x ", frame_d, " x ", z_tb1, " mm"));
-echo(str("assembled envelope    = ", frame_w + 2 * handle_t, " x ",
+echo(str("assembled envelope    = ", frame_w, " x ",
          frame_d + ant_leg_t + max(bnc_reach, so239_reach), " x ",
          handle_z2, " mm  (depth shown for the deeper SO-239 bracket)"));
 echo(str("radio bay (WxDxH)     = ", radio_w, " x ", frame_d - 2 * beam_d,
          " x ", bay_h, " mm"));
 echo(str("radio clearance  side = ", (frame_d - 2 * beam_d - radio_h) / 2,
          " mm/side   above/below = ", (bay_h - radio_d) / 2, " mm"));
-echo(str("panel print footprint = ", panel_h, " x ", frame_d,
-         "  (bed ", BED, ") -> margin ", BED - panel_h, " mm"));
+panel_print_h = handle_z2 - panel_z0;   // 175, the unified part's long side
+echo(str("panel print footprint = ", panel_print_h, " x ", frame_d,
+         "  (bed ", BED, ") -> margin ", BED - panel_print_h, " mm"));
 echo(str("panel under M5 recess = ", panel_t - m5_recess_h,
          " mm of material carrying the radio"));
 echo(str("base plate opening    = ", base_open_x1 - base_open_x0, " x ",
@@ -379,7 +431,10 @@ assert(triple_pitch > ant_bracket_w,
 assert(ant_bolt_dx[0] - m4_cb_d/2 >= ant_rib_t &&
        ant_bolt_dx[1] + m4_cb_d/2 <= ant_bracket_w - ant_rib_t,
        "antenna bracket bolts overlap its gusset ribs");
-assert(panel_h <= BED && frame_d <= BED, "side panel exceeds the print bed");
+// panel_h is only the plate portion now; the part that has to fit the bed is the
+// panel PLUS the integral handle, panel_z0 up to handle_z2.
+assert(panel_print_h <= BED && frame_d <= BED,
+       str("unified side panel is ", panel_print_h, " mm, bed is ", BED));
 assert(radio_w <= BED, "crossbeam span exceeds the print bed");
 // The radio is NOT limited by bay_h: the crossbeams sit at the extreme front and
 // back in Y, so a radio in the Y 17..53 channel passes between them and may use
@@ -470,7 +525,46 @@ module round2d(r) {
 // =============================================================================
 module side_panel() {
     difference() {
-        translate([0, 0, z_frame]) plate_x(panel_t, frame_d, panel_h);
+        union() {
+            // OUTER face and the whole perimeter rounded, INNER face left dead
+            // flat.  The inner face is what the crossbeams land on -- their
+            // footprints run right out to Y 0 and Y 70 -- so it cannot be
+            // softened.  Rounding the whole part in one operation is what keeps
+            // the handle/panel junction smooth: an arch-only fillet left a 2 mm
+            // ledge across the part at Z 180, exactly where a hand wraps.
+            //
+            // Shrink the profile by the radius, extrude it short of the inner
+            // face, then minkowski a sphere back on and slice at the inner face.
+            // ...up to the frame top only.  Above it the arch replaces this, so
+            // the two must be cut apart rather than unioned: the arch version is a
+            // SUBSET of this one, and a union would silently keep this one.
+            difference() {
+                translate([0, 0, handle_z0]) rotate([90, 0, 90])
+                    difference() {
+                        minkowski() {
+                            translate([0, 0, grip_round])
+                                linear_extrude(height = panel_t - grip_round)
+                                    offset(r = -grip_round) panel_profile();
+                            sphere(r = grip_round, $fn = 16);
+                        }
+                        translate([-200, -200, panel_t]) cube([400, 400, 400]);
+                    }
+                translate([-1, -1, z_tb1]) cube([panel_t + 2, frame_d + 2, 60]);
+            }
+            // Above the frame top there is no beam to seat, so the INNER face is
+            // rounded too and the grip is soft on both edges.  The resulting step
+            // on the inner face sits at Z 180, which is the top crossbeam's own
+            // top edge.
+            intersection() {
+                translate([grip_round, 0, handle_z0]) rotate([90, 0, 90])
+                    minkowski() {
+                        linear_extrude(height = panel_t - 2 * grip_round)
+                            offset(r = -grip_round) panel_arch_profile();
+                        sphere(r = grip_round, $fn = 16);
+                    }
+                translate([-1, -1, z_tb1]) cube([panel_t + 2, frame_d + 2, 60]);
+            }
+        }
 
         // --- [PORTED] radio mount: M5 through-hole + outer-face recess ---
         // Two sets, one per radio.  Lower = RT-95 (the ported position), upper =
@@ -488,15 +582,9 @@ module side_panel() {
         for (y = [beam_cy_f, beam_cy_b], z = concat(bb_z, tb_z))
             translate([0, y, z]) rotate([0, 90, 0]) m4_bolt_hole(panel_t);
 
-        // --- handle bolts: heads recessed in the INNER face ---
-        for (y = [beam_cy_f, beam_cy_b], z = handle_bz)
-            translate([panel_t, y, z]) rotate([0, -90, 0]) m4_bolt_hole(panel_t);
-
         // --- lightening / ventilation windows ---
-        if (panel_windows) {
+        if (panel_windows)
             translate([-1, 0, 0]) window_x(panel_t + 2, win_a);
-            translate([-1, 0, 0]) window_x(panel_t + 2, win_b);
-        }
     }
 }
 
@@ -509,15 +597,16 @@ module side_panel() {
 //  Two axial M4 inserts per end: ALL inserts for the panel joint live here.
 //  Local frame: X 0..radio_w along the span, Y 0..beam_d, Z 0..beam_h.
 // =============================================================================
-module crossbeam(front_cols = [], base_face = false) {
+module crossbeam(front_cols = [], base_face = false,
+                 rows = [beam_h/2 - beam_dz, beam_h/2 + beam_dz]) {
     difference() {
         rbox(radio_w, beam_d, beam_h);
 
         // two inserts per end, axis along the span
-        for (dz = [-beam_dz, beam_dz]) {
-            translate([0, beam_d/2, beam_h/2 + dz])
+        for (rz = rows) {
+            translate([0, beam_d/2, rz])
                 rotate([0, 90, 0]) m4_insert();
-            translate([radio_w, beam_d/2, beam_h/2 + dz])
+            translate([radio_w, beam_d/2, rz])
                 rotate([0, -90, 0]) m4_insert();
         }
 
@@ -566,6 +655,31 @@ module handle_outer(extend = 0) {
 // 24% notch sitting exactly where the arch meets the shoulder, which is the last
 // place you want one.  Following the arch keeps the band constant instead, and it
 // then widens naturally into the leg where the aperture's sides cut it off.
+// The unified panel's silhouette: the same outer shape as the handle, but with the
+// straight-sided lap carried all the way down to panel_z0, and the grip aperture
+// FLOORED at the frame top.  On the bolt-on handle the aperture ran out through
+// the bottom edge and the panel closed it; here the panel is the same part, so the
+// aperture has to stop at Z 180.
+//  The arch only, from a little below the frame top upward.  Rounding is applied
+//  to this region alone: a minkowski over the whole 175 mm profile would be slow
+//  and would round the panel's straight sides too.
+module panel_arch_profile() {
+    intersection() {
+        panel_profile();
+        translate([-10, z_tb1 - handle_z0 - 12]) square([frame_d + 20, 400]);
+    }
+}
+
+module panel_profile() {
+    difference() {
+        handle_outer(extend = handle_z0 - panel_z0);
+        round2d(4) intersection() {
+            translate([grip_y0, grip_floor - handle_z0]) square([grip_ap_len, 400]);
+            offset(r = -grip_bar_h) handle_outer(extend = 40);
+        }
+    }
+}
+
 module handle_profile() {
     difference() {
         handle_outer();
@@ -637,9 +751,13 @@ module handle(mic = false) {
                 translate([-60, -60, -2 * handle_fill])
                     cube([250, 250, 2 * handle_fill]);
             }
-        // insert pockets, axis along X, opening onto the mating face
+        // Bolt holes, not inserts.  The handle no longer fastens to the panel:
+        // one M4 now runs handle -> panel -> crossbeam insert, so the head is
+        // countersunk in the handle's OUTER face and the hole is plain clearance.
+        // That is what keeps the bolts out of the panel pocket, where a
+        // counterbore would have left 1 mm of panel under the head.
         for (y = [beam_cy_f, beam_cy_b], z = handle_bz)
-            translate([0, y, z]) rotate([0, 90, 0]) m4_insert();
+            translate([handle_t, y, z]) rotate([0, -90, 0]) m4_bolt_hole(handle_t);
         if (mic) mic_bracket_inserts();
     }
     }
@@ -969,7 +1087,7 @@ module cm_tie_mount(wall_t) {
 }
 
 // --- inline variant ---
-cmi_cav_z = sbc_stand + sbc_clear + 2;                   // 29, +2 so the
+cmi_cav_z = sbc_stand_hi + sbc_clear + 2;                // +2 so the
                      //   board clears the top flanges
 cmi_z     = box_boss + cmi_cav_z + cm_floor + foot_h;    // 49, the stack pitch
 
@@ -1185,9 +1303,13 @@ module compute_box_inline() {
             for (x = foot_x, y = foot_y)
                 translate([x, y, fz - foot_h]) cylinder(d = foot_d, h = foot_h + 1);
             // SBC standoffs
-            translate([sbc_cx, sbc_cy, cz0]) sbc_pads();
+            // 8 mm standoffs, same as the front boxes: with sbc_ins_h at 7.5 a
+            // 6 mm pad would put the insert 1.5 mm into the floor rather than in
+            // the pad.  It still works there -- 2.5 mm of floor is left beneath --
+            // but the pad should hold its own insert.
+            translate([sbc_cx, sbc_cy, cz0]) sbc_pads(sbc_stand_hi);
         }
-        translate([sbc_cx, sbc_cy, cz0]) sbc_pad_pockets();
+        translate([sbc_cx, sbc_cy, cz0]) sbc_pad_pockets(sbc_stand_hi);
         // generic M3 grid over the rest of the floor
         translate([0, 0, fz])
             cm_grid_holes(sbc_cx + sbc_l/2 + 8, 12, frame_w - cm_wall - 6,
@@ -1580,14 +1702,14 @@ module frame(ex = 0) {
     color("#7f9dc0") translate([-ex, 0, 0]) side_panel();
     color("#7f9dc0") translate([frame_w + ex, 0, 0]) mirror([1, 0, 0]) side_panel();
 
-    color("#c9a227") translate([panel_t, beam_y_f, z_bb0 - ex]) crossbeam(base_face = true);
-    color("#c9a227") translate([panel_t, beam_y_b, z_bb0 - ex]) crossbeam(base_face = true);
+    color("#c9a227") translate([panel_t, beam_y_f, z_bb0 - ex])
+        crossbeam(base_face = true, rows = bb_rows);
+    color("#c9a227") translate([panel_t, beam_y_b, z_bb0 - ex])
+        crossbeam(base_face = true, rows = bb_rows);
     color("#c9a227") translate([panel_t, beam_y_f, z_tb0 + ex])
         crossbeam(front_cols = front_cols);
     color("#c9a227") translate([panel_t, beam_y_b, z_tb0 + ex]) crossbeam();
 
-    color("#b05a4a") translate([-ex, 0, 0]) mirror([1, 0, 0]) handle();
-    color("#b05a4a") translate([frame_w + ex, 0, 0]) handle();
 
     for (bx = [ant_x_l, ant_x_r])
         color("#5f9e6e") translate([bx, -ex, z_tb0]) antenna_mount_fitted();
@@ -1605,42 +1727,41 @@ module frame(ex = 0) {
 if      (part == "assembly") frame(0);
 else if (part == "exploded") frame(26);
 
-// flat on the bed, INNER face down: 164 x 70 x 9.  This way the Ø26.468 M5
-// recess and the eight crossbeam counterbores all open upward as plain pockets.
+// Plan section through the upper shared-bolt row.  Cut at Z 168..176 so the slab
+// passes through the top crossbeams, the panel pocket and the handle -- the one
+// view that actually shows handle / pocket / panel / beam stacked up.
+
+// flat on the bed, INNER face down: 175 x 70 x 9.  This way the Ø26.468 M5
+// recess and the six crossbeam counterbores all open upward as plain pockets.
+// The integral handle costs nothing in the print: the arch is in the plate's own
+// plane and the grip aperture is a through-hole, so there is still nothing to
+// bridge and no overhang anywhere.
 // Outer-face-down would instead bridge a Ø26.5 ceiling directly under the
 // 3.5 mm ligament that carries the radio's entire weight.
 else if (part == "side_panel")
     translate([0, 0, panel_t]) rotate([0, 90, 0])
-        translate([0, 0, -z_frame]) side_panel();
+        translate([0, 0, -panel_z0]) side_panel();
 
 // long axis on the bed, 24 mm tall: end and front-face inserts are both in-plane
 else if (part == "crossbeam_top_front_dual")   crossbeam(front_cols = dual_cols);
 else if (part == "crossbeam_top_front_triple") crossbeam(front_cols = triple_cols);
 else if (part == "crossbeam_top_front_grid")   crossbeam(front_cols = grid_cols);
 else if (part == "crossbeam_top_back")     crossbeam();
-else if (part == "crossbeam_bottom_front") crossbeam(base_face = true);
+else if (part == "crossbeam_bottom_front") crossbeam(base_face = true, rows = bb_rows);
 // Same beam with a single row of accessory columns in its front face, so a tall
 // front module (the compute box) bolts at the bottom as well as the top.  ONE
 // row, not two: this beam's underside already carries the base-plate inserts
 // over beam-local Z 0..9, and a second row at 6 would run straight into them.
 // A row at 16 leaves 4.15 mm between the two sets of pockets.
 else if (part == "crossbeam_bottom_front_rail")
-    crossbeam(front_cols = grid_cols, front_rows = [16], base_face = true);
-else if (part == "crossbeam_bottom_back")  crossbeam(base_face = true);
+    crossbeam(front_cols = grid_cols, front_rows = [16], base_face = true,
+              rows = bb_rows);
+else if (part == "crossbeam_bottom_back")  crossbeam(base_face = true, rows = bb_rows);
 
-// flat on the bed, 70 x 78 x 12; one bridge over the grip aperture
-else if (part == "handle")
-    translate([handle_z2 - handle_z0, 0, 0]) rotate([0, -90, 0])
-        translate([0, 0, -handle_z0]) handle();
-else if (part == "handle_mic")
-    // Same pose as `handle`: mating face DOWN.  The flip was only needed while
-    // this part had a pocket opening onto the mating face; with the bracket doing
-    // the capturing there is no pocket, so the sliced-flat mating face goes back
-    // to being the best first layer available.  It also puts the M3 bracket
-    // pockets face-up, where they are blind holes drilled downward rather than
-    // bridged ceilings.
-    translate([handle_z2 - handle_z0, 0, 0]) rotate([0, -90, 0])
-        translate([0, 0, -handle_z0]) handle(mic = true);
+// The handle is integral to side_panel (§2.6), so there are no `handle` or
+// `handle_mic` parts to emit.  handle(), handle_mic() and handle_profile() are
+// kept because panel_profile() reuses handle_outer() for the arch silhouette.
+// stl/handle.stl and stl/handle_mic.stl are orphaned leftovers.
 
 // On its back: every layer is smaller than the one below it, so the ribs and pad
 // print with no supports and the bolt holes come out vertical.
@@ -1650,6 +1771,8 @@ else if (part == "handle_mic")
 // columns were offset (14/30) to dodge the crossbeam's end-insert pockets;
 // insetting the whole bracket 6 mm instead lets the columns sit symmetrically
 // between the ribs, which removes the handedness.
+
+
 else if (part == "antenna_mount_bnc")   rotate([-90, 0, 0]) antenna_mount_bnc();
 else if (part == "antenna_mount_so239") rotate([-90, 0, 0]) antenna_mount_so239();
 

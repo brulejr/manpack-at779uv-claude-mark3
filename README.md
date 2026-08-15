@@ -7,7 +7,7 @@ This is a clean-room decomposition of the single-piece reference STL from
   which fits a Prusa Mini (180 × 180 mm bed).
 - Every module-to-module joint uses stainless M4 socket-cap bolts into brass heat-set inserts.
   M3 appears only where an off-the-shelf part dictates it: the SBC and cover in
-  the compute box, and the microphone bracket on `handle_mic`.
+  the compute box.
 - Radio mounts use stainless M5 bolts or factory thumb screws.
 - Frame base allows additional modules to be connected such as battery frame or compute box.
 - Optional handle variant carries the AT-779UV's own microphone bracket (§2.6.1).
@@ -55,7 +55,7 @@ Two measurements drove real design decisions and are worth calling out:
 
 | #   | Part                       | Qty   | Print size (mm)   | Solid vol | Inserts |
 | --- | -------------------------- | ----- | ----------------- | --------- | ------- |
-| 1   | `side_panel`               | 2     | 164 × 70 × 9      | 76.0 cm³  | —       |
+| 1   | `side_panel`               | 2     | 175 × 70 × 9      | 68.8 cm³  | —       |
 | 2a  | `crossbeam_top_front_dual` | 1\*\* | 124.25 × 16 × 24  | 44.5 cm³  | 12      |
 | 2b  | `crossbeam_top_front_triple` | 1\*\* | 124.25 × 16 × 24  | 43.5 cm³  | 16      |
 | 2c  | `crossbeam_top_front_grid` | 1\*\* | 124.25 × 16 × 24  | 43.1 cm³  | 14      |
@@ -63,12 +63,11 @@ Two measurements drove real design decisions and are worth calling out:
 | 4a  | `crossbeam_bottom_front`   | 1\*\*\*\* | 124.25 × 16 × 24  | 45.9 cm³  | 6       |
 | 4b  | `crossbeam_bottom_front_rail` | 1\*\*\*\* | 124.25 × 16 × 24  | 42.6 cm³  | 13      |
 | 5   | `crossbeam_bottom_back`    | 1     | 124.25 × 16 × 24  | 45.9 cm³  | 6       |
-| 6a  | `handle`                   | 2\*\*\*\*\* | 68 × 70 × 12      | 23.1 cm³  | 4 M4    |
-| 6b  | `handle_mic`               | 1\*\*\*\*\* | 101 × 70 × 12     | 46.1 cm³  | 4 M4 + 2 M3 |
+| ~~6~~ | ~~`handle`~~             | —     | *integral to the side panel* | —  | —       |
 | 7   | `antenna_mount_bnc`        | 2\*   | 35 × 24 × 33      | 10.9 cm³  | —       |
 | 8   | `antenna_mount_so239`      | 2\*   | 35 × 24 × 38      | 11.6 cm³  | —       |
-| 9   | `base_plate`               | 1     | 142.25 × 70 × 16  | 55.9 cm³  | 4       |
-| 11a | `compute_box_inline`     | 1\*\*\* | 142.25 × 49 × 70  | 95.7 cm³  | 4       |
+| 9   | `base_plate`               | 1     | 142.25 × 70 × 25  | 114.2 cm³ | 4       |
+| 11a | `compute_box_inline`     | 1\*\*\* | 142.25 × 52 × 70  | 98.7 cm³  | 4       |
 | 11b | `compute_box_front`      | 1\*\*\* | 72 × 160 × 40     | 84.5 cm³  | 4 M3    |
 | 11c | `compute_box_front_cover`| 1\*\*\* | 72 × 160 × 5      | 36.6 cm³  | —       |
 | 11d | `compute_box_front_slim` | 1\*\*\* | 72 × 160 × 32     | 73.9 cm³  | 4 M3    |
@@ -90,10 +89,6 @@ optional if you fit the box they belong to.
 the bottom beam's front face, needed only if you fit `compute_box_front`. The
 plain one is bit-identical to the beam already printed.
 
-\*\*\*\*\* Parts 6a and 6b are alternatives **per side**. `handle_mic` carries the
-AT-779UV's own microphone bracket (§2.6.1); print it for one side and a plain
-`handle` for the other, or two plain ones if you do not want the mic mount.
-
 #### Which variants do I actually print?
 
 Five of the entries above are alternates, not additions. The minimum working
@@ -103,18 +98,19 @@ frame is **12 parts**; everything else is opt-in.
 | ------ | ------- | ------------- |
 | Top-front beam | `_dual` / `_triple` / `_grid` | `_dual` if you only want two antenna mounts and already own the printed beam — it is bit-identical. `_grid` if you want the accessory rail. `_triple` for three stations. |
 | Bottom-front beam | plain / `_rail` | `_rail` **only** if fitting `compute_box_front`; otherwise the plain one, which is bit-identical to the beam already printed. |
-| Handles ×2 | `handle` / `handle_mic` | Two plain ones normally. Swap **one** for `handle_mic` if you want the AT-779UV microphone bracket. |
+| Handles | — | No choice: the handle is integral to the side panel (§2.6). |
 | Antenna mounts ×2 | `_bnc` / `_so239` | Two of whichever connector you use — never one of each. Same leg and bolt pattern, so you can swap later. |
 | Compute module | `_inline` / `_front` / `_front_slim` / none | `_front` and `_front_slim` both need the `_rail` bottom beam and their own cover — they are alternatives to each other, not additions. `_inline` stacks under the frame instead. Most builds need none of them. |
 
-Largest part is 164 mm — **16 mm of bed margin**. All seventeen meshes verified
+Largest part is the side panel at 175 mm — **5 mm of bed margin**, the tightest
+in the project. All meshes verified
 watertight, single-shell, and bed-legal.
 
 Solid volume is 851 cm³ for one of each of the seventeen files. A full 12-piece
 build (BNC mounts, battery frame, no compute box) is 560 cm³ with the grid beam,
 561 cm³ with the triple, 562 cm³ with the dual; add 96 cm³ for the inline compute
 box, or 109 cm³ for the front one with its cover. Swapping one plain handle for
-`handle_mic` adds 23 cm³.
+The handle is part of the side panel and adds nothing separately.
 Actual filament use is far lower — the beams are small enough in section that
 the slicer's perimeters and infill dominate. If mass matters, the base plate is
 the obvious place to add a lightening window.
@@ -123,25 +119,24 @@ the obvious place to add a lightening window.
 
 ![side_panel](img/side_panel.png)
 
-A plain flat plate. It carries **only** the ported radio mount plus through-holes
-for the beams and handle. No feet, no handle, no antenna mount, and **no heat-set
-inserts at all** — every insert lives in the mating part, which is what keeps
-this a simple flat print.
+A flat plate spanning **Z 25 to 200** — the frame's side *and* its carrying
+handle in one part (§2.6). It carries the ported radio mount, through-holes for the
+four crossbeams, and nothing else: no feet, no antenna mount, and **no heat-set
+inserts at all**. Every insert lives in the mating part, which is what keeps this a
+simple flat print.
 
 - Radio mount: **two** Ø5.000 through-holes at Y 35, each with the Ø26.468 × 5.5 mm
   outer-face recess, verbatim from the reference. **Z 98** is the ported reference
-  position and suits the RT-95; **Z 129** is 31 mm higher for the AT-779UV. See
-  §2.10 for the derivation. Use whichever pair matches the radio; the unused pair
-  is just a drain hole.
-- Windows: the upper one moved from Z 118–132 to **Z 150–172**. The new AT-779UV
-  recess spans Z 115.8–142.2 and ran straight through where it used to be.
-- 8 × M4 clearance holes, heads counterbored flush in the **outer** face → the
-  four crossbeams.
-- 4 × M4 clearance holes, heads counterbored flush in the **inner** face → the
-  handle. Flush heads keep the radio bay clear.
-- Two lightening/ventilation windows, positioned to leave ≥ 10.8 mm of material
-  between them and the M5 recess ligament. Set `panel_windows = false` for a
+  position and suits the RT-95; **Z 129** is 31 mm higher for the AT-779UV. Both
+  are set by the frame top, so they do not move if the bay height changes. Use
+  whichever pair matches the radio; the unused pair is just a drain hole.
+- **8 × M4 clearance holes**, heads counterbored flush in the **outer** face, into
+  the four crossbeams — two rows per beam, at global Z 31.5 / 42.5 and
+  162.5 / 173.5.
+- **One lightening window**, `win_a` at Z 32–74, plus the grip aperture at
+  Z 150–193 which absorbed the old upper window. Set `panel_windows = false` for a
   plain plate.
+- No handle bolts: the handle is the same part.
 
 ### 2–5 — `crossbeam` ×4
 
@@ -161,14 +156,91 @@ Extra insert faces by position:
 - `crossbeam_bottom_front` / `_bottom_back` — 2 inserts each in their
   **undersides** for the base plate.
 
-### 6 — `handle` ×2
+### 6 — the handle, now integral to the side panel
 
-![handle](img/handle.png)
+**There is no separate handle part.** The arch is the same 9 mm plate as the panel,
+continuing up past the frame top. That removes the 12 mm lap on each outer face:
 
-An arch, not the reference's squared loop. It still laps 48 mm down the panel's
-outer face on four M4 bolts, and the panel's top edge still forms the aperture
-floor, but everything above that line was reworked after the built pack showed
-the original reading as two blocky slabs.
+| | separate handle | integral |
+| --- | --- | --- |
+| Assembled width | 166.25 mm | **142.25 mm** |
+| Parts per side | 2 | **1** |
+| M4 bolts, panels + handles | 24 | **12** |
+| Handle inserts | 8 | **none** |
+
+**The part is 175 × 70 × 9, and making it fit the bed drove one frame change.**
+Panel plus handle is naturally 184 mm — Z 16 at the base plate up to Z 200 at the
+grip — which fits no orientation on a 180 bed: flat 184 × 70, on edge 184 × 9,
+upright it needs 184 mm of Z, and rotated flat the best case is 179.6 mm at exactly
+45°, leaving 0.2 mm a side.
+
+Neither end can give. The grip aperture floor cannot drop below the radio top at
+**Z 179.5** — lower than that and your fingers are inside the radio rather than
+around a bar — so the 20 mm of grip is fixed. And the panel must reach **Z 16** to
+cover the bottom crossbeams and pick up their bolts.
+
+**The 9 mm came out of the dead space under the radio instead.** Thickening the
+base plate (`base_t` 8 → 17) raises the bottom crossbeams from Z 16–40 to
+**Z 25–49**, and the panel starts where the beams start. `bay_h` drops 116 → 107 to
+keep the top beams exactly where they were.
+
+| | before | now |
+| --- | --- | --- |
+| Panel starts at | Z 16 | **Z 25** |
+| Bottom beams | Z 16–40 | **Z 25–49** |
+| Part height | 184 mm | **175 mm**, 5 mm of margin |
+| Dead space under the radio | 38.5 mm | 29.5 mm — still room for the DC harness |
+
+**Nothing above the bay moves.** Frame height, top crossbeams, accessory rail,
+antenna mounts, compute-box mounting and the radio's own M5 holes at Z 98 / 129 are
+all exactly where they were. **The only reprint is the base plate.** All four
+crossbeams keep their original insert rows — 22.5 / 33.5 relative to their own
+bodies, landing at global 31.5 / 42.5 once raised — and the panel's holes measure
+to the same figures.
+
+While doing this the radio's mounting height was restated as *"face 0.5 mm below
+the frame top"* rather than *"centred in the bay"*. Both give today's numbers, but
+the old form only landed correctly by coincidence and would have moved the radio
+the moment `bay_h` changed.
+
+**The grip bar is now 7 × 9 mm rather than 7 × 12**, because it lies in the panel's
+own thickness. That is a thinner edge to carry on. If it reads as uncomfortable the
+fix is a local thickening at the bar only, which would cost width just at the very
+top rather than down the whole side.
+
+**The top cross piece is gone and `win_b` with it.** The grip aperture now runs
+from **Z 150 to 193** as a single opening, so the band of panel that used to tie
+the front and back legs together above the top crossbeam screws no longer exists —
+the arch does that job. The screws never constrained it: they sit at Y 8 / 62 while
+the aperture spans Y 18–52, so the two never overlapped.
+
+**The bottom cutout matches the arch.** `win_a` runs Z 32–74, leaving a **7.00 mm**
+band along the bottom edge against the arch's **7.05 mm** at its apex. It can go
+that low because Y 16–54 is the gap *between* the two bottom crossbeams, so it
+never opens onto a beam, and the bolt counterbores measure Y 3.95–12.05, leaving
+3.95 mm to the window edge.
+
+**Edges are rounded 2 mm on the outer face and the whole perimeter; the inner face
+is left dead flat.** That split is forced: the crossbeam footprints run right out
+to Y 0 and Y 70, so the face they seat on cannot be softened. Measured — the inner
+face reaches Y 0.04 / 69.96 at all four bolt rows and at the top beam's upper edge.
+
+The rounding runs over the **whole part in one operation**, not just the arch. A
+first attempt filleted the arch alone and left a 2 mm ledge straight across the
+part at Z 180 — exactly where a hand wraps. Continuous, the outer edge measures
+Y 0.98 at Z 170 / 178 / 179 and 1.04 at Z 181: a 0.06 mm difference where there had
+been 2 mm.
+
+Above Z 180 the **inner** face is rounded as well, since no beam seats there, so
+the grip is soft on both edges — the bar underside measures 193.98 at each face and
+193.04 across a 5 mm flat. The radius is 2 mm rather than the old bolt-on handle's
+2.5, because the bar is 9 mm thick now instead of 12.
+
+**This part takes ~2 m 40 s to export** — two minkowski passes over a 175 mm
+profile. Everything else in the project is under a second.
+
+The arch is not the reference's squared loop — everything above the frame line was
+reworked after the built pack showed the original reading as two blocky slabs.
 
 |                    | reference / v1             | now                           |
 | ------------------ | -------------------------- | ----------------------------- |
@@ -215,66 +287,18 @@ span and _grows_ to 8.25 mm into the shoulders.
 | stress, one-handed 6× drop-catch | 7.06 MPa | **3.47 MPa**  |
 | safety factor (PLA)              | 7.1      | **14.4**      |
 
-Note this part renders through an `offset()` plus `minkowski()` and takes ~65 s to
-export, against well under a second for everything else.
 
-#### 2.6.1 — `handle_mic`, the microphone-bracket variant
 
-![handle_mic](img/handle_mic.png)
+#### 2.6.1 — microphone bracket: removed for now
 
-The AT-779UV ships with its own microphone bracket — **55 H × 35 W × 10 D mm, two
-M3 holes 45 mm apart vertically**. So this variant does not capture the mic at
-all. It only presents two flat, coplanar landings with an M3 insert in each.
+The AT-779UV's own bracket used to mount to a `handle_mic` variant of the bolt-on
+handle. With the handle now integral to the side panel that part no longer exists,
+and the mic mount has been **set aside rather than redesigned** — it would now
+attach to the panel itself.
 
-| Z (global)  | feature                                              |
-| ----------- | ---------------------------------------------------- |
-| 99 – 111    | lower bracket beam — **M3 insert at 105**            |
-| 111 – 144   | open window, 33 mm                                    |
-| 144 – 156   | upper bracket beam — **M3 insert at 150**            |
-| 156 – 193   | **grip aperture, 37 mm**                              |
-| 193 – 200   | grip band, unchanged at 7 mm                          |
-
-The bracket occupies Z 100–155, clearing the grip floor by 1 mm, so **nothing
-crosses the hand opening**. Inserts measure 105.00 and 150.00 off the mesh —
-45.00 apart.
-
-**The handle had to grow downward, 68 → 101 mm.** This is forced, not a choice:
-55 mm of bracket below a usable grip does not fit in the original 61 mm aperture,
-which would have left 6 mm of finger room. The extension lies against the side
-panel it already bolts to, so it needs **no panel changes** — the mic's load is
-downward, in-plane shear on the existing four M4 bolts, and the small outboard
-moment is taken by the extension bearing flat on the panel.
-
-The window between the two beams is what keeps the extension a frame rather than a
-slab, and gives the mic lead somewhere to run. The grip band is untouched: the
-aperture *floor* was raised to 156 and its top still follows the offset arch, so
-the constant-thickness band from the v2 rework is exactly as it was.
-
-**Inserts differ by face and size** — M3 for the bracket, opening onto the *outer*
-face; M4 for the frame, opening onto the *mating* face. They cannot be confused at
-assembly.
-
-Print pose is the same as the plain handle, mating face down: that face is sliced
-dead flat, and it puts the M3 pockets face-up as blind holes rather than bridged
-ceilings.
-
-**Not for storage.** The bracket projects 10 mm outboard and the mic well beyond
-that. This is for when the frame is out of the bag standing on its own, or the
-side is pulled away.
-
-One cost: the upper beam overlaps the panel's `win_b` ventilation window across
-Z 150–156, covering about 6 mm of its 22 mm height.
-
-**Before printing 101 mm of handle**, confirm the bracket's two holes are centred
-on its 55 mm height. That assumption is what puts 5 mm of bracket above the top
-hole and 5 below the bottom; if they sit off-centre, `mic_bolt_z` moves.
-
-*Approaches tried and abandoned, so they are not re-attempted:* a printed stud for
-the mic to hang on (wrong — the mic carries the male knob), and a keyhole plate to
-receive that knob. The knob's disc measures **20 mm**, which needs a 29 mm pocket;
-the plate left in front came out 3.5 mm, and it still caught the disc by only
-1.9 mm because the neck could never drop clear of the Ø21.5 entry hole inside a
-61 mm aperture. The bracket sidesteps all of it.
+The bracket's numbers are worth keeping for when it comes back: **55 H × 35 W ×
+10 D mm, two M3 holes 45 mm apart vertically**, and it must sit clear of the grip
+aperture, which on the unified panel is at Z 180–193.
 
 ### 7–8 — `antenna_mount_bnc` / `antenna_mount_so239`
 
@@ -571,7 +595,10 @@ retire — the first was the antenna bracket's sealed counterbores.
 | Volume            | 95.7 cm³                      | 86.0 cm³                        |
 
 **`_inline`** bolts up into the plate above and presents the same four feet
-below, so the battery box hangs off it unchanged — stack pitch **49 mm**. Its
+below, so the battery box hangs off it unchanged — stack pitch **52 mm**. Its SBC
+standoffs are 8 mm like the front boxes': at the old 6 mm the 7.5 mm insert pocket
+reached 1.5 mm past the pad into the floor, which worked but put the insert
+somewhere other than the pad meant to hold it. Its
 topology deliberately mirrors `battery_box`: back wall, two end walls, floor,
 full-length top flanges carrying the M4s, feet, open at the front and top. That
 is the one shape already proven to print on this frame. Floor-down would put the
@@ -972,9 +999,9 @@ These are engineering necessities, not preferences. Each is a parameter.
 | Panel thickness      | 8.25 mm                                                               | **9.0 mm**                                               | Leaves 5.0 mm under an M4 counterbore and 3.5 mm under the M5 recess (reference: 2.75 mm).                                                                                                                                        |
 | Antenna gusset       | one 8.25 mm rib in the rail plane                                     | **two 5 mm ribs, one per bracket edge**                  | A bolt-on bracket has no rail plane to hide the rib in. Duplicating it onto both edges keeps the bore under the hole clear and makes the bracket symmetric; 5 mm rather than 8 mm leaves a clear central span for the bolts.      |
 | Antenna hole spacing | 101.5 mm                                                              | **70–77.25 mm**                                          | Set by which top-front layout the brackets sit on (§2.11): 77.25 mm on `_dual`, 76 mm on `_triple`, 70 mm on `_grid`.                                                                                                            |
-| Handle thickness     | 8.25 mm                                                               | **12 mm**                                                | Needed to seat an axial M4 insert.                                                                                                                                                                                                |
+| Handle thickness     | 8.25 mm                                                               | **9 mm**                                                 | The handle is integral to the side panel, so it is simply the panel's own thickness. No axial insert is needed because it no longer bolts to anything.                                                                            |
 | Handle form          | squared loop, 30 mm proud, 33.75 × 18.5 aperture under an 11.5 mm bar | **arch, 20 mm proud, 40 × 13 aperture under a 7 mm bar** | The built pack showed the squared loops reading as two blocky slabs — hard on the bag it only just fits, and hard on the hand. See §2.6.                                                                                          |
-| Leg standoff         | 45 mm of integral leg                                                 | **18 mm base plate**                                     | That 45 mm of dead space is now where a bolt-on module goes.                                                                                                                                                                      |
+| Leg standoff         | 45 mm of integral leg                                                 | **25 mm base plate**                                     | That 45 mm of dead space is now where a bolt-on module goes. The plate went 16 → 25 mm to raise the bottom crossbeams, which is what makes the unified panel+handle printable (§2.6).                                             |
 
 Unchanged on purpose: inner span 124.25 mm, M5 hole Ø5.000 at the bay centre,
 Ø26.468 × 5.5 recess, Ø12.468 antenna hole, 3.75 mm pad, 25 mm reach, 12.66 mm
@@ -991,13 +1018,12 @@ them redundant.
 All bolts stainless, socket cap. Structural inserts are brass M4, 6.0 mm OD ×
 8.0 mm long (Ruthex/Bumat type) — pockets Ø5.7 × 9.0 mm with a Ø6.6 lead-in
 chamfer. **M3 inserts appear in three places only** — the SBC standoffs and cover
-screws in `compute_box_front`, and the microphone bracket on `handle_mic` —
+screws in `compute_box_front` —
 pockets Ø4.0 × 5.0 mm. Everything structural stays M4.
 
 | Joint                           | Bolt           | Qty                      | Insert lives in                      |
 | ------------------------------- | -------------- | ------------------------ | ------------------------------------ |
-| Side panels → 4 crossbeams      | M4 × 12        | 16                       | crossbeam ends                       |
-| Side panels → handles           | M4 × 12        | 8                        | handle legs                          |
+| Side panels → 4 crossbeams      | M4 × 12        | **12**                   | crossbeam ends                       |
 | Antenna mounts → top-front beam | M4 × 12        | 8                        | top-front beam front face            |
 | Base plate → bottom beams       | M4 × 12        | 4                        | bottom beam undersides               |
 | **Battery box → base plate**    | **M4 × 12**    | **4**                    | base plate feet                      |
@@ -1006,7 +1032,7 @@ pockets Ø4.0 × 5.0 mm. Everything structural stays M4.
 | SO-239 flange → antenna mount   | M3 × 10 + nut  | 4 per mount              | (through-holes; SO-239 variant only) |
 | La Frite → compute box          | M3 × 8         | 4                        | box standoffs                        |
 | Cover → compute box             | *velcro tape*  | —                        | (was 6 × M3; see §11c)               |
-| **Mic bracket → `handle_mic`**  | **M3**         | **2**                    | the two bracket beams                |
+
 | **Radio → side panels**         | **M5 × 10–12** | **2**                    | the radio's own threaded side holes  |
 |                                 | **M4 total**   | **40 bolts, 44 inserts** | (frame only; compute box adds 6)     |
 
@@ -1027,7 +1053,7 @@ and 8.5 mm into the radio.
 | `side_panel`       | flat, **inner** face down         | M5 recess and all 8 beam counterbores open upward; only 4 × Ø8.2 bridges                                                      |
 | `crossbeam` ×4     | long axis on the bed, 24 mm tall  | end **and** front-face inserts both come out in-plane                                                                         |
 | `handle`           | flat, mating face down            | one bridge over the grip aperture; flattest face becomes the lap joint                                                        |
-| `handle_mic`       | flat, mating face down            | same pose; puts the M3 bracket pockets face-up as blind holes rather than bridged ceilings                                     |
+
 | `compute_box_front`| back wall down, open front up     | standoffs and all pockets open upward; the floor is flat and unbroken                                                         |
 | `compute_box_front_populated` | — | **not printable.** Layout aid; render in preview so `color()` survives |
 | `compute_box_front_cover` | flat, rim up               | panel face on the bed; plain panel, nothing to bridge                                                                         |
@@ -1064,9 +1090,8 @@ heads, so the top beams go on first.
    lips should capture both panel bottom edges.
 4. Drop the radio in and fit the two M5 bolts through the panel recesses into
    the radio's side holes.
-5. Bolt on the two handles (8 × M4 × 12, heads on the **inside**, flush). If one
-   is a `handle_mic`, its two M3 bracket inserts go in from the **outer** face —
-   do not confuse them with the M4s, which open on the mating face.
+5. *(No handle step — the handles are part of the side panels, fitted in step 2.)*
+   Note the panel now carries **two bolt rows per beam**, eight per panel.
 6. Bolt on the two antenna mounts (8 × M4 × 12), then fit the antenna
    connectors.
 7. If fitting the battery box: bolt it up into the four feet (4 × M4 × 12),
@@ -1079,8 +1104,7 @@ heads, so the top beams go on first.
    the La Frite on its four M3 standoffs — **start all four screws before
    tightening any of them** — then the right-angle adapters, then USB devices in
    the top bay. Cover last — velcro, no tools.
-9. The microphone bracket mounts to `handle_mic` last, and comes off again for
-   storage — it projects 10 mm outboard and the mic well beyond that.
+9. *(No microphone bracket at present — see §2.6.1.)*
 
 10. **Bolt either front compute box to the crossbeam BEFORE fitting its switch and
     USB bulkhead.** Both cover the M4 heads once installed — the switch bezel and
@@ -1177,6 +1201,14 @@ Not just rendered — checked:
 - Slim box: seven islands proud of the back wall counted at bedZ 7 — four standoffs
   at 49.5 × 58.75, two converter posts 54 apart, and the M4 pad slab (posts have
   since been replaced by countersunk through-holes).
+- Unified side panel: beam inserts and panel holes measured **independently** and
+  compared — 31.48 / 42.48 from the beam mesh, the same from the panel mesh. This
+  is the check that caught an earlier attempt where the panel had been trimmed and
+  the beam rows moved, leaving the beams protruding 6 mm below the panel.
+- Panel rounding verified by scanning the grip bar's underside at nine depths
+  through the 9 mm plate (193.98 at each face, 193.04 across the flat), the outer
+  edge either side of the Z 180 junction (0.06 mm difference), and the inner face
+  at every beam seat (Y 0.04 / 69.96, flat).
 - `handle_mic`: M3 insert axes measured at Z 105.00 / 150.00 — 45.00 apart —
   scanned strictly inside each beam, and both apertures confirmed by a centreline
   sweep that finds exactly two runs (37 mm grip, 33 mm window). The plain `handle`
@@ -1208,6 +1240,12 @@ fastener from its clearance hole into the material that is supposed to receive i
 and assert that material exists.** That check was applied to the M4 frame joints and
 not to the M3 cover screws.
 
+**A bulk re-export makes every part look modified.** OpenSCAD writes byte-different
+STLs for identical geometry, so re-exporting everything to check nothing broke left
+19 files showing as changed when only 3 had actually moved. Always diff bounds and
+volume against `HEAD` and restore the rest, or the reprint list reads far worse than
+it is and the real changes are buried.
+
 **Point-probes lie more often than the geometry does.** Every false alarm during
 the compute-box and handle work was a bad measurement, not a bad part, and they
 failed in ways that looked exactly like real defects:
@@ -1230,12 +1268,32 @@ Reported clearances at the shipped parameters:
 
 ```
 frame body            = 142.25 x 70 x 180 mm
-assembled envelope    = 166.25 x 108 x 200 mm  (depth shown for the deeper SO-239 bracket)
-radio bay (WxDxH)     = 124.25 x 38 x 116 mm
-radio clearance  side = 1 mm/side   above/below = 7.5 mm
-panel print footprint = 164 x 70  (bed 180) -> margin 16 mm
+assembled envelope    = 142.25 x 108 x 200 mm  (depth shown for the deeper SO-239 bracket)
+radio bay (WxDxH)     = 124.25 x 38 x 107 mm
+radio clearance  side = 1 mm/side   above/below = 3 mm
+panel print footprint = 175 x 70  (bed 180) -> margin 5 mm
 panel under M5 recess = 3.5 mm of material carrying the radio
 ```
+
+---
+
+## 7.1 What to reprint after the unified-panel change
+
+Geometry diffed against the previous commit — bounds and volume, not bytes, since
+OpenSCAD re-exports differ byte-wise for identical geometry.
+
+| Part | Why |
+| --- | --- |
+| `side_panel` ×2 | the unified panel + handle |
+| `base_plate` | 16 → 25 mm thick; this is what raises the bottom crossbeams so the panel fits the bed |
+| `compute_box_inline` | only if you build it — SBC standoffs 6 → 8 mm |
+
+**Nothing else changed.** All four crossbeams, both antenna mounts, the battery
+box, both front compute boxes and their covers are byte-for-byte identical.
+
+The base plate is not optional alongside the panel: a 175 mm panel bolted to a
+frame still using the 16 mm plate would leave the beams 9 mm below where its holes
+are.
 
 ---
 
@@ -1613,21 +1671,20 @@ A full set is five plates. Footprints verified against the bed:
 
 | Plate | Contents                                     | Footprint    | Margin      |
 | ----- | -------------------------------------------- | ------------ | ----------- |
-| 1     | 2 × `side_panel`, stacked in Y               | 164 × 146 mm | 16 / 34 mm  |
-| 2     | 4 × `crossbeam`, stacked in Y, 5 mm brim     | 134 × 122 mm | 46 / 58 mm  |
-| 3     | `base_plate` + 2 × `antenna_mount` behind it | 142 × 100 mm | 38 / 80 mm  |
-| 4     | 2 × `handle`, side by side in X              | 142 × 70 mm  | 38 / 110 mm |
-| 4b    | `handle_mic` + 1 × `handle`, side by side    | 175 × 70 mm  | 5 / 110 mm  |
+| 1     | 1 × `side_panel`                             | 175 × 70 mm  | **5** / 110 mm |
+| 2     | 1 × `side_panel` (the second one)            | 175 × 70 mm  | **5** / 110 mm |
+| 3     | 4 × `crossbeam`, stacked in Y, 5 mm brim     | 134 × 122 mm | 46 / 58 mm  |
+| 4     | `base_plate` + 2 × `antenna_mount` behind it | 142 × 100 mm | 38 / 80 mm  |
 | 5     | `battery_box` (only if you build it)         | 143 × 60 mm  | 37 / 120 mm |
 | 6     | `compute_box_front` + its cover, side by side | 150 × 160 mm | 30 / 20 mm (box is 40 tall in this pose) |
 
-Plate 4b is the tightest of all at **5 mm of X margin** — `handle_mic` is 101 mm
-long against the plain handle's 68. If that is too close for your Mini, print them
-separately; there is no reason they must share a plate.
+**The side panels get a plate each.** Two of them stacked in Y would be
+175 × 146 mm, which fits, but at 5 mm of X margin there is no room for a skirt and
+no tolerance for bed-origin error on a part that takes over two hours. One per
+plate is the safer call. There is no separate handle plate any more — the handles
+are part of these panels.
 
-Plate 1 is the tightest of the original set at 16 mm of X margin — check your
-Mini's actual usable area before nesting it, and note that the two panels are
-_identical_, not mirrored, so both come off the same STL.
+The two panels are _identical_, not mirrored, so both come off the same STL.
 
 > **On preset and setting names.** The two system presets named above
 > (`0.20mm SPEED @MINI`, `0.20mm STRUCTURAL @MINI`) were confirmed against an
