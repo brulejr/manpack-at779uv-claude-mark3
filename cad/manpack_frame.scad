@@ -37,6 +37,11 @@ show_radio = true;
 // draw the bolt-on battery frame in the assembly views
 show_battery_box = true;
 
+// assembly views: swap base_plate for compute_box_inline + its cover.  They are
+// alternatives -- the inline box's cover does the plate's job -- so this is a
+// choice, not an addition.  It drops everything below it by 30 mm.
+show_inline_box = false;
+
 // -----------------------------------------------------------------------------
 //  RADIO
 // -----------------------------------------------------------------------------
@@ -1418,10 +1423,11 @@ cmi_z0   = cmi_z1 - 35 - cmi_floor;    // -22, underside of the floor
 //  other -- and 64 of board plus 20 of clearance at each end is 104 against only
 //  88.8 mm of depth.  Across the tray the same 104 fits in 137 with room to spare.
 //
-//  The converter cannot stack behind the board either: 56 + 35 = 91, again past
-//  88.8.  It therefore sits beside the board, and 64 + 35 = 99 leaves 38 mm to
-//  split between the two connector zones -- about 19 mm each.  That is the whole
-//  packing problem in one line.
+//  Beside the board the converter would cost 35 mm of the X band: 64 + 35 = 99
+//  leaves 38 mm to split between the two connector zones, about 19 mm each.  That
+//  is what the extra 5.2 mm of depth buys -- at 100 deep the converter stacks
+//  BEHIND the board (56 + 35 = 91 against 94 of interior) and both zones go to
+//  36.5 mm.  That is the whole packing problem in one line.
 //  Board hard against the FRONT wall, centred across; converter BEHIND it, biased
 //  toward the notch so the power wiring stays on one side.
 //  Y -25.75, not -27: hard against the front wall the standoff pads merged 0.75 mm
@@ -1441,8 +1447,7 @@ cmi_conv_dy = 54;                      // its tab holes, 54 apart along its leng
 cmi_conv_dx = 13.5;                    //   and 13.5 in from one edge
 //  RACEWAY: an EXTERNAL notch in the right-hand wall, not a passage through the
 //  box.  The battery's two leads lay into it from outside and run up past the
-//  cover, so nothing routes through the sealed interior.  Centred 35 mm in from
-//  the back wall at Y 70.
+//  cover, so nothing routes through the sealed interior.
 //
 //  It only fits because the converter moved under the board.  Flat, the converter
 //  had to sit against this wall to leave connector room, which is exactly where
@@ -1853,9 +1858,17 @@ module frame(ex = 0) {
     for (bx = [ant_x_l, ant_x_r])
         color("#5f9e6e") translate([bx, -ex, z_tb0]) antenna_mount_fitted();
 
-    color("#8a8f98") translate([0, 0, -ex]) base_plate();
+    if (show_inline_box) {
+        color("#8a8f98") translate([0, 0, -ex]) compute_box_inline_cover();
+        color("#8a8f98") translate([0, 0, -2 * ex]) compute_box_inline();
+    } else
+        color("#8a8f98") translate([0, 0, -ex]) base_plate();
+
+    // the battery hangs off whichever part presents the feet; the inline tray's
+    // are 30 mm lower than the plate's
     if (show_battery_box)
-        color("#6d7f96") translate([0, 0, -2 * ex]) battery_box();
+        color("#6d7f96") translate([0, 0, (show_inline_box ? cmi_z0 - foot_h : 0)
+                                          - 3 * ex]) battery_box();
 
     if (show_radio) radio_proxy();
 }
@@ -1926,8 +1939,21 @@ else if (part == "base_plate")
 // 19.5 mm along the whole length of each end wall.  Stood on its back the
 // flanges become vertical ribs growing off the back wall, supported the whole
 // way, and the open front simply faces up.
-// Tray: floor down, open side up.  The only overhangs are the four foot insert
-// mouths, and the screw pads sit on 45 degree cones.
+// Tray: feet down, open side up.  NOT self-supporting -- see below.
+//
+// This is the ONE part on the frame that needs supports.  The four Ø16 feet are
+// the first 8 mm; the floor then appears all at once above them.  Sectioned:
+// 702 mm2 at Z 7.6 (four feet), 13688 mm2 at Z 8.4 -- about 13000 mm2 of floor
+// arriving in mid-air, which is the base plate's old failure mode reintroduced.
+// The base plate escapes it by printing upside down, feet UP; the tray cannot,
+// because inverting it turns the 4 mm floor into a 137 x 94 ceiling and hangs the
+// SBC standoffs off it.
+//
+// Support under the floor for the first 8 mm is the workaround.  The fix is to
+// move the feet INSIDE as bosses rising off the floor, leaving a flat underside:
+// the part then prints straight onto the bed, the battery box bolts flat against
+// it, and the stack loses 8 mm of height.  Not done yet -- it costs cavity space
+// at the four foot positions.
 else if (part == "compute_box_inline")
     translate([-cmi_x0, -cmi_y0, -(cmi_z0 - foot_h)]) compute_box_inline();
 // Cover: flat, bolt counterbores opening upward.

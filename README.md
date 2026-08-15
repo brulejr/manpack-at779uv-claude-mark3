@@ -3,14 +3,23 @@
 This is a clean-room decomposition of the single-piece reference STL from
 [RT-95 Manpack Rails and BNC bulkhead antenna mount](https://makerworld.com/en/models/1117937-rt-95-manpack-rails-and-bnc-bulkhead-antenna-mount?from=search#profileId-1115768) with the following notable changes:
 
-- Separated into printable modules — **17 STLs**, counting alternates — each of
+- Separated into printable modules — **18 STLs**, counting alternates — each of
   which fits a Prusa Mini (180 × 180 mm bed).
 - Every module-to-module joint uses stainless M4 socket-cap bolts into brass heat-set inserts.
-  M3 appears only where an off-the-shelf part dictates it: the SBC and cover in
-  the compute box.
+  M3 appears only where an off-the-shelf part dictates it: the SBC and covers in
+  the compute boxes.
 - Radio mounts use stainless M5 bolts or factory thumb screws.
+- The carrying handles are **integral to the side panels** (§2.6) — one part per
+  side, no lap joint, no separate handle print.
 - Frame base allows additional modules to be connected such as battery frame or compute box.
-- Optional handle variant carries the AT-779UV's own microphone bracket (§2.6.1).
+
+| frame + base plate + battery box | the same frame on `compute_box_inline` |
+| --- | --- |
+| ![assembly](img/asm_iso.png) | ![assembly, inline box](img/asm_inline.png) |
+
+Left is the standard stack. Right swaps the base plate for `compute_box_inline`
+(§12), which does the plate's structural job and carries the SBC inside it —
+they are alternatives, not a stack of both.
 
 Key files and directories
 
@@ -66,13 +75,14 @@ Two measurements drove real design decisions and are worth calling out:
 | ~~6~~ | ~~`handle`~~             | —     | *integral to the side panel* | —  | —       |
 | 7   | `antenna_mount_bnc`        | 2\*   | 35 × 24 × 33      | 10.9 cm³  | —       |
 | 8   | `antenna_mount_so239`      | 2\*   | 35 × 24 × 38      | 11.6 cm³  | —       |
-| 9   | `base_plate`               | 1     | 142.25 × 70 × 25  | 114.2 cm³ | 4       |
-| 11a | `compute_box_inline`     | 1\*\*\* | 142.25 × 52 × 70  | 98.7 cm³  | 4       |
+| 9   | `base_plate`               | 1\*\*\*\*\*\* | 142.25 × 70 × 25  | 112.8 cm³ | 4       |
+| 10  | `battery_box`              | 1     | 143 × 59.8 × 94.8 | 103.3 cm³ | 4       |
+| 11a | `compute_box_inline`       | 1\*\*\* | 143 × 100 × 47 | 119.2 cm³ | 4 + 4 M3 |
+| 11f | `compute_box_inline_cover` | 1\*\*\* | 143 × 100 × 8  | 105.5 cm³ | 6 M3    |
 | 11b | `compute_box_front`      | 1\*\*\* | 72 × 160 × 40     | 84.5 cm³  | 4 M3    |
 | 11c | `compute_box_front_cover`| 1\*\*\* | 72 × 160 × 5      | 36.6 cm³  | —       |
 | 11d | `compute_box_front_slim` | 1\*\*\* | 72 × 160 × 32     | 73.9 cm³  | 4 M3    |
 | 11e | `compute_box_front_slim_cover` | 1\*\*\* | 72 × 160 × 5 | 37.1 cm³  | —       |
-| 10  | `battery_box`              | 1     | 143 × 59.8 × 94.8 | 103.3 cm³ | 4       |
 
 \*\* Parts 2a–2c are alternatives — the three top-front layouts (§2.11). Print one.
 `_dual` is the original and is bit-identical to it, so an existing beam still fits.
@@ -82,8 +92,13 @@ not both. They share an identical leg, rib and bolt pattern, so they are
 interchangeable on the same crossbeam without touching anything else.
 
 \*\*\* Parts 11a, 11b and 11d are the three compute-module variants (§2.12) — pick
-one, or none. 11c and 11e are the covers for 11b and 11d respectively, and are not
-optional if you fit the box they belong to.
+one, or none. 11c, 11e and 11f are the covers for 11b, 11d and 11a respectively,
+and are not optional if you fit the box they belong to.
+
+\*\*\*\*\*\* **`base_plate` and `compute_box_inline` are alternatives, not
+companions.** The inline box absorbs the base plate's job entirely — its cover
+bolts into the bottom crossbeams and its tray presents the stacking feet. Fit one
+or the other.
 
 \*\*\*\* Parts 4a and 4b are alternatives. `_rail` adds a row of accessory columns to
 the bottom beam's front face, needed only if you fit `compute_box_front`. The
@@ -100,20 +115,22 @@ frame is **12 parts**; everything else is opt-in.
 | Bottom-front beam | plain / `_rail` | `_rail` **only** if fitting `compute_box_front`; otherwise the plain one, which is bit-identical to the beam already printed. |
 | Handles | — | No choice: the handle is integral to the side panel (§2.6). |
 | Antenna mounts ×2 | `_bnc` / `_so239` | Two of whichever connector you use — never one of each. Same leg and bolt pattern, so you can swap later. |
-| Compute module | `_inline` / `_front` / `_front_slim` / none | `_front` and `_front_slim` both need the `_rail` bottom beam and their own cover — they are alternatives to each other, not additions. `_inline` stacks under the frame instead. Most builds need none of them. |
+| Compute module | `_inline` / `_front` / `_front_slim` / none | All three are alternatives to each other, and each needs its own cover. `_front` and `_front_slim` hang off the frame and need the `_rail` bottom beam. **`_inline` sits under the frame and replaces `base_plate`** — print it *instead of* the plate, not as well. Most builds need none of them. |
 
 Largest part is the side panel at 175 mm — **5 mm of bed margin**, the tightest
 in the project. All meshes verified
 watertight, single-shell, and bed-legal.
 
-Solid volume is 851 cm³ for one of each of the seventeen files. A full 12-piece
-build (BNC mounts, battery frame, no compute box) is 560 cm³ with the grid beam,
-561 cm³ with the triple, 562 cm³ with the dual; add 96 cm³ for the inline compute
-box, or 109 cm³ for the front one with its cover. Swapping one plain handle for
-The handle is part of the side panel and adds nothing separately.
+Solid volume is 1076 cm³ for one of each of the eighteen part files. A full
+12-piece build (BNC mounts, battery frame, no compute box) is **557 cm³** with the
+grid beam, 557 with the triple, 558 with the dual; add 121 cm³ for the front
+compute box with its cover. The inline box swaps the 113 cm³ base plate for 225 cm³
+of tray plus cover — **+112 cm³ net**, the single heaviest option in the project.
+The handle adds nothing separately; it is part of the side panel.
+
 Actual filament use is far lower — the beams are small enough in section that
-the slicer's perimeters and infill dominate. If mass matters, the base plate is
-the obvious place to add a lightening window.
+the slicer's perimeters and infill dominate. Both large flat parts are already
+windowed, so there is no easy mass left to take out.
 
 ### 1 — `side_panel` ×2
 
@@ -367,6 +384,10 @@ M4 bolts. Its **four bosses are simultaneously the frame's feet and the M4
 attachment grid** that future modules (battery, tuner, ATU) bolt up into — one
 feature doing both jobs, so nothing else needs to hang off the frame.
 
+**`compute_box_inline` is an alternative to this part, not an addition** (§12) —
+that box's cover does the bolting-up and its tray presents the same four feet, so a
+build with the inline module does not print a base plate at all.
+
 **It is a ring, not a plate.** All that remains is the perimeter backing the two
 side panels (X 0–9 and 133.25–142.25) and the two bottom crossbeams, widened front
 and back to carry the feet. The centre is a **120.25 × 30 mm stadium opening**,
@@ -383,6 +404,12 @@ Y 20–50 with r = 15, inset 2 mm from the panel inner faces, it leaves **2.94 m
 of material between each foot boss and the opening edge, which the model asserts
 on every render.
 
+**Its bolt counterbores are sunk.** The plate grew from 8 to 17 mm of body when the
+bay shortened to make room for the unified side panel (§2.6), which would have
+needed a 20 mm shank — past the M4 × 12 the rest of the frame uses. The counterbore
+now runs to `base_t − 4`, so the head sits 4 mm below the top face and an M4 × 12
+still reaches 7 mm into the beam. Nothing else about the joint changed.
+
 The 2 mm inset is deliberate. Running the opening right up to the panel line — the
 literal reading of "line up with the side panels" — made the arc exactly tangent
 to the panel's inner face at Y 35: zero margin at one point. Because the plate
@@ -394,7 +421,8 @@ the foot ligament from 2.08 to 2.94 mm.
 Verified after the cut: the perimeter still fully backs both side panels (100 % of
 samples) and both crossbeams, the material around all four feet and all four base
 bolts is intact, and the worst-case panel margin measures 1.995 mm. Opening the
-centre took the plate from 75.9 cm³ to **55.9 cm³**, 26 % lighter.
+centre takes **58.0 cm³** out of the plate — a solid one at the current 17 mm of
+body would be 170.8 cm³ against the actual 112.8, 34 % lighter.
 
 Its top face is deliberately left flat. An earlier revision had two raised
 locating lips for the panel bottom edges; they made the part unprintable (see
@@ -543,9 +571,9 @@ with; it also moves the antenna brackets to that layout's outer stations.
 
 ---
 
-### 12 — `compute_box`, two variants
+### 12 — `compute_box`, three variants
 
-| `_inline` | `_front` (cover off) |
+| `_inline` (cover off) | `_front` (cover off) |
 | --- | --- |
 | ![inline](img/compute_box_inline.png) | ![front](img/compute_box_front.png) |
 
@@ -553,13 +581,11 @@ Carries a **Libre Computer La Frite** (AML-S805X-AC, 64 × 56 mm, M3 mounting on
 **58.75 × 49.5**) with its 128 GB eMMC, plus a CM108/CM119 USB audio
 fob, a PTT board and a GPS module, for onboard logging over WiFi to a tablet.
 
-**Only the SBC gets a dedicated mount**, because it is the only one of the four
-whose footprint is fixed and known. On `_inline` everything else lands on a
-generic **M3 through-hole grid at 10 mm pitch** — 30 positions — plus zip-tie
-slots. Swapping a CM108 for a CM119, or changing the PTT board entirely, costs
-nothing here. The grid holes double as ventilation.
+**Only the SBC and the converter get dedicated mounts**, because they are the only
+two whose footprints are fixed and known. Everything else is zip-tied. Swapping a
+CM108 for a CM119, or changing the PTT board entirely, costs nothing.
 
-`_front` **no longer has the grid.** It was removed along with the back-wall
+Neither box **has the M3 hole grid** any more. It was removed along with the back-wall
 cutout: neither earned its place once the board was rotated, and the bays are big
 enough that loose devices are better zip-tied than bolted to a hole that happens
 to line up. Ventilation is now whatever the openings happen to give: the cover is
@@ -584,31 +610,122 @@ rather than merely tight. If a later measurement lands nearer one end of the ran
 This is the second assumption in the project that only a printed part could
 retire — the first was the antenna bracket's sealed counterbores.
 
-|                   | `_inline`                     | `_front`                        |
-| ----------------- | ----------------------------- | ------------------------------- |
-| Mounts to         | the module stack, above the battery box | the top-front crossbeam's accessory columns |
-| Outer             | 142.25 × 70 × 49 mm           | **72** × 160 × **33** mm        |
-| SBC orientation   | lying flat on the floor       | flat on the back wall, **turned 90°** |
-| Grid positions    | 30 (6 × 5)                    | none — see above                |
-| Outer depth       | 49 mm                         | **40 mm** (was 33; the converter forced it) |
-| Cover             | open front                    | `compute_box_front_cover`, 36.6 cm³ |
-| Volume            | 95.7 cm³                      | 86.0 cm³                        |
+|                   | `_inline`                          | `_front`                        |
+| ----------------- | ---------------------------------- | ------------------------------- |
+| Mounts to         | nothing — **it is** the base plate, and the stack sits on it | the top-front crossbeam's accessory columns |
+| Outer, tray       | 143 × 100 × 47 mm                  | 72 × 160 × 40 mm                |
+| Outer, with cover | 143 × 100 × **55 mm**              | 72 × 160 × 43 mm (2 of the cover's 5 nests inside) |
+| SBC orientation   | flat on the floor, long axis **across** the tray | flat on the back wall, **turned 90°** |
+| Converter         | flat on the floor, **behind** the board | flat on the floor, below the board |
+| Opens             | **upward**, cover off              | forward, cover off              |
+| Cover             | `compute_box_inline_cover`, 105.5 cm³ | `compute_box_front_cover`, 36.6 cm³ |
+| Volume, tray      | 119.2 cm³                          | 84.5 cm³                        |
 
-**`_inline`** bolts up into the plate above and presents the same four feet
-below, so the battery box hangs off it unchanged — stack pitch **52 mm**. Its SBC
-standoffs are 8 mm like the front boxes': at the old 6 mm the 7.5 mm insert pocket
-reached 1.5 mm past the pad into the floor, which worked but put the insert
-somewhere other than the pad meant to hold it. Its
-topology deliberately mirrors `battery_box`: back wall, two end walls, floor,
-full-length top flanges carrying the M4s, feet, open at the front and top. That
-is the one shape already proven to print on this frame. Floor-down would put the
-feet on the bed under a full-width floor — the base plate's old mid-air failure —
-and a closed front would become a 142 × 49 ceiling in the back-down pose. The
-open front doubles as the port access: the SBC's connector edge faces out of it,
-so USB, Ethernet, DC and the GPS lead are all reachable.
+#### 11a/11f — `compute_box_inline` and its cover
 
-The SBC does not have to dodge the top flanges: it tops out 1 mm below their
-underside, so the whole floor width is usable and the grid gets the rest.
+| plan (cover off) | cover |
+| --- | --- |
+| ![inline plan](img/compute_box_inline_plan.png) | ![inline cover](img/compute_box_inline_cover.png) |
+
+**This part replaces `base_plate`. Do not print both.** The tray takes over the
+plate's structural job — its cover is what the bottom crossbeams bolt into, and its
+underside carries the same four Ø16 feet with M4 inserts that the battery box hangs
+from. Everything above and below it is unchanged; the frame simply sits 30 mm
+higher.
+
+Total stacked height is **55 mm** — the constraint the whole part was designed
+against — split 47 mm of tray plus an 8 mm cover:
+
+| band | Z (frame) | height |
+| ---- | --------- | ------ |
+| cover | 17 … 25  | 8 mm  |
+| cavity | −18 … 17 | **35 mm** |
+| floor | −22 … −18 | 4 mm |
+| feet  | −30 … −22 | 8 mm |
+
+The cavity's 35 mm against 24.6 mm of contents (8 mm standoff + 1.6 board + an
+assumed 15 mm of component height) leaves **10.4 mm of headroom**. That number is
+only as good as the 15 mm assumption — see §8.
+
+**Depth is 100 mm, 5.2 mm deeper than the battery box, and that 5.2 mm is what
+makes the box work.** The board lies with its long axis *across* the tray, because
+its connectors are on both 56 mm edges — USB one end, Ethernet/HDMI the other — and
+64 of board plus 20 of clearance at each end is 104 mm against only 88.8 of depth.
+Across the tray it fits in 137. That settles the board, but not the converter: put
+it *beside* the board and it eats 35 mm of the X band, leaving 38 mm to split
+between the two connector zones — about 19 mm each, which is not enough for a
+right-angle adapter. At 100 mm deep the converter stacks **behind** the board
+instead (56 + 35 = 91 against 94 of interior) and both connector zones open up to
+**36.5 mm**. The cost is that the box reaches 30 mm forward of the frame rather
+than 24.8.
+
+Measured positions:
+
+| | X | Y | note |
+| --- | --- | --- | --- |
+| Board | 39.125 … 103.125 | −25.75 … 30.25 | standoffs 58.75 × 49.5, 8 mm tall |
+| Converter | 31.5 … 96.5 | 31.5 … 66.5 | 0.5 mm off the back wall and the raceway wall |
+| Raceway | 100 … 114 | 62 … 70 | 14 × 8, in the back wall |
+
+The board is at Y −25.75 rather than hard against the front wall at −27: at −27 the
+standoff pads merged 0.75 mm *into* the wall and the board's edge sat dead flush.
+The pads overhang the board by 0.75 mm at each end, so of the 3 mm of slack in this
+direction 1.5 is theirs; the remaining 1.5 is split 0.5 pad-to-wall, 0.5
+pad-to-converter, 0.5 converter-to-back-wall.
+
+**The raceway is external — a notch in the back wall, not a passage through the
+box.** The TalentCell's two leads lay into it from outside and run up past the
+cover to the radio, so nothing routes through the sealed interior and there is no
+hole to seal. It is cut through the feet band as well, so the channel is
+continuous from below the battery to above the frame, and the cover has a matching
+edge notch so the run is unbroken. At 8 mm deep the cables stay inside the box's
+own footprint; nothing protrudes behind the frame.
+
+Getting there took two corrections. The first cut went straight through into the
+cavity — a notch with no wall behind it. The fix keeps a block of material inboard
+of the cut. The first version of that block was exactly as wide as the notch, which
+gave it a back wall and no sides; it is now widened by `cmi_wall` at each end, so
+all three inboard faces measure **3.00 mm**, matching the box walls.
+
+It sits in the **back** wall rather than the right wall for the same packing reason
+as everything else: on the right it would have forced the converter 8.6 mm inboard,
+straight off the connector zones (14.7 mm each instead of 19). In the back wall the
+right side stays clear, the converter keeps its full width, and the notch still
+lands beside it on the power side — the converter's leads and the battery's share
+one corner.
+
+Tray-to-cover is **six M3** into inserts in the cover, on 12 mm pads at the top of
+the wall, each sat on a 45° cone so nothing overhangs — a continuous inward rim
+would have been an 8 mm unsupported ledge right round the part. Corners plus
+mid-side, all hard against the walls: a mid-*front* pad would land on the board,
+which now runs right up to the front wall.
+
+The cover carries the four M4 clearance holes for the bottom crossbeams on the base
+plate's own bolt pattern, with the heads sunk to 4 mm so an **M4 × 12 still engages
+7 mm** in the beam. Its cable opening is a 24 × 30 slot at X 6–30, Y 20–50, sized
+to the raceway rather than the base plate's full-width stadium, and kept inside
+Y 16–54 because the bottom crossbeams land on this face at Y 0–16 and Y 54–70.
+
+**The tray is the one part on this frame that needs supports, and that is a
+defect, not a choice.** It prints feet down, open side up. The four Ø16 feet are
+the first 8 mm; the floor then arrives all at once above them — sectioned,
+**702 mm² at Z 7.6 against 13 688 mm² at Z 8.4**, so roughly 13 000 mm² of floor
+prints in mid-air. That is the base plate's old failure mode reintroduced. The
+plate escapes it by printing upside down with the feet *up*; the tray cannot,
+because inverting it turns the 4 mm floor into a 137 × 94 ceiling and hangs the
+four SBC standoffs off it.
+
+Support under the floor for the first 8 mm works and is cheap — it is a
+non-cosmetic underside and only 8 mm tall. **The proper fix is to move the feet
+inside**, as bosses rising off the floor with their insert mouths opening
+downward through it: the underside goes flat, the tray prints straight onto the
+bed with no supports at all, the battery box bolts flat against it, and the stack
+loses 8 mm of height. The cost is cavity space at the four foot positions. **Not
+done yet** — see §8.
+
+The cover prints flat, bolt heads up, and needs nothing.
+
+#### 11b — `compute_box_front`
 
 **`_front`** hangs off the crossbeam, inside the 160 H × 80 W × 50 D envelope
 available on the front of the frame. **Width is set by the rail, not by the
@@ -1017,16 +1134,19 @@ them redundant.
 
 All bolts stainless, socket cap. Structural inserts are brass M4, 6.0 mm OD ×
 8.0 mm long (Ruthex/Bumat type) — pockets Ø5.7 × 9.0 mm with a Ø6.6 lead-in
-chamfer. **M3 inserts appear in three places only** — the SBC standoffs and cover
-screws in `compute_box_front` —
-pockets Ø4.0 × 5.0 mm. Everything structural stays M4.
+chamfer. **M3 inserts appear only in the compute boxes** — the SBC standoffs in all
+three variants, and the six tray-to-cover screws in `compute_box_inline` —
+pockets Ø4.0 × 5.0 mm (the SBC standoffs use 7.5 mm pockets for 7 mm inserts).
+Everything structural stays M4.
 
 | Joint                           | Bolt           | Qty                      | Insert lives in                      |
 | ------------------------------- | -------------- | ------------------------ | ------------------------------------ |
 | Side panels → 4 crossbeams      | M4 × 12        | **12**                   | crossbeam ends                       |
 | Antenna mounts → top-front beam | M4 × 12        | 8                        | top-front beam front face            |
 | Base plate → bottom beams       | M4 × 12        | 4                        | bottom beam undersides               |
-| **Battery box → base plate**    | **M4 × 12**    | **4**                    | base plate feet                      |
+| **Battery box → base plate**    | **M4 × 12**    | **4**                    | base plate feet (or the inline tray's) |
+| Inline box cover → bottom beams | M4 × 12        | 4 *(instead of the base plate's)* | bottom beam undersides      |
+| Inline box tray → its cover     | M3 × 10        | 6                        | cover underside                      |
 | Next module → battery box       | M4 × 12        | 4                        | battery box feet                     |
 | Compute box (front) → beams     | M4 × 12        | 4 top + 2 bottom         | box back-wall pads / beam front face |
 | SO-239 flange → antenna mount   | M3 × 10 + nut  | 4 per mount              | (through-holes; SO-239 variant only) |
@@ -1061,6 +1181,8 @@ and 8.5 mm into the radio.
 | `compute_box_front_slim_cover` | flat, rim up          | as 11c                                                                                                                        |
 | `antenna_mount` ×2 | on its back                       | every layer smaller than the one below — no supports; one symmetric part, print two                                           |
 | `base_plate`       | upside down, flat top face on bed | feet and every insert mouth point upward; fully self-supporting                                                               |
+| `compute_box_inline` | feet down, open side up         | **the one part that needs supports** — the floor lands in mid-air over the four feet; see §12                                 |
+| `compute_box_inline_cover` | flat, bolt heads up       | plain slab; the counterbores and insert mouths all open upward                                                                |
 | `battery_box`      | **back wall down**, open front up | floor-down would cantilever both top flanges 19.5 mm along their whole length; on its back they become ribs off the back wall |
 
 Each `part=` value in the .scad already emits the part in its recommended pose,
@@ -1079,15 +1201,23 @@ inserts, both of which are loaded in compression by the pack's own weight.
 
 ## 6. Assembly order
 
-Order matters in one place: the handle lap pads cover the top crossbeam bolt
-heads, so the top beams go on first.
+Order matters in one place: the two front compute boxes must be bolted on before
+their switch and USB bulkhead go in (step 10). Nothing else is order-sensitive —
+the handles are integral to the side panels now, so the old "top beams first"
+constraint from the lap pads is gone.
+
+![exploded](img/exploded.png)
 
 1. Heat all 40 inserts. Beam ends first — check the two per end are square, or
    the panel will not sit flat.
 2. Bolt the four crossbeams to one side panel (16 × M4 × 12, heads on the
    **outside**). Add the second panel.
 3. Bolt the base plate up into the two bottom beams (4 × M4 × 12). Its locating
-   lips should capture both panel bottom edges.
+   lips should capture both panel bottom edges. **If you are fitting
+   `compute_box_inline` instead**, populate and close its tray first, then bolt the
+   assembled box up into the beams through the cover's four holes — the cover *is*
+   the base plate. Lay the battery leads into the back-wall raceway before the
+   frame goes down on it.
 4. Drop the radio in and fit the two M5 bolts through the panel recesses into
    the radio's side holes.
 5. *(No handle step — the handles are part of the side panels, fitted in step 2.)*
@@ -1095,8 +1225,9 @@ heads, so the top beams go on first.
 6. Bolt on the two antenna mounts (8 × M4 × 12), then fit the antenna
    connectors.
 7. If fitting the battery box: bolt it up into the four feet (4 × M4 × 12),
-   route the battery lead up through the base plate's central opening, slide the
-   pack in from the front and strap it.
+   route the battery lead up through the base plate's central opening — or, with
+   the inline box, up the external raceway — slide the pack in from the front and
+   strap it.
 8. If fitting `compute_box_front`, populate it **before** the cover goes on —
    the downward-facing power and Ethernet connections are not reachable once it
    is closed. Order inside the box: converter onto the floor first (two M3 through
@@ -1161,9 +1292,17 @@ Not just rendered — checked:
   The handle prints flat so arch bending runs along the filaments, not across
   layer bonds.
 - Compute boxes: SBC envelope (64 × 56 board + 22 mm of connectors) traced clear
-  of the walls and top flanges, both variants single-shell with zero enclosed
-  voids, inline verified to bolt up into the plate above and accept a module on
-  its own feet below.
+  of the walls and top flanges, all three variants single-shell with zero enclosed
+  voids.
+- `compute_box_inline`: tray 142.98 × 99.98 × 47.00 / 119.20 cm³, cover
+  142.98 × 99.98 × 7.98 / 105.51 cm³, both watertight and single-shell; stacked
+  height **55.00 mm** against the 55 mm budget. Cavity sectioned at 35.00 mm.
+  Raceway measured 13.98 wide × 8 deep with **3.00 mm** of wall on all three
+  inboard faces — the check that caught two earlier versions, one that cut through
+  into the cavity and one whose kept block was exactly as wide as the notch and so
+  had no side walls at all. Converter and board footprints traced against the
+  interior: 0.5 mm clearance to the back wall and to the raceway wall, 36.5 mm of
+  connector zone at each end of the board, 10.4 mm of headroom over it.
 - `compute_box_front` after the rework: all four standoffs located by **counting
   solid islands standing proud of the back wall**, not by point-probing — four at
   X 11.25 / 60.75 × Z 41.65 / 100.35, each 38.0 mm², which is a Ø8 pad minus its
@@ -1225,7 +1364,8 @@ Not just rendered — checked:
   find material laid over voids. This caught two real orientation defects: the
   base plate printing 98 % in mid-air on two locating lips, and the side panel
   bridging a Ø26.5 mm ceiling directly under the ligament that carries the
-  radio. Both are fixed; no part now needs supports.
+  radio. Both are fixed. `compute_box_inline` has since reintroduced the same
+  class of defect and is the one part that still needs supports (§12).
 - Asserts in the model fail the render if the panel exceeds the bed, the beam
   span exceeds the bed, `frame_d` is too small to clear the control panel,
   `bay_h` is too small for the radio, or the M5 recess leaves < 3 mm of panel.
@@ -1286,7 +1426,7 @@ OpenSCAD re-exports differ byte-wise for identical geometry.
 | --- | --- |
 | `side_panel` ×2 | the unified panel + handle |
 | `base_plate` | 16 → 25 mm thick; this is what raises the bottom crossbeams so the panel fits the bed |
-| `compute_box_inline` | only if you build it — SBC standoffs 6 → 8 mm |
+| `compute_box_inline` | superseded entirely — the old part was a 142 × 70 × 49 open frame bolting *up* into the plate. The new one is a 143 × 100 × 55 closed box that **replaces** the plate. |
 
 **Nothing else changed.** All four crossbeams, both antenna mounts, the battery
 box, both front compute boxes and their covers are byte-for-byte identical.
@@ -1382,15 +1522,38 @@ are.
 
 ---
 
+14. **`compute_box_inline`: the buck converter's own 12 V feed has no modelled
+    path.** The raceway is deliberately external and sealed off from the cavity, so
+    the battery leads that lie in it never enter the box — but the converter *inside*
+    the box has to be fed from those same leads. Nothing in the model gets them
+    across the 3 mm raceway wall. Either drill that wall on the bench (the converter
+    is 0.5 mm from it, so the run is trivially short), or bring 12 V in through the
+    cover's cable opening with the rest of the wiring. **Decide which before you
+    close the box** — the converter's terminals are the least accessible thing in it.
+
+15. **`compute_box_inline` needs supports and should not.** ~13 000 mm² of floor
+    prints in mid-air over the four feet (§12). It slices and prints with support
+    under the first 8 mm, but the fix — feet as internal bosses, flat underside —
+    also takes 8 mm off the stack. Decide before printing it; the change is not
+    made yet.
+
+16. **The 15 mm component height over the La Frite is assumed, not measured.** It
+    is what gives the inline box its 10.4 mm of headroom in a 35 mm cavity, and the
+    tallest thing on the board — a right-angle adapter standing off the connector
+    edge, or a USB stick — is exactly what has not been put on a caliper. If it runs
+    to 25 mm the box still closes; past that, the cavity has to grow and the 55 mm
+    budget goes with it.
+
 ## 9. Print settings
 
 ### Overview
 
 Slice `stl/*.stl` as-is. Every part is already in its recommended pose (§5) and
-**no part on this frame needs supports** — the only ceilings anywhere are the
+**no part on this frame needs supports except `compute_box_inline`** (§12) — the
+only ceilings anywhere else are the
 tops of insert pockets and bolt bores, the largest of which is the Ø12.468 mm
 antenna bore through a 3.75 mm wall. Verified by measuring per-layer
-cross-sectional area on all seventeen meshes; the biggest single unsupported area on
+cross-sectional area on all eighteen meshes; the biggest single unsupported area on
 any layer is about 93 mm². The one exception is `compute_box_front_cover`, whose
 counterbores and vents all open upward, and `compute_box_front`, whose floor is now
 flat — the buck-converter ribs that once stood on it were removed when the rim
@@ -1667,7 +1830,9 @@ its mass, and there are two of them.
 
 #### Plate layout (Prusa Mini, 180 × 180 mm)
 
-A full set is five plates. Footprints verified against the bed:
+Five plates cover the frame and battery box. A compute module adds one more plate
+for either front variant, or **two** for the inline box. Footprints verified
+against the bed:
 
 | Plate | Contents                                     | Footprint    | Margin      |
 | ----- | -------------------------------------------- | ------------ | ----------- |
@@ -1677,6 +1842,12 @@ A full set is five plates. Footprints verified against the bed:
 | 4     | `base_plate` + 2 × `antenna_mount` behind it | 142 × 100 mm | 38 / 80 mm  |
 | 5     | `battery_box` (only if you build it)         | 143 × 60 mm  | 37 / 120 mm |
 | 6     | `compute_box_front` + its cover, side by side | 150 × 160 mm | 30 / 20 mm (box is 40 tall in this pose) |
+| 7a    | `compute_box_inline` (only if you build it)  | 143 × 100 mm | 37 / 80 mm  |
+| 7b    | `compute_box_inline_cover`                   | 143 × 100 mm | 37 / 80 mm  |
+
+The inline box needs **two plates of its own** — tray and cover are both
+143 × 100, and neither pairing fits (286 mm side by side, 200 mm stacked). If you
+build it, plate 4 loses the base plate and carries only the two antenna mounts.
 
 **The side panels get a plate each.** Two of them stacked in Y would be
 175 × 146 mm, which fits, but at 5 mm of X margin there is no room for a skirt and
