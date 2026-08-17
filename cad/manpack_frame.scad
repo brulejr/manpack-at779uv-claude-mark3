@@ -335,6 +335,28 @@ ant_x_l     = station_x[0] - ant_bracket_w / 2;
 ant_x_r     = station_x[len(station_x) - 1] - ant_bracket_w / 2;
 
 // bottom interface plate
+// -----------------------------------------------------------------------------
+//  BATTERY-BOX TABS -- the bottom frame-to-module joint
+// -----------------------------------------------------------------------------
+//  The battery box carries two tabs per side that stand in the space the bottom
+//  crossbeams' ends used to occupy, immediately inboard of each side panel.  The
+//  bolts then run panel -> tab -> beam insert, so the module is captured by the
+//  same fixings that hold the frame together instead of hanging off a plate.
+//
+//  Consequences, both deliberate:
+//    * the base plate has nothing left to do and is dropped from the assembly;
+//    * the bottom beams lose 2 x tab_t of length, and therefore CANNOT reach the
+//      panels without the battery box.  The box is now a structural member of
+//      the frame, not an accessory.
+//
+//  The frame's own geometry is untouched -- z_frame stays 25, so the panels'
+//  bolt rows do not move and neither panel needs reprinting.
+tab_t     = panel_t;                          // 9, tab fills the panel's thickness
+tab_x     = [panel_t, frame_w - panel_t - tab_t];   // 9, 124.25
+bb_span   = radio_w - 2 * tab_t;              // 106.25, shortened bottom beam
+bb_beam_x = panel_t + tab_t;                  // 18, where that beam now starts
+assert(bb_span > 0, "tabs are wider than the frame's clear span");
+
 base_bolt_x = [35, frame_w - 35];             // 35, 107.25
 base_bolt_y = [beam_cy_f, beam_cy_b];         // 8, 62
 foot_x      = [14, frame_w - 14];             // 14, 128.25
@@ -602,28 +624,36 @@ module side_panel() {
 //  Two axial M4 inserts per end: ALL inserts for the panel joint live here.
 //  Local frame: X 0..radio_w along the span, Y 0..beam_d, Z 0..beam_h.
 // =============================================================================
+//  `span` is the beam's length and `x0` the frame X it starts at.  The two differ
+//  between top and bottom beams now: the top pair still run panel face to panel
+//  face, the bottom pair stop short by tab_t at each end to leave room for the
+//  battery box's tabs.  x0 is what maps frame X (grid_cols, base_bolt_x) into
+//  beam-local X, so it has to travel with span.
 module crossbeam(front_cols = [], base_face = false,
-                 rows = [beam_h/2 - beam_dz, beam_h/2 + beam_dz]) {
+                 rows = [beam_h/2 - beam_dz, beam_h/2 + beam_dz],
+                 span = radio_w, x0 = panel_t) {
     difference() {
-        rbox(radio_w, beam_d, beam_h);
+        rbox(span, beam_d, beam_h);
 
         // two inserts per end, axis along the span
         for (rz = rows) {
             translate([0, beam_d/2, rz])
                 rotate([0, 90, 0]) m4_insert();
-            translate([radio_w, beam_d/2, rz])
+            translate([span, beam_d/2, rz])
                 rotate([0, -90, 0]) m4_insert();
         }
 
         // top-front beam: accessory bolt columns in its FRONT face
         for (gx = front_cols, z = rail_z)
-            translate([gx - panel_t, 0, z - z_tb0])
+            translate([gx - x0, 0, z - z_tb0])
                 rotate([-90, 0, 0]) m4_insert();
 
-        // bottom beams: inserts in the UNDERSIDE for the bottom interface plate
+        // bottom beams: inserts in the UNDERSIDE.  The base plate is gone; these
+        // remain only so compute_box_inline still bolts up as it does today,
+        // until that part is reworked onto tabs too.
         if (base_face)
             for (gx = base_bolt_x)
-                translate([gx - panel_t, beam_d/2, 0]) m4_insert();
+                translate([gx - x0, beam_d/2, 0]) m4_insert();
     }
 }
 
@@ -919,12 +949,16 @@ bb_out_y = bb_cav_y + box_wall;                  // 94.8
 bb_out_z = box_boss + 1 + bb_cav_z + box_floor;  // 51.8
 bb_x0    = frame_w / 2 - bb_out_x / 2;           // -0.375, centred on the frame
 bb_y0    = frame_d - bb_out_y;                   // -24.8, back flush with the frame
-bb_z0    = -bb_out_z;                            // -51.8, underside of the floor
-bb_cz1   = -(box_boss + 1);                      // -9,    cavity ceiling
+// The box top IS the frame datum now.  It used to hang below the base plate with
+// its top at Z 0; with the plate gone the frame lands straight on this face and
+// the tabs rise off it into the bottom beams.  Everything below moves up by 25.
+bb_z1    = z_frame;                              // 25, the face the frame sits on
+bb_z0    = bb_z1 - bb_out_z;                     // -26.8, underside of the floor
+bb_cz1   = bb_z1 - (box_boss + 1);               // 16,    cavity ceiling
 bb_cz0   = bb_cz1 - bb_cav_z;                    // -47.8, cavity floor
 bb_bat_y1= bb_y0 + bb_out_y - box_wall;          // 66, pack seats against the back
 bb_bat_y0= bb_bat_y1 - batt_y;                   // -9.8, pack's front face
-bb_tot_z = bb_out_z + foot_h;                    // 59.8, including the feet
+bb_tot_z = bb_out_z;                             // 51.8, flat-bottomed now
 // Side strips of floor left solid to carry the stacking feet, and the clear
 // band between the two foot zones where a window can still go.
 bb_pad_x = [[bb_x0, 26], [116.25, bb_x0 + bb_out_x]];
@@ -944,24 +978,27 @@ module battery_box() {
             // pads because the bolts sit 10.4 mm inboard of the walls -- too far
             // to cantilever, and a full-width cross rail would be a 135 mm bridge.
             for (fx = [bb_x0, bb_x0 + bb_out_x - box_wall - flange_w])
-                translate([fx, bb_y0, -box_boss])
+                translate([fx, bb_y0, bb_z1 - box_boss])
                     rbox(box_wall + flange_w, bb_out_y, box_boss, 1.5);
-            // Stacking interface: the same four feet the base plate presents, at
-            // the same X/Y, so a further module bolts under this one exactly as
-            // this one bolts under the base plate.
+            // TABS: two per side, one under each bottom crossbeam, standing in the
+            // space that beam's end used to occupy.  They run only over the beams'
+            // Y bands, not the full depth -- the radio occupies Y 17..53 at this
+            // height and a full-depth tab would foul it.
             //
-            // Deliberately plain cylinders. A 45 degree print ramp would have to
-            // run toward +Y (the downward direction in the print pose), and for
-            // the rear pair at Y 58 that would reach Y 74 -- past the back face,
-            // breaking both the "nothing behind the frame" rule and the print
-            // pose's bed datum. Unramped they cost ~18 mm2 of unsupported area
-            // each, which is what any horizontal boss costs.
-            for (x = foot_x, y = foot_y)
-                translate([x, y, bb_z0 - foot_h]) cylinder(d = foot_d, h = foot_h + 1);
+            // They rise from the flange, which already spans this X: the flange
+            // reaches flange_w inboard of each end wall, i.e. to X 23.125 and
+            // 119.5, so both tab footprints sit on solid material.
+            // Sunk 1 mm into the flange: sitting exactly on bb_z1 makes each tab
+            // a separate shell, coplanar contact rather than a union.
+            for (tx = tab_x, ty = [beam_y_f, beam_y_b])
+                translate([tx, ty, bb_z1 - 1])
+                    rbox(tab_t, beam_d, beam_h + 1, 1.5);
         }
-        // four M4 bolts up into the base plate's foot inserts
-        for (x = foot_x, y = foot_y)
-            translate([x, y, -box_boss]) m4_bolt_hole(box_boss);
+        // The tabs' bolt clearance: the panel's own counterbore takes the head, so
+        // these are plain through-holes on the beams' two rows.
+        for (tx = tab_x, y = [beam_cy_f, beam_cy_b], z = bb_z)
+            translate([tx - 1, y, z]) rotate([0, 90, 0])
+                cylinder(d = m4_clear, h = tab_t + 2);
         // Floor windows.  Reshaped around the stacking feet: a pair of central
         // windows either side of a centre rib, plus one small window in each
         // side strip in the clear band between that strip's two foot pads.
@@ -985,9 +1022,6 @@ module battery_box() {
         // between them, because nothing is ever built there.
         translate([bb_x0 + box_wall, bb_y0 - 1, bb_cz0])
             rbox(bb_cav_x, bb_cav_y + 1, bb_cav_z, 1.5);
-        // next-module inserts, opening downward through the feet
-        for (x = foot_x, y = foot_y)
-            translate([x, y, bb_z0 - foot_h]) m4_insert();
         // strap slots through both end walls, in the clear zone ahead of the pack
         for (wx = [bb_x0 - 1, bb_x0 + bb_out_x - box_wall - 1])
             translate([wx, bb_y0 + strap_zone/2 - strap_t/2,
@@ -996,10 +1030,12 @@ module battery_box() {
     }
 }
 
-echo(str("battery frame outer   = ", bb_out_x, " x ", bb_out_y, " x ", bb_tot_z,
-         " mm (", bb_out_z, " to the floor + ", foot_h, " of stacking feet), ",
-         "reaching ", -bb_y0, " mm forward of the frame, nothing behind it"));
-echo(str("module stack pitch    = ", bb_tot_z, " mm"));
+echo(str("battery frame outer   = ", bb_out_x, " x ", bb_out_y, " x ", bb_out_z,
+         " mm, flat-bottomed, plus ", beam_h, " mm of tab standing into the ",
+         "bottom crossbeams; reaching ", -bb_y0,
+         " mm forward of the frame, nothing behind it"));
+echo(str("bottom beam span      = ", bb_span, " mm (was ", radio_w,
+         "); the frame does not close without the battery box"));
 echo(str("battery cavity        = ", bb_cav_x, " x ", bb_cav_y, " x ", bb_cav_z,
          " mm  for a ", batt_x, " x ", batt_y, " x ", batt_z, " mm pack lying flat"));
 assert(bb_out_x <= BED && bb_tot_z <= BED && bb_out_y <= BED,
@@ -1879,10 +1915,12 @@ module frame(ex = 0) {
     color("#7f9dc0") translate([-ex, 0, 0]) side_panel();
     color("#7f9dc0") translate([frame_w + ex, 0, 0]) mirror([1, 0, 0]) side_panel();
 
-    color("#c9a227") translate([panel_t, beam_y_f, z_bb0 - ex])
-        crossbeam(base_face = true, rows = bb_rows);
-    color("#c9a227") translate([panel_t, beam_y_b, z_bb0 - ex])
-        crossbeam(base_face = true, rows = bb_rows);
+    color("#c9a227") translate([bb_beam_x, beam_y_f, z_bb0 - ex])
+        crossbeam(base_face = true, rows = bb_rows,
+                  span = bb_span, x0 = bb_beam_x);
+    color("#c9a227") translate([bb_beam_x, beam_y_b, z_bb0 - ex])
+        crossbeam(base_face = true, rows = bb_rows,
+                  span = bb_span, x0 = bb_beam_x);
     color("#c9a227") translate([panel_t, beam_y_f, z_tb0 + ex])
         crossbeam(front_cols = front_cols);
     color("#c9a227") translate([panel_t, beam_y_b, z_tb0 + ex]) crossbeam();
@@ -1891,17 +1929,17 @@ module frame(ex = 0) {
     for (bx = [ant_x_l, ant_x_r])
         color("#5f9e6e") translate([bx, -ex, z_tb0]) antenna_mount_fitted();
 
+    // The base plate is gone -- the battery box's tabs are the bottom joint now.
+    // compute_box_inline still bolts up into the beams' underside inserts, but it
+    // cannot brace them: with the bottom beams short by tab_t at each end it needs
+    // tabs of its own, which is the next piece of this rework.
     if (show_inline_box) {
         color("#8a8f98") translate([0, 0, -ex]) compute_box_inline_cover();
         color("#8a8f98") translate([0, 0, -2 * ex]) compute_box_inline();
-    } else
-        color("#8a8f98") translate([0, 0, -ex]) base_plate();
+    }
 
-    // the battery hangs off whichever part presents the feet; the inline tray's
-    // are 30 mm lower than the plate's
     if (show_battery_box)
-        color("#6d7f96") translate([0, 0, (show_inline_box ? cmi_z0 - foot_h : 0)
-                                          - 3 * ex]) battery_box();
+        color("#6d7f96") translate([0, 0, -2 * ex]) battery_box();
 
     if (show_radio) radio_proxy();
 }
@@ -1932,16 +1970,18 @@ else if (part == "crossbeam_top_front_dual")   crossbeam(front_cols = dual_cols)
 else if (part == "crossbeam_top_front_triple") crossbeam(front_cols = triple_cols);
 else if (part == "crossbeam_top_front_grid")   crossbeam(front_cols = grid_cols);
 else if (part == "crossbeam_top_back")     crossbeam();
-else if (part == "crossbeam_bottom_front") crossbeam(base_face = true, rows = bb_rows);
+else if (part == "crossbeam_bottom_front")
+    crossbeam(base_face = true, rows = bb_rows, span = bb_span, x0 = bb_beam_x);
 // Same beam with a single row of accessory columns in its front face, so a tall
 // front module (the compute box) bolts at the bottom as well as the top.  ONE
 // row, not two: this beam's underside already carries the base-plate inserts
 // over beam-local Z 0..9, and a second row at 6 would run straight into them.
 // A row at 16 leaves 4.15 mm between the two sets of pockets.
 else if (part == "crossbeam_bottom_front_rail")
-    crossbeam(front_cols = grid_cols, front_rows = [16], base_face = true,
-              rows = bb_rows);
-else if (part == "crossbeam_bottom_back")  crossbeam(base_face = true, rows = bb_rows);
+    crossbeam(front_cols = grid_cols, base_face = true, rows = bb_rows,
+              span = bb_span, x0 = bb_beam_x);
+else if (part == "crossbeam_bottom_back")
+    crossbeam(base_face = true, rows = bb_rows, span = bb_span, x0 = bb_beam_x);
 
 // The handle is integral to side_panel (§2.6), so there are no `handle` or
 // `handle_mic` parts to emit.  handle(), handle_mic() and handle_profile() are
@@ -2002,4 +2042,4 @@ else if (part == "compute_box_front_cover") compute_box_front_cover();
 // straight into the opening; render in PREVIEW so the colours survive.
 else if (part == "compute_box_front_populated") compute_box_front_populated();
 else if (part == "battery_box")
-    translate([-bb_x0, bb_tot_z, frame_d]) rotate([-90, 0, 0]) battery_box();
+    translate([-bb_x0, -bb_z0, frame_d]) rotate([-90, 0, 0]) battery_box();
