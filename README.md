@@ -1,4 +1,4 @@
-# Modular manpack internal frame — Retevis RT-95 / AnyTone AT-779UV
+# Modular manpack internal frame — AnyTone AT-779UV
 
 This is a clean-room decomposition of the single-piece reference STL from
 [RT-95 Manpack Rails and BNC bulkhead antenna mount](https://makerworld.com/en/models/1117937-rt-95-manpack-rails-and-bnc-bulkhead-antenna-mount?from=search#profileId-1115768) with the following notable changes:
@@ -67,7 +67,7 @@ Two measurements drove real design decisions and are worth calling out:
 
 | #   | Part                       | Qty   | Print size (mm)   | Solid vol | Inserts |
 | --- | -------------------------- | ----- | ----------------- | --------- | ------- |
-| 1   | `side_panel`               | 2     | 175 × 70 × 9      | 68.8 cm³  | —       |
+| 1   | `side_panel`               | 2     | 175 × 70 × 9      | 71.8 cm³  | —       |
 | 2a  | `crossbeam_top_front_dual` | 1\*\* | 124.25 × 16 × 24  | 44.5 cm³  | 12      |
 | 2b  | `crossbeam_top_front_triple` | 1\*\* | 124.25 × 16 × 24  | 43.5 cm³  | 16      |
 | 2c  | `crossbeam_top_front_grid` | 1\*\* | 124.25 × 16 × 24  | 43.1 cm³  | 18      |
@@ -130,13 +130,13 @@ Largest part is the side panel at 175 mm — **5 mm of bed margin**, the tightes
 in the project. All meshes verified
 watertight, single-shell, and bed-legal.
 
-Solid volume is 838 cm³ for one of each of the fifteen part files. A full
-**11-piece** build (BNC mounts, battery box, no compute module) is **444 cm³** with
-the grid beam, 445 with the triple, 446 with the dual; add 111 cm³ for the slim
+Solid volume is 841 cm³ for one of each of the fifteen part files. A full
+**11-piece** build (BNC mounts, battery box, no compute module) is **451 cm³** with
+the grid beam, 451 with the triple, 452 with the dual; add 111 cm³ for the slim
 front compute box with its cover, or **226 cm³** for the inline one — it hangs below
 the battery box and changes nothing else in the build.
 
-That is **113 cm³ lighter than before the tab joint**, which was a 12-piece build
+That is **106 cm³ lighter than before the tab joint**, which was a 12-piece build
 at 557 cm³: the base plate's 113 cm³ gone outright, less what the battery box put
 back on in tabs, plus 20 cm³ off the three shortened bottom beams. It is also one
 part fewer and 25 mm shorter. The handle adds nothing separately; it is part of the
@@ -158,9 +158,8 @@ simple flat print.
 
 - Radio mount: **two** Ø5.000 through-holes at Y 35, each with the Ø26.468 × 5.5 mm
   outer-face recess, verbatim from the reference. **Z 98** is the ported reference
-  position and suits the RT-95; **Z 129** is 31 mm higher for the AT-779UV. Both
-  are set by the frame top, so they do not move if the bay height changes. Use
-  whichever pair matches the radio; the unused pair is just a drain hole.
+  set by the frame top, so it does not move if the bay height changes. There used
+  to be a second pair 31 mm lower; see §2.13.
 - **8 × M4 clearance holes**, heads counterbored flush in the **outer** face, into
   the four crossbeams — two rows per beam, at global Z 31.5 / 42.5 and
   162.5 / 173.5.
@@ -843,27 +842,41 @@ Losing those fixings bought back the clearance that was the tightest thing on th
 part. The 24 mm screw span made the hardware 30 mm wide and left **1 mm** to the
 switch bezel; a bare Ø12 leaves **10 mm**.
 
-### Radio mount positions — why two sets of holes
+### Radio mount position — and why the RT-95 was dropped
 
-The two radios differ almost entirely in the dimension that becomes the standing
-height in this frame:
+The mount is **one M5 hole per side at Z 129**, derived from the frame top rather
+than the bay centre: the radio's control face sits 0.5 mm below `z_tb1`, so the
+hole follows automatically if the radio's depth changes.
 
 | Radio            | W × D × H          | Standing height | Mount hole |
 | ---------------- | ------------------ | --------------- | ---------- |
-| Retevis RT-95    | 124 × **163** × 39 | 163 mm          | **Z 98**   |
 | AnyTone AT-779UV | 124 × **101** × 36 | 101 mm          | **Z 129**  |
 
-With a single hole at Z 98 and each radio's side hole at its own mid-depth, the
-RT-95 spans Z 16.5–179.5 — filling the frame with its face flush at the top. The
-AT-779UV spans Z 47.5–148.5, leaving its control face 31 mm down inside the
-frame. That is the "too low" symptom exactly, and it makes the offset
-(163 − 101) / 2 = **31 mm**. At Z 129 the AT-779UV's face reaches the same 179.5
-the RT-95 does.
+**The Retevis RT-95 no longer fits and has been removed from the design.** The
+frame was originally ported for it, and it fails now on two independent counts:
 
-The two Ø26.468 recesses end up 4.5 mm apart. The material between them is full
-9 mm thickness — only the recess discs themselves are thinned to 3.5 mm.
+| | RT-95 needs | frame provides | |
+| --- | --- | --- | --- |
+| standing height | 163 mm | **154.5 mm** — panel bottom Z 25 to the radio's top line at Z 179.5 | **8.5 mm short** |
+| body thickness | 39 mm | **38 mm** clear between the crossbeams | **1 mm interference** |
 
----
+The height failure is the fatal one, and **no mounting position fixes it** — the
+body is simply taller than the space between the two planes. At the old Z 98 hole
+it spanned Z 16.5–179.5, protruding 8.5 mm below the frame and into the battery
+box's top flange at Z 17–25.
+
+**It became true when the frame datum moved.** With `panel_z0` at Z 16 the RT-95's
+bottom at 16.5 just cleared. Raising it to **Z 25** — which is what made the
+unified side panel fit the 180 mm bed (§2.6) — took 9 mm out of the one dimension
+the RT-95 had no margin in. The depth interference predates that and was already
+recorded as an open item.
+
+The reference STL is still an RT-95 part and is credited as such in §1 and under
+Resources. The frame itself is an AT-779UV frame.
+
+The Ø26.468 recess is 5.5 mm deep, leaving the 3.5 mm ligament that carries the
+radio. With the second pair gone there is no longer a 4.5 mm gap between two
+recesses to worry about.
 
 ---
 
@@ -1205,6 +1218,7 @@ OpenSCAD re-exports differ byte-wise for identical geometry.
 | `compute_box_inline` | moves to the bottom of the stack: no feet, no raceway, sealed floor, prints floor-down (§12) |
 | `compute_box_inline_cover` | bolts up into the battery box's feet, gains six lugs for the horizontal tray screws and a Ø12 grommet in place of the raceway |
 | `side_panel` ×2 | the unified panel + handle |
+| `side_panel` ×2 | **model only, no reprint needed** — the RT-95's M5 pair at Z 129−31 was removed (§2.13). Panels already printed carry the extra hole harmlessly; the radio mounts at the Z 129 pair either way. |
 
 **Nothing else changed** at any point in that sequence — the top beams, both
 antenna mounts and the front compute box came back byte-for-byte identical every
@@ -1244,13 +1258,9 @@ panel's holes are.
    control panel — but it means a radio thicker than 38 mm needs `frame_d`
    increased.
 
-5. **The RT-95 does not fit this frame in Y.** Its 39 mm body against the 38 mm
-   clear channel between the front and back crossbeams is a **1 mm
-   interference** — the mount holes at Z 98 are right for it, but the beams are
-   1 mm too close. The fix is `beam_d` 16 → 15, giving 40 mm clear, but that
-   means reprinting all four crossbeams, so it has been left alone rather than
-   forced on a frame that is already built and working with the AT-779UV. The
-   model prints a warning rather than failing when `radio = "rt95"`.
+5. **RESOLVED — the RT-95 has been dropped from the design.** It was 1 mm too
+   thick for the channel between the crossbeams and, once the frame datum rose to
+   Z 25 for the unified panel, **8.5 mm too tall** for the bay as well. See §2.13.
 
 6. The Ø26.468 × 5.5 mm recess is reproduced because the brief says to transfer
    the radio mounts, but its purpose is inferred: it is far too large for an M5

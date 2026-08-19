@@ -1,5 +1,5 @@
 // =============================================================================
-//  Modular manpack internal frame -- Retevis RT-95 / AnyTone AT-779UV
+//  Modular manpack internal frame -- AnyTone AT-779UV
 // =============================================================================
 //  Clean-room decomposition of RT95_Manpack_rails_Dual_antenna_mount_STL.stl
 //  (one 140.75 x 85 x 228 mm part) into separately printable modules that all
@@ -45,24 +45,25 @@ show_inline_box = false;
 // -----------------------------------------------------------------------------
 //  RADIO
 // -----------------------------------------------------------------------------
-//  Both radios share the 124 mm width the frame is built around; they differ in
-//  the depth that becomes the standing height, which is why the frame carries two
-//  sets of mount holes.
-//
-//      Retevis RT-95    124 x 163 x 39 mm   -> 163 mm standing
 //      AnyTone AT-779UV 124 x 101 x 36 mm   -> 101 mm standing
 //
+//  The Retevis RT-95 this frame was originally ported for NO LONGER FITS and has
+//  been removed.  It fails on two independent counts:
+//
+//    height  163 mm standing against 154.5 mm of usable bay -- the panel bottom at
+//            Z 25 to the radio's top line at Z 179.5.  Short by 8.5 mm, and no
+//            mounting position fixes it.  This became true when the unified side
+//            panel forced the frame datum from Z 16 up to Z 25 (see the FRAME
+//            section): that took 9 mm out of the one dimension the RT-95 had no
+//            margin in.
+//    depth   39 mm of body in the 38 mm channel between the crossbeams -- 1 mm of
+//            interference, which needed beam_d 16 -> 15 and four reprinted beams.
+//
+//  The reference STL is still an RT-95 part and is credited as such; the frame
+//  itself is an AT-779UV frame now.
 radio_w = 124.25;  // X  [PORTED] clear span measured between the reference rails
-
-rt95_d   = 163;    // Z  standing height
-rt95_h   = 39;     // Y  body thickness
-at779_d  = 101;    // Z  standing height
-at779_h  = 36;     // Y  body thickness
-
-// which radio the assembly views draw
-radio = "at779uv"; // [at779uv, rt95]
-radio_d = (radio == "rt95") ? rt95_d : at779_d;
-radio_h = (radio == "rt95") ? rt95_h : at779_h;
+radio_d = 101;     // Z  standing height
+radio_h = 36;      // Y  body thickness
 
 // -----------------------------------------------------------------------------
 //  FRAME
@@ -218,25 +219,16 @@ bb_rows = [beam_h/2 - beam_dz, beam_h/2 + beam_dz];        // 6.5, 17.5 beam-loc
 bb_z = [z_bb0 + bb_rows[0], z_bb0 + bb_rows[1]];          // 22.5, 33.5 -- UNCHANGED
 tb_z = [z_tb0 + beam_h/2 - beam_dz, z_tb0 + beam_h/2 + beam_dz]; // 162.5, 173.5
 
-// Radio side bolts.  Y is the bay centre for both radios, exactly as the
-// reference.  In Z there are TWO positions:
-//
-//   RT-95     Z 98  -- the ported reference position, bay centre.  A 163 mm
-//                      radio hung here spans Z 16.5..179.5, filling the frame.
-//   AT-779UV  Z 129 -- 31 mm higher, i.e. (163-101)/2, which puts the shorter
-//                      radio's control face at the same 179.5 the RT-95 reaches.
-//                      At the RT-95 hole the AT-779UV sat 31 mm too low.
-//
-// Both hole sets are cut in every panel; use whichever pair suits the radio.
-radio_by      = frame_d / 2;                        // 35
+// Radio side bolts.  Y is the bay centre, exactly as the reference.  ONE position
+// in Z now: there used to be a second pair 31 mm lower for the RT-95, and it went
+// with that radio.  A lower hole can never serve a shorter radio anyway -- the
+// derivation below sets the hole from the frame TOP, so a shorter body wants a
+// HIGHER hole, not a lower one.
+radio_by = frame_d / 2;                             // 35
 //  Set by the FRAME TOP, not the bay centre: the radio's control face sits 0.5 mm
-//  below z_tb1 in both cases.  The old form centred the RT-95 in the bay and only
-//  coincidentally landed there, so it moved whenever bay_h changed.  Both
-//  expressions give the same numbers as before, 98 and 129.
-radio_bz_rt95 = z_tb1 - 0.5 - rt95_d / 2;           // 98
-radio_bz_at779= z_tb1 - 0.5 - at779_d / 2;          // 129
-radio_bz_all  = [radio_bz_rt95, radio_bz_at779];
-radio_bz = (radio == "rt95") ? radio_bz_rt95 : radio_bz_at779;
+//  below z_tb1.  The old form centred the radio in the bay and only coincidentally
+//  landed there, so it moved whenever bay_h changed.
+radio_bz = z_tb1 - 0.5 - radio_d / 2;               // 129
 radio_z0 = radio_bz - radio_d / 2;
 radio_z1 = radio_bz + radio_d / 2;
 
@@ -580,16 +572,13 @@ module side_panel() {
         }
 
         // --- [PORTED] radio mount: M5 through-hole + outer-face recess ---
-        // Two sets, one per radio.  Lower = RT-95 (the ported position), upper =
-        // AT-779UV, 31 mm higher so the shorter radio's face reaches the same
-        // height.  Recess edges end up 4.5 mm apart; the material between them is
-        // full 9 mm thickness, only the discs themselves are thinned to 3.5 mm.
-        for (bz = radio_bz_all) {
-            translate([-1, radio_by, bz]) rotate([0, 90, 0])
-                cylinder(d = m5_clear, h = panel_t + 2);
-            translate([-0.01, radio_by, bz]) rotate([0, 90, 0])
-                cylinder(d = m5_recess_d, h = m5_recess_h + 0.01);
-        }
+        // One set.  There was a second pair 31 mm lower for the RT-95; it went when
+        // that radio did.  Panels already printed carry the extra hole harmlessly --
+        // it is a drain, and the radio mounts at this pair either way.
+        translate([-1, radio_by, radio_bz]) rotate([0, 90, 0])
+            cylinder(d = m5_clear, h = panel_t + 2);
+        translate([-0.01, radio_by, radio_bz]) rotate([0, 90, 0])
+            cylinder(d = m5_recess_d, h = m5_recess_h + 0.01);
 
         // --- crossbeam bolts: heads recessed in the OUTER face ---
         for (y = [beam_cy_f, beam_cy_b], z = concat(bb_z, tb_z))
