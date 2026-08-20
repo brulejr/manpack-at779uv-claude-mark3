@@ -340,33 +340,6 @@ base_bolt_x = [35, frame_w - 35];             // 35, 107.25
 foot_x      = [14, frame_w - 14];             // 14, 128.25
 foot_y      = [12, frame_d - 12];             // 12, 58
 
-// Base-plate central opening.  The plate is a ring: all that remains is the
-// perimeter backing the two side panels (X 0..9 and 133.25..142.25) and the two
-// bottom crossbeams, widened front and back to carry the feet.
-//
-// It cannot follow the beam lines exactly.  The Ø16 feet at Y 12 / 58 reach 4 mm
-// past them, and corner rounding cannot rescue it: at Y 16..54 the largest
-// radius that fits (19) is still short of the 19.2 needed to clear a foot.
-// Counter-intuitively a LARGER radius helps -- a small corner brings the opening
-// nearer the foot -- so the optimum is the limit case, a full stadium.
-//
-// This also supersedes the old 36 x 26 cable slot: the opening spans the same
-// 30 mm of Y and the entire width, so it passes anything the slot did.
-// Inset 2 mm from the panel inner faces rather than tangent to them.  Tangent
-// left exactly zero margin at the arc's leftmost point, and because the plate
-// prints upside down that face is the first layer, where elephant-foot
-// compensation enlarges a hole -- which would have let the opening creep ~0.2 mm
-// under the panel edge.  Costs ~120 mm2 of opening, 3%.
-base_open_inset = 2;
-base_open_x0 = panel_t + base_open_inset;                 // 11
-base_open_x1 = frame_w - panel_t - base_open_inset;       // 131.25
-base_open_y0 = 20;
-base_open_y1 = frame_d - base_open_y0;                    // 50
-base_open_r  = (base_open_y1 - base_open_y0) / 2;         // 15 -> stadium ends
-// material left between a foot boss and the opening edge
-base_open_gap = sqrt(pow(base_open_x0 + base_open_r - foot_x[0], 2) +
-                     pow(base_open_y0 + base_open_r - foot_y[0], 2))
-                - base_open_r - foot_d / 2;
 
 // panel windows: kept well clear of the M5 recess ligament and every counterbore
 // Panel windows.  The upper one used to sit at Z 118..132, which the new
@@ -408,10 +381,6 @@ echo(str("panel print footprint = ", panel_print_h, " x ", frame_d,
          "  (bed ", BED, ") -> margin ", BED - panel_print_h, " mm"));
 echo(str("panel under M5 recess = ", panel_t - m5_recess_h,
          " mm of material carrying the radio"));
-echo(str("base plate opening    = ", base_open_x1 - base_open_x0, " x ",
-         base_open_y1 - base_open_y0, " mm stadium, leaving ", base_open_gap,
-         " mm of material to each foot"));
-assert(base_open_gap >= 1.5, "base plate opening cuts too close to the feet");
 echo(str("top-front layout      = ", top_front, ", ", len(front_cols),
          " bolt columns at X ", front_cols));
 echo(str("                        ",

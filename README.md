@@ -1,5 +1,45 @@
 # Modular manpack internal frame — AnyTone AT-779UV
 
+A 3D-printed internal frame that turns a mobile amateur-radio transceiver into a
+self-contained man-portable pack. The **AnyTone AT-779UV** bolts into a rigid box
+of two side panels and four crossbeams; a battery box carrying a 12 V LiFePO4 pack
+joins underneath, and an optional compute module hangs below that with a Libre
+Computer La Frite for logging and digital modes. Antenna bulkheads mount on a rail
+across the top front, so the coax terminates at the frame rather than dangling off
+the radio.
+
+Nothing is glued and nothing is printed as one piece. The joints are stainless
+socket caps into brass heat-set inserts — M4 where the frame carries load, M3 only
+where an off-the-shelf part dictates it — so the stack comes apart for service and
+grows by bolting another module beneath the last one.
+
+**It is built around one bag.** The target is a
+[Qcute waterproof MOLLE sling pack](https://www.amazon.com/dp/B014XYQI18) — the
+frame's outside dimensions are what that bag will swallow, not what the radio alone
+would need. The fit is tight enough to have driven real design changes: a built
+pack showed the original bolt-on handle loops reading as two blocky slabs and
+catching on a bag they only just fitted, so the handles were folded into the side
+panels instead. That took assembled width from 166.25 mm to **142.25 mm** and
+removed two parts and twelve bolts along the way.
+
+| | |
+| --- | --- |
+| Frame body | 142.25 × 70 × 180 mm |
+| Assembled, including antenna brackets | 142.25 × 108 × 200 mm |
+| Pack height, radio + battery | 226.8 mm |
+| Pack height, + compute module | 281.8 mm |
+| Radio bay | 124.25 × 38 × 107 mm |
+
+**Everything prints on a Prusa Mini.** The reference design this began from is a
+single 228 mm part that fits no orientation on a 180 × 180 bed. It is decomposed
+here into 13 printable pieces, the largest being the side panel at 175 mm — 5 mm of
+margin, the tightest tolerance in the project. A complete frame with its battery
+box is 11 parts and roughly 451 cm³ of plastic.
+
+Printed in PLA and in service.
+
+## Background
+
 This is a clean-room decomposition of the single-piece reference STL from
 [RT-95 Manpack Rails and BNC bulkhead antenna mount](https://makerworld.com/en/models/1117937-rt-95-manpack-rails-and-bnc-bulkhead-antenna-mount?from=search#profileId-1115768) with the following notable changes:
 
