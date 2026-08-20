@@ -32,7 +32,7 @@ removed two parts and twelve bolts along the way.
 
 **Everything prints on a Prusa Mini.** The reference design this began from is a
 single 228 mm part that fits no orientation on a 180 × 180 bed. It is decomposed
-here into 13 printable pieces, the largest being the side panel at 175 mm — 5 mm of
+here into 14 printable pieces, the largest being the side panel at 175 mm — 5 mm of
 margin, the tightest tolerance in the project. A complete frame with its battery
 box is 11 parts and roughly 451 cm³ of plastic.
 
@@ -43,7 +43,7 @@ Printed in PLA and in service.
 This is a clean-room decomposition of the single-piece reference STL from
 [RT-95 Manpack Rails and BNC bulkhead antenna mount](https://makerworld.com/en/models/1117937-rt-95-manpack-rails-and-bnc-bulkhead-antenna-mount?from=search#profileId-1115768) with the following notable changes:
 
-- Separated into printable modules — **13 STLs**, counting alternates — each of
+- Separated into printable modules — **14 STLs**, counting alternates — each of
   which fits a Prusa Mini (180 × 180 mm bed).
 - Every module-to-module joint uses stainless M4 socket-cap bolts into brass heat-set inserts.
   M3 appears only where an off-the-shelf part dictates it: the SBC and covers in
@@ -115,21 +115,24 @@ Two measurements drove real design decisions and are worth calling out:
 | 4a  | `crossbeam_bottom_front`      | 1\*\*\*\*           | **106.25** × 16 × 24 | 39.5 cm³  | 4        |
 | 4b  | `crossbeam_bottom_front_rail` | 1\*\*\*\*           | **106.25** × 16 × 24 | 36.2 cm³  | 18       |
 | 5   | `crossbeam_bottom_back`       | 1                   | **106.25** × 16 × 24 | 39.5 cm³  | 4        |
-| 7   | `antenna_mount_bnc`           | 2\*                 | 35 × 24 × 33         | 10.9 cm³  | —        |
-| 8   | `antenna_mount_so239`         | 2\*                 | 35 × 24 × 38         | 11.6 cm³  | —        |
+| 7a  | `antenna_mount_bnc`           | 2\*                 | 35 × 24 × 33         | 10.9 cm³  | —        |
+| 7b  | `antenna_mount_so239`         | 2\*                 | 35 × 24 × 38         | 11.6 cm³  | —        |
+| 7c  | `antenna_mount_usb`           | 2\*                 | 35 × 24 × 37         | 11.6 cm³  | —        |
 | 10  | `battery_box`                 | **1, not optional** | 143 × 83.8 × 94.8    | 116.8 cm³ | 4 + tabs |
 | 12a | `compute_box_inline`          | 1\*\*\*             | 143 × 100 × 39       | 107.8 cm³ | 4 + 2 M3 |
 | 12b | `compute_box_inline_cover`    | 1\*\*\*             | 143 × 100 × 18       | 118.1 cm³ | 6 M3     |
 
-Numbers track the §2 subsections below, so 6 and 9 are absent as _parts_: §2.6 is
-the handle, now part of the side panel, and §2.9 is the bottom joint, which is
-made by the battery box's tabs rather than by a part of its own.
+Numbers track the §2 subsections below, so 6, 8 and 9 are absent as _parts_: §2.6
+is the handle, now part of the side panel; §2.8 folded into §2.7 when the antenna
+mount gained a third connector variant and all three became alternates of one
+bracket; and §2.9 is the bottom joint, which is made by the battery box's tabs
+rather than by a part of its own.
 
 \*\* Parts 2a–2c are alternatives — the three top-front layouts (§2.11). Print one.
 `_dual` is the original and is bit-identical to it, so an existing beam still fits.
 
-\* Parts 7 and 8 are alternatives — print **two of whichever connector you use**,
-not both. They share an identical leg, rib and bolt pattern, so they are
+\* Parts 7a–7c are alternatives — print **two of whichever connector you use**, not
+a mixture. They share an identical leg, rib and bolt pattern, so they are
 interchangeable on the same crossbeam without touching anything else.
 
 \*\*\* Part 12a is the only compute module, and it is optional. 12b is its cover and
@@ -161,14 +164,14 @@ the bottom joint (§2.9). Everything else is opt-in.
 | ----------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Top-front beam    | `_dual` / `_triple` / `_grid` | `_dual` if you only want two antenna mounts and already own the printed beam — it is bit-identical. `_grid` if you want the accessory rail. `_triple` for three stations. |
 | Bottom-front beam | plain / `_rail`               | **The plain one.** `_rail` has no user now that the front compute boxes are gone; it is kept only for a future front accessory.                                           |
-| Antenna mounts ×2 | `_bnc` / `_so239`             | Two of whichever connector you use — never one of each. Same leg and bolt pattern, so you can swap later.                                                                 |
+| Antenna mounts ×2 | `_bnc` / `_so239` / `_usb`    | Two of whichever connector you use — never one of each. Same leg and bolt pattern, so you can swap later. `_usb` is a keyed Ø15 bulkhead rather than an antenna.          |
 | Compute module    | `_inline` / none              | One option. **`_inline` hangs under the battery box** on its four feet and needs nothing else changed. Most builds need none of it.                                       |
 
 Largest part is the side panel at 175 mm — **5 mm of bed margin**, the tightest
 in the project. All meshes verified
 watertight, single-shell, and bed-legal.
 
-Solid volume is 730 cm³ for one of each of the thirteen part files. A full
+Solid volume is 742 cm³ for one of each of the fourteen part files. A full
 **11-piece** build (BNC mounts, battery box, no compute module) is **451 cm³** with
 the grid beam, 451 with the triple, 452 with the dual. Add **226 cm³** for the
 inline compute module — it hangs below the battery box and changes nothing else in
@@ -362,25 +365,26 @@ span and _grows_ to 8.25 mm into the shoulders.
 | stress, one-handed 6× drop-catch | 7.06 MPa | **3.47 MPa**  |
 | safety factor (PLA)              | 7.1      | **14.4**      |
 
-### 7–8 — `antenna_mount_bnc` / `antenna_mount_so239`
+### 7 — `antenna_mount_bnc` / `_so239` / `_usb`
 
-| BNC                                             | SO-239                                              |
-| ----------------------------------------------- | --------------------------------------------------- |
-| ![antenna_mount_bnc](img/antenna_mount_bnc.png) | ![antenna_mount_so239](img/antenna_mount_so239.png) |
+| BNC                                             | SO-239                                              | USB                                             |
+| ----------------------------------------------- | --------------------------------------------------- | ----------------------------------------------- |
+| ![antenna_mount_bnc](img/antenna_mount_bnc.png) | ![antenna_mount_so239](img/antenna_mount_so239.png) | ![antenna_mount_usb](img/antenna_mount_usb.png) |
 
-The reference ear, made modular and offered in two connector variants. Both share
-an identical leg, gusset ribs and M4 bolt pattern, so either bolts to the same
-inserts in the top-front crossbeam — you can swap connector type later without
-reprinting anything else.
+The reference ear, made modular and offered in three bulkhead variants. All three
+share an identical leg, gusset ribs and M4 bolt pattern, so any of them bolts to
+the same inserts in the top-front crossbeam — you can swap connector type later
+without reprinting anything else.
 
-|                       | `antenna_mount_bnc`     | `antenna_mount_so239`                      |
-| --------------------- | ----------------------- | ------------------------------------------ |
-| Connector             | BNC bulkhead            | SO-239 / UHF female, 4-hole flange         |
-| Bore                  | **Ø12.468 mm** [PORTED] | **Ø15.88 mm** (0.625")                     |
-| Flange screws         | —                       | 4 × Ø3.4 on a **17.98 mm** square (0.708") |
-| Forward reach         | 25 mm [PORTED]          | 30 mm                                      |
-| Bore setback from tip | 12.66 mm [PORTED]       | 17 mm                                      |
-| Print size            | 35 × 24 × 33 mm         | 35 × 24 × 38 mm                            |
+|                       | `antenna_mount_bnc`     | `antenna_mount_so239`                      | `antenna_mount_usb`              |
+| --------------------- | ----------------------- | ------------------------------------------ | -------------------------------- |
+| Connector             | BNC bulkhead            | SO-239 / UHF female, 4-hole flange         | USB bulkhead, Ø23 body           |
+| Bore                  | **Ø12.468 mm** [PORTED] | **Ø15.88 mm** (0.625")                     | **Ø15.5 mm, keyed**              |
+| Anti-rotation         | —                       | the flange screws                          | **1.0 mm flat** on +X, 14.5 a/f  |
+| Flange screws         | —                       | 4 × Ø3.4 on a **17.98 mm** square (0.708") | — (captive on its own nut)       |
+| Forward reach         | 25 mm [PORTED]          | 30 mm                                      | 29 mm                            |
+| Bore setback from tip | 12.66 mm [PORTED]       | 17 mm                                      | 14.5 mm                          |
+| Print size            | 35 × 24 × 33 mm         | 35 × 24 × 38 mm                            | 35 × 24 × 37 mm                  |
 
 The BNC variant is the reference connector carried over verbatim — the reference
 STL is itself titled a _BNC bulkhead_ antenna mount, which is what the Ø12.468
@@ -388,14 +392,41 @@ bore is for. The SO-239 variant reaches 30 mm rather than 25 mm and sets its bor
 17 mm back from the tip; both were needed so the rear pair of flange screws clears
 the bracket's own leg and the front pair keeps material at the pad tip.
 
-**Both variants are a single symmetric part used twice.** An earlier revision
-needed a mirrored left/right pair because the bolt columns were offset to dodge
-the crossbeam's end-insert pockets. Insetting the whole bracket 6 mm from the
-panel inner face solves that instead, which lets the bolts sit symmetrically
-between the ribs and removes the handedness.
+The USB variant is not an antenna at all — it is the same bracket carrying a
+panel-mount USB bulkhead, so a port can be brought out to the frame instead of
+left dangling on a cable. It has no flange screws: the connector is captive on its
+own nut, and what stops it spinning when a plug is twisted in is a **flat on the
+bore**. The flat is a feature of the connector, so `usb_flat_dp` — its **depth**,
+1.0 mm — is the fixed quantity, and the across-flats figure is derived from it as
+`usb_bore_d - usb_flat_dp` = 14.5 mm. Stating it the other way round leaves two
+independent literals that drift apart the moment the bore changes, which is
+exactly what happened when the bore was corrected from 15 to 15.5 mm.
+
+Its reach and setback are not free choices. The Ø23 body has to clear the pad's
+front tip and the bracket leg by `usb_margin` at both ends, which fixes the reach
+at `usb_body_d + 2 × usb_margin` = 29 mm and centres the bore in it at 14.5 mm.
+Change the body diameter and both follow; an assert catches a body that would
+overhang the tip or foul the leg.
+
+**The flat faces +X**, the bracket's inboard side, set by `usb_flat_az`. Which way
+it points is a free choice: the bracket is placed twice **unmirrored**, so any
+azimuth keys both mounts identically. The pad is symmetric about the bore in X,
+and the flat only ever removes bore — never pad — so no azimuth brings it nearer a
+gusset rib. The bore's nearest edge stays 4.75 mm clear of the rib either way.
+
+**All three variants are one part printed twice, never a mirrored pair.** An
+earlier revision needed a handed left/right pair because the bolt columns were
+offset to dodge the crossbeam's end-insert pockets. Insetting the whole bracket
+6 mm from the panel inner face solves that instead, which lets the bolts sit
+symmetrically between the ribs and removes the handedness. The assembly places
+both brackets by translation only — there is no `mirror()` — which is why the USB
+variant may key its flat to one side without becoming handed: the same print goes
+to both stations with the flat pointing the same way in the frame.
 
 Verified: bore clear below each pad for the connector body, all four flange-screw
-nut positions clear, and zero enclosed voids in either part.
+nut positions clear, and zero enclosed voids in any of the three. The USB bore
+measures 15.50 mm across the round axis and 14.50 mm across the flat, with the
+flat on the +X side and 4.75 mm of clearance from the bore to the nearest rib.
 
 ### 9 — the bottom joint: tabs, not a plate
 
@@ -866,6 +897,7 @@ is easy to miss when ordering. Everything structural stays M4.
 | **Inline box cover → battery box feet**                        | **M4 × 12**             | **4**       | battery box feet                     |
 | Inline box tray → its cover                                    | M3 × 10, **horizontal** | 6           | lugs under the cover                 |
 | SO-239 flange → antenna mount                                  | M3 × 10 + nut           | 4 per mount | (through-holes; SO-239 variant only) |
+| USB bulkhead → antenna mount                                   | its own captive nut     | 1 per mount | (keyed bore; USB variant only)       |
 | La Frite → compute box                                         | M3 × 8                  | 4           | box standoffs                        |
 | **Radio → side panels**                                        | **M5 × 10–12**          | **2**       | the radio's own threaded side holes  |
 
@@ -962,8 +994,9 @@ Not just rendered — checked:
 - **All 24 M4 bolt axes and both M5 axes** traced: each passes through a
   clearance hole in one part and lands inside the insert pocket of the other,
   with no material fouling the shank.
-- Antenna bore clear below each pad for the connector body, and for the SO-239
-  variant all four flange-screw nut positions clear.
+- Antenna bore clear below each pad for the connector body; for the SO-239 variant
+  all four flange-screw nut positions clear, and for the USB variant the Ø23 body
+  clears the pad tip and the bracket leg by 3 mm at both ends.
 - **Void connectivity**: every M4 counterbore traced back to outside air, and
   both antenna brackets confirmed to contain **zero enclosed voids**. This is the
   check that would have caught the v1 bracket, whose two right-hand bolt holes

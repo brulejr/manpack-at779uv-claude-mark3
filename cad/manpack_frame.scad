@@ -20,13 +20,13 @@ $fa = 2;
 $fs = 0.4;
 
 /* [Output] */
-part = "assembly"; // [assembly, exploded, side_panel, crossbeam_top_front_dual, crossbeam_top_front_grid, crossbeam_top_back, crossbeam_bottom_front, crossbeam_bottom_front_rail, crossbeam_bottom_back, crossbeam_top_front_triple, compute_box_inline, compute_box_inline_cover, antenna_mount_bnc, antenna_mount_so239, battery_box]
+part = "assembly"; // [assembly, exploded, side_panel, crossbeam_top_front_dual, crossbeam_top_front_grid, crossbeam_top_back, crossbeam_bottom_front, crossbeam_bottom_front_rail, crossbeam_bottom_back, crossbeam_top_front_triple, compute_box_inline, compute_box_inline_cover, antenna_mount_bnc, antenna_mount_so239, antenna_mount_usb, battery_box]
 
 // which top-front crossbeam the assembly is built with
 top_front = "grid"; // [grid, triple, dual]
 
 // which connector variant the assembly views fit
-ant_style = "bnc"; // [bnc, so239]
+ant_style = "bnc"; // [bnc, so239, usb]
 
 // lightening / ventilation windows in the side panels
 panel_windows = true;
@@ -156,6 +156,30 @@ so239_flange_p    = 17.98;  // 0.708" square pattern pitch
 so239_flange_hole = 3.4;    // clearance for M3 / #4-40
 so239_reach       = 30;     // longer than BNC so the flange screws clear the leg
 so239_setback     = 17;     // bore centre, back from the pad's front tip
+
+// --- variant C: USB bulkhead, keyed (D-shaped) bore ---
+//  A round panel bore with one flat, so the connector cannot spin when a plug is
+//  twisted in.  Unlike the SO-239 the body is NOT screwed to the pad -- it is
+//  captive on its own nut -- so the pad only has to be wide enough to back it and
+//  long enough that the body clears both ends.
+usb_bore_d  = 15.5;    // panel cutout, measured off the connector
+usb_body_d  = 23;      // body / shoulder OD: what the pad must actually clear
+// The flat is a feature of the CONNECTOR, so its depth is the fixed quantity and
+// the across-flats measurement follows the bore.  Stated the other way round the
+// two would drift apart the moment the bore changed -- which is exactly what
+// happened when the bore went 15 -> 15.5.
+usb_flat_dp = 1.0;     // depth of the flat, cut off the bore wall
+usb_flat_af = usb_bore_d - usb_flat_dp;  // 14.5, across flats: flat face to the
+                                         //   far WALL of the bore
+usb_margin  = 3;       // pad material left beyond the body, tip end and leg end
+usb_flat_az = -90;     // which way the flat faces: -90 = +X, the bracket's inboard
+                       //   side.  Free choice -- the bracket is placed twice
+                       //   unmirrored, so either side keys both mounts alike.
+// Reach and setback are consequences of the body, not free choices: the body has
+// to clear the pad's front tip and the bracket leg by usb_margin at both ends,
+// which fixes the reach and centres the bore in it.
+usb_reach   = usb_body_d + 2 * usb_margin;   // 29
+usb_setback = usb_reach / 2;                 // 14.5 -> body centred on the pad
 
 // -----------------------------------------------------------------------------
 //  PORTED HANDLE FEATURE
@@ -370,7 +394,7 @@ grip_round = 2;      // edge radius on the arch, through the plate's 9 mm.  2 ra
 BED = 180;
 echo(str("frame body            = ", frame_w, " x ", frame_d, " x ", z_tb1, " mm"));
 echo(str("assembled envelope    = ", frame_w, " x ",
-         frame_d + ant_leg_t + max(bnc_reach, so239_reach), " x ",
+         frame_d + ant_leg_t + max(bnc_reach, so239_reach, usb_reach), " x ",
          handle_z2, " mm  (depth shown for the deeper SO-239 bracket)"));
 echo(str("radio bay (WxDxH)     = ", radio_w, " x ", frame_d - 2 * beam_d,
          " x ", bay_h, " mm"));
@@ -405,6 +429,16 @@ assert(triple_pitch > ant_bracket_w,
 assert(ant_bolt_dx[0] - m4_cb_d/2 >= ant_rib_t &&
        ant_bolt_dx[1] + m4_cb_d/2 <= ant_bracket_w - ant_rib_t,
        "antenna bracket bolts overlap its gusset ribs");
+// USB variant: the flat must fall between the bore centre and the bore wall --
+// at or past the centre it would sever the bore, at the wall there is no flat.
+assert(usb_flat_af > usb_bore_d / 2 && usb_flat_af < usb_bore_d,
+       "USB flat lies outside the bore");
+// the body has to sit on the pad, not hang off its tip or foul the leg
+assert(usb_setback - usb_body_d / 2 >= usb_margin &&
+       usb_reach - usb_setback - usb_body_d / 2 >= usb_margin,
+       "USB bulkhead body overhangs the pad tip or fouls the bracket leg");
+assert(usb_body_d <= ant_bracket_w,
+       "USB bulkhead body is wider than the antenna bracket pad");
 // panel_h is only the plate portion now; the part that has to fit the bed is the
 // panel PLUS the integral handle, panel_z0 up to handle_z2.
 assert(panel_print_h <= BED && frame_d <= BED,
@@ -665,7 +699,7 @@ module panel_profile() {
 
 
 // =============================================================================
-//  PART 4 -- antenna_mount  (x2; the right-hand one is mirrored)
+//  PART 4 -- antenna_mount  (x2, identical; placed twice, NOT mirrored)
 // -----------------------------------------------------------------------------
 //  The reference's cantilevered antenna ear -- Ø12.468 hole, 3.75 mm pad, 25 mm
 //  forward reach, diagonal gusset -- made modular.  Bolts to the FRONT FACE of
@@ -673,7 +707,27 @@ module panel_profile() {
 //  Local frame: X 0..ant_bracket_w (0 = outboard edge), Y -(leg+reach)..0,
 //               Z 0..beam_h (0 = the top-front beam's underside).
 // =============================================================================
-module antenna_mount(bore_d, reach, setback, flange_p = 0, flange_d = 0) {
+//  Connector bore.  af = 0 gives a plain round hole; af > 0 gives a round hole
+//  with one flat, keyed against rotation.  af is measured ACROSS FLATS -- from
+//  the flat face straight across to the far wall -- so the flat plane sits
+//  (af - d/2) off centre.
+//
+//  az rotates which way the flat faces: 0 = +Y (toward the bracket leg), 90 = -X,
+//  -90 = +X.  Orientation is free here because the bracket is placed twice
+//  UNMIRRORED, so whichever way the flat points, both mounts key their connector
+//  identically.  The pad is symmetric about the bore in X, and the flat only ever
+//  removes bore, never pad, so no azimuth brings it nearer a gusset rib.
+module keyed_bore(d, af, h, az = 0) {
+    if (af <= 0) cylinder(d = d, h = h);
+    else intersection() {
+        cylinder(d = d, h = h);
+        rotate([0, 0, az])
+            translate([-d, -d, -1]) cube([2 * d, d + af - d / 2, h + 2]);
+    }
+}
+
+module antenna_mount(bore_d, reach, setback, flange_p = 0, flange_d = 0,
+                     flat_af = 0, flat_az = 0) {
     pad_z0 = beam_h - ant_pad_t;        // 20.25
     tip_y  = -(ant_leg_t + reach);
     bore_y = tip_y + setback;
@@ -700,9 +754,9 @@ module antenna_mount(bore_d, reach, setback, flange_p = 0, flange_d = 0) {
                         polygon([[tip_y, pad_z0], [tip_y, beam_h], [0, beam_h],
                                  [0, 0], [-ant_leg_t, 0]]);
         }
-        // connector bore
+        // connector bore, keyed if the variant calls for it
         translate([bore_x, bore_y, pad_z0 - 1])
-            cylinder(d = bore_d, h = ant_pad_t + 2);
+            keyed_bore(bore_d, flat_af, ant_pad_t + 2, flat_az);
         // SO-239 only: four flange screw holes on a square pattern
         if (flange_p > 0)
             for (dx = [-flange_p/2, flange_p/2], dy = [-flange_p/2, flange_p/2])
@@ -725,9 +779,16 @@ module antenna_mount_so239() {
                   so239_flange_p, so239_flange_hole);
 }
 
+module antenna_mount_usb() {
+    antenna_mount(usb_bore_d, usb_reach, usb_setback,
+                  flat_af = usb_flat_af, flat_az = usb_flat_az);
+}
+
 // the variant drawn in the assembly views
 module antenna_mount_fitted() {
-    if (ant_style == "so239") antenna_mount_so239(); else antenna_mount_bnc();
+    if (ant_style == "so239") antenna_mount_so239();
+    else if (ant_style == "usb") antenna_mount_usb();
+    else antenna_mount_bnc();
 }
 
 // =============================================================================
@@ -1376,6 +1437,7 @@ else if (part == "crossbeam_bottom_back")
 
 else if (part == "antenna_mount_bnc")   rotate([-90, 0, 0]) antenna_mount_bnc();
 else if (part == "antenna_mount_so239") rotate([-90, 0, 0]) antenna_mount_so239();
+else if (part == "antenna_mount_usb")   rotate([-90, 0, 0]) antenna_mount_usb();
 
 // upside down: flat top face on the bed, feet upward, and every counterbore and
 // insert mouth opening upward -- no supports, no bridges
