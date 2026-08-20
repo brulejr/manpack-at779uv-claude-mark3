@@ -15,8 +15,8 @@ This is a clean-room decomposition of the single-piece reference STL from
   (§2.9) — no base plate, no feet, and it is a structural member rather than an
   accessory.
 
-| frame + battery box | with `compute_box_inline` in the stack |
-| --- | --- |
+| frame + battery box          | with `compute_box_inline` in the stack      |
+| ---------------------------- | ------------------------------------------- |
 | ![assembly](img/asm_iso.png) | ![assembly, inline box](img/asm_inline.png) |
 
 There is **no base plate.** The battery box's four tabs stand in the ends of the two
@@ -49,7 +49,7 @@ watertight body, **140.75 × 85.00 × 228.00 mm**, 226.9 cm³:
 | Handles           | integral loop in the top of each rail: **33.75 × 18.5 mm** hand aperture, **11.5 mm** grip bar                                                                                                                                                  |
 | Feet              | integral bottom arch: 40 × 40 mm aperture, 3.19 mm ground pad                                                                                                                                                                                   |
 
-**228 mm tall is why it cannot print on a Mini.** A 60 × 228 rectangle will not
+**228 mm tall is why it cannot print on a Prusa Mini.** A 60 × 228 rectangle will not
 fit a 180 × 180 square at any rotation ((228 + 60)/√2 = 203.6 > 180).
 
 Two measurements drove real design decisions and are worth calling out:
@@ -65,23 +65,23 @@ Two measurements drove real design decisions and are worth calling out:
 
 ## 2. Part breakdown
 
-| #   | Part                       | Qty   | Print size (mm)   | Solid vol | Inserts |
-| --- | -------------------------- | ----- | ----------------- | --------- | ------- |
-| 1   | `side_panel`               | 2     | 175 × 70 × 9      | 71.8 cm³  | —       |
-| 2a  | `crossbeam_top_front_dual` | 1\*\* | 124.25 × 16 × 24  | 44.5 cm³  | 12      |
-| 2b  | `crossbeam_top_front_triple` | 1\*\* | 124.25 × 16 × 24  | 43.5 cm³  | 16      |
-| 2c  | `crossbeam_top_front_grid` | 1\*\* | 124.25 × 16 × 24  | 43.1 cm³  | 18      |
-| 3   | `crossbeam_top_back`       | 1     | 124.25 × 16 × 24  | 46.3 cm³  | 4       |
-| 4a  | `crossbeam_bottom_front`   | 1\*\*\*\* | **106.25** × 16 × 24  | 39.5 cm³  | 4       |
-| 4b  | `crossbeam_bottom_front_rail` | 1\*\*\*\* | **106.25** × 16 × 24  | 36.2 cm³  | 18      |
-| 5   | `crossbeam_bottom_back`    | 1     | **106.25** × 16 × 24  | 39.5 cm³  | 4       |
-| 7   | `antenna_mount_bnc`        | 2\*   | 35 × 24 × 33      | 10.9 cm³  | —       |
-| 8   | `antenna_mount_so239`      | 2\*   | 35 × 24 × 38      | 11.6 cm³  | —       |
-| 10  | `battery_box`              | **1, not optional** | 143 × 83.8 × 94.8 | 116.8 cm³ | 4 + tabs |
-| 12a | `compute_box_inline`       | 1\*\*\* | 143 × 100 × 39 | 107.8 cm³ | 4 + 2 M3 |
-| 12b | `compute_box_inline_cover` | 1\*\*\* | 143 × 100 × 18 | 118.1 cm³ | 6 M3    |
+| #   | Part                          | Qty                 | Print size (mm)      | Solid vol | Inserts  |
+| --- | ----------------------------- | ------------------- | -------------------- | --------- | -------- |
+| 1   | `side_panel`                  | 2                   | 175 × 70 × 9         | 71.8 cm³  | —        |
+| 2a  | `crossbeam_top_front_dual`    | 1\*\*               | 124.25 × 16 × 24     | 44.5 cm³  | 12       |
+| 2b  | `crossbeam_top_front_triple`  | 1\*\*               | 124.25 × 16 × 24     | 43.5 cm³  | 16       |
+| 2c  | `crossbeam_top_front_grid`    | 1\*\*               | 124.25 × 16 × 24     | 43.1 cm³  | 18       |
+| 3   | `crossbeam_top_back`          | 1                   | 124.25 × 16 × 24     | 46.3 cm³  | 4        |
+| 4a  | `crossbeam_bottom_front`      | 1\*\*\*\*           | **106.25** × 16 × 24 | 39.5 cm³  | 4        |
+| 4b  | `crossbeam_bottom_front_rail` | 1\*\*\*\*           | **106.25** × 16 × 24 | 36.2 cm³  | 18       |
+| 5   | `crossbeam_bottom_back`       | 1                   | **106.25** × 16 × 24 | 39.5 cm³  | 4        |
+| 7   | `antenna_mount_bnc`           | 2\*                 | 35 × 24 × 33         | 10.9 cm³  | —        |
+| 8   | `antenna_mount_so239`         | 2\*                 | 35 × 24 × 38         | 11.6 cm³  | —        |
+| 10  | `battery_box`                 | **1, not optional** | 143 × 83.8 × 94.8    | 116.8 cm³ | 4 + tabs |
+| 12a | `compute_box_inline`          | 1\*\*\*             | 143 × 100 × 39       | 107.8 cm³ | 4 + 2 M3 |
+| 12b | `compute_box_inline_cover`    | 1\*\*\*             | 143 × 100 × 18       | 118.1 cm³ | 6 M3     |
 
-Numbers track the §2 subsections below, so 6 and 9 are absent as *parts*: §2.6 is
+Numbers track the §2 subsections below, so 6 and 9 are absent as _parts_: §2.6 is
 the handle, now part of the side panel, and §2.9 is the bottom joint, which is
 made by the battery box's tabs rather than by a part of its own.
 
@@ -117,13 +117,12 @@ Seven of the entries above are alternates, not additions. The minimum working
 frame is **11 parts** — and the battery box is one of them, because its tabs are
 the bottom joint (§2.9). Everything else is opt-in.
 
-| Choose | Options | Pick this if… |
-| ------ | ------- | ------------- |
-| Top-front beam | `_dual` / `_triple` / `_grid` | `_dual` if you only want two antenna mounts and already own the printed beam — it is bit-identical. `_grid` if you want the accessory rail. `_triple` for three stations. |
-| Bottom-front beam | plain / `_rail` | **The plain one.** `_rail` has no user now that the front compute boxes are gone; it is kept only for a future front accessory. |
-| Handles | — | No choice: the handle is integral to the side panel (§2.6). |
-| Antenna mounts ×2 | `_bnc` / `_so239` | Two of whichever connector you use — never one of each. Same leg and bolt pattern, so you can swap later. |
-| Compute module | `_inline` / none | One option. **`_inline` hangs under the battery box** on its four feet and needs nothing else changed. Most builds need none of it. |
+| Choose            | Options                       | Pick this if…                                                                                                                                                             |
+| ----------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Top-front beam    | `_dual` / `_triple` / `_grid` | `_dual` if you only want two antenna mounts and already own the printed beam — it is bit-identical. `_grid` if you want the accessory rail. `_triple` for three stations. |
+| Bottom-front beam | plain / `_rail`               | **The plain one.** `_rail` has no user now that the front compute boxes are gone; it is kept only for a future front accessory.                                           |
+| Antenna mounts ×2 | `_bnc` / `_so239`             | Two of whichever connector you use — never one of each. Same leg and bolt pattern, so you can swap later.                                                                 |
+| Compute module    | `_inline` / none              | One option. **`_inline` hangs under the battery box** on its four feet and needs nothing else changed. Most builds need none of it.                                       |
 
 Largest part is the side panel at 175 mm — **5 mm of bed margin**, the tightest
 in the project. All meshes verified
@@ -149,7 +148,7 @@ both already windowed, so there is no easy mass left to take out.
 
 ![side_panel](img/side_panel.png)
 
-A flat plate spanning **Z 25 to 200** — the frame's side *and* its carrying
+A flat plate spanning **Z 25 to 200** — the frame's side _and_ its carrying
 handle in one part (§2.6). It carries the ported radio mount, through-holes for the
 four crossbeams, and nothing else: no feet, no antenna mount, and **no heat-set
 inserts at all**. Every insert lives in the mating part, which is what keeps this a
@@ -182,6 +181,7 @@ Extra insert faces by position:
   front face, for a tall front module.
 
   ![bottom front rail](img/crossbeam_bottom_front_rail.png)
+
 - `crossbeam_bottom_front` / `_bottom_back` — **4 each, ends only.** They once
   carried two more in their undersides for the base plate; those went when the
   plate did, and nothing bolts up into these beams any more.
@@ -191,12 +191,12 @@ Extra insert faces by position:
 **There is no separate handle part.** The arch is the same 9 mm plate as the panel,
 continuing up past the frame top. That removes the 12 mm lap on each outer face:
 
-| | separate handle | integral |
-| --- | --- | --- |
-| Assembled width | 166.25 mm | **142.25 mm** |
-| Parts per side | 2 | **1** |
-| M4 bolts, panels + handles | 24 | **16** (8 per panel, two rows per beam) |
-| Handle inserts | 8 | **none** |
+|                            | integral                                |
+| -------------------------- | --------------------------------------- |
+| Assembled width            | **142.25 mm**                           |
+| Parts per side             | **1**                                   |
+| M4 bolts, panels + handles | **16** (8 per panel, two rows per beam) |
+| Handle inserts             | **none**                                |
 
 **The part is 175 × 70 × 9, and making it fit the bed drove one frame change.**
 Panel plus handle is naturally 184 mm — Z 16 at the base plate up to Z 200 at the
@@ -214,15 +214,14 @@ base plate (`base_t` 8 → 17) raises the bottom crossbeams from Z 16–40 to
 **Z 25–49**, and the panel starts where the beams start. `bay_h` drops 116 → 107 to
 keep the top beams exactly where they were.
 
-| | before | now |
-| --- | --- | --- |
-| Panel starts at | Z 16 | **Z 25** |
-| Bottom beams | Z 16–40 | **Z 25–49** |
-| Part height | 184 mm | **175 mm**, 5 mm of margin |
+|                            | before  | now                                     |
+| -------------------------- | ------- | --------------------------------------- |
+| Panel starts at            | Z 16    | **Z 25**                                |
+| Bottom beams               | Z 16–40 | **Z 25–49**                             |
+| Part height                | 184 mm  | **175 mm**, 5 mm of margin              |
 | Dead space under the radio | 38.5 mm | 29.5 mm — still room for the DC harness |
 
-> **The base plate has since been removed entirely (§2.9), but `z_frame` stays at
-> 25.** It is now a bare datum with nothing underneath it rather than a derived
+> **The base plate has since been removed entirely (§2.9), but `z_frame` stays at 25.** It is now a bare datum with nothing underneath it rather than a derived
 > height, and that is deliberate: moving it would move the panels' bolt rows and
 > force a reprint of the two slowest parts on the plate. The battery box's top face
 > simply comes up to meet it.
@@ -234,8 +233,8 @@ four crossbeams keep their original insert rows — 22.5 / 33.5 relative to thei
 bodies, landing at global 31.5 / 42.5 once raised — and the panel's holes measure
 to the same figures.
 
-While doing this the radio's mounting height was restated as *"face 0.5 mm below
-the frame top"* rather than *"centred in the bay"*. Both give today's numbers, but
+While doing this the radio's mounting height was restated as _"face 0.5 mm below
+the frame top"_ rather than _"centred in the bay"_. Both give today's numbers, but
 the old form only landed correctly by coincidence and would have moved the radio
 the moment `bay_h` changed.
 
@@ -252,7 +251,7 @@ the aperture spans Y 18–52, so the two never overlapped.
 
 **The bottom cutout matches the arch.** `win_a` runs Z 32–74, leaving a **7.00 mm**
 band along the bottom edge against the arch's **7.05 mm** at its apex. It can go
-that low because Y 16–54 is the gap *between* the two bottom crossbeams, so it
+that low because Y 16–54 is the gap _between_ the two bottom crossbeams, so it
 never opens onto a beam, and the bolt counterbores measure Y 3.95–12.05, leaving
 3.95 mm to the window edge.
 
@@ -278,12 +277,12 @@ profile. Everything else in the project is under a second.
 The arch is not the reference's squared loop — everything above the frame line was
 reworked after the built pack showed the original reading as two blocky slabs.
 
-|                    | reference / v1             | now                           |
-| ------------------ | -------------------------- | ----------------------------- |
-| Proud of the frame | 30 mm                      | **20 mm**                     |
-| Overall height     | 78 mm                      | **68 mm**                     |
-| Hand aperture      | 33.75 × 18.5               | **40 × 13**                   |
-| Grip bar section   | 11.5 × 12 mm, square edges | **7 × 9 mm, fully radiused**  |
+|                    | reference / v1              | now                                 |
+| ------------------ | --------------------------- | ----------------------------------- |
+| Proud of the frame | 30 mm                       | **20 mm**                           |
+| Overall height     | 78 mm                       | **68 mm**                           |
+| Hand aperture      | 33.75 × 18.5                | **40 × 13**                         |
+| Grip bar section   | 11.5 × 12 mm, square edges  | **7 × 9 mm, fully radiused**        |
 | Arch volume        | 37.6 cm³ as a separate part | **~22.6 cm³, now inside the panel** |
 
 Three changes, each aimed at a stated problem:
@@ -323,12 +322,10 @@ span and _grows_ to 8.25 mm into the shoulders.
 | stress, one-handed 6× drop-catch | 7.06 MPa | **3.47 MPa**  |
 | safety factor (PLA)              | 7.1      | **14.4**      |
 
-
-
 ### 7–8 — `antenna_mount_bnc` / `antenna_mount_so239`
 
-| BNC | SO-239 |
-| --- | ------ |
+| BNC                                             | SO-239                                              |
+| ----------------------------------------------- | --------------------------------------------------- |
 | ![antenna_mount_bnc](img/antenna_mount_bnc.png) | ![antenna_mount_so239](img/antenna_mount_so239.png) |
 
 The reference ear, made modular and offered in two connector variants. Both share
@@ -359,29 +356,6 @@ between the ribs and removes the handedness.
 
 Verified: bore clear below each pad for the connector body, all four flange-screw
 nut positions clear, and zero enclosed voids in either part.
-
-#### Rework history (v2)
-
-The first version of this bracket had three defects, all found on a printed part:
-
-1. **One entire bolt column was unusable.** The ribs were 8 mm thick at the
-   bracket edges and the bolt columns sat at 14 and 30 mm across a 35 mm width —
-   so the 30 mm column landed inside the right-hand rib. Worse than overlapping:
-   because the rib spans the full pad depth, up to **19.75 mm of solid rib sat in
-   front of the counterbore mouth**, sealing both holes into enclosed internal
-   voids with no tool access. The printed part showed them as blind dimples where
-   the slicer had bridged over a sealed cavity.
-2. **The ribs were too wide**, leaving no clear span to put the bolts in.
-3. **The ribs were not actually joined to the pad.** The rib profile stopped
-   exactly at the pad's underside, so the two shared a plane and nothing more —
-   zero volumetric overlap. Combined with the fillet on the pad's edge, that left
-   a real groove along the top of each rib, visible on the print.
-
-Fixes: ribs thinned 8 → **5 mm**, bolts moved to **10.5 / 24.5 mm** in the open
-span between them, the whole bracket inset 6 mm so those symmetric columns still
-clear the crossbeam's end inserts, and the rib profile carried up through the
-pad's full thickness so it merges rather than touches. Consequence: antenna bore
-spacing drops from 89.25 mm to **77.25 mm**.
 
 ### 9 — the bottom joint: tabs, not a plate
 
@@ -442,7 +416,7 @@ The eight bolts run panel → tab → beam insert: 4 mm of counterbore, 5 mm of
 remaining panel, 9 mm of tab, then **6 mm of thread engagement** on an
 **M4 × 20**. That is one millimetre less engagement than everywhere else on the
 frame — still 1.5 × D, the normal minimum for M4 in a brass insert, and the insert
-is 8 mm long. M4 × 25 is *not* an alternative: the pocket is 9 mm deep and 25 would
+is 8 mm long. M4 × 25 is _not_ an alternative: the pocket is 9 mm deep and 25 would
 need 11, so it bottoms out before it clamps.
 
 Structure: two end walls, a back wall and a floor, every one of them windowed,
@@ -489,8 +463,8 @@ Windowing still nearly halves it: 116.8 cm³ — tabs and feet included — agai
 
 ### 11 — the top-front crossbeam: three layouts
 
-| `_dual` | `_triple` | `_grid` |
-| --- | --- | --- |
+| `_dual`                                   | `_triple`                                     | `_grid`                                   |
+| ----------------------------------------- | --------------------------------------------- | ----------------------------------------- |
 | ![dual](img/crossbeam_top_front_dual.png) | ![triple](img/crossbeam_top_front_triple.png) | ![grid](img/crossbeam_top_front_grid.png) |
 
 All three use the **same station pattern** — a copy of the antenna mount's own
@@ -498,16 +472,16 @@ four bolts, two M4 columns 14 mm apart and two rows 10 mm apart at Z 162 / 172.
 They differ only in how many stations and where, so the antenna mounts are
 unchanged and interchangeable between them.
 
-| | `_dual` | `_triple` | `_grid` |
-| --- | --- | --- | --- |
-| Bolt columns | 4 | 6 | **7, uniform** |
-| Column spacing | 14 / 63 / 14 | 14 / 24 / 14 / 24 / 14 | **14 mm throughout** |
-| Front-face inserts | 8 | 12 | 14 |
-| Mounting positions | 2 fixed | 3 fixed | **6, overlapping at 14 mm** |
-| Wider bolt spans | no | no | **yes — 28, 42, 56, 70, 84 mm** |
-| Outer bore spacing | 77.25 mm | 76 mm | 70 mm |
-| **35 mm brackets at once** | 2 | **3** | 2 |
-| Volume | 44.5 cm³ | 43.5 cm³ | 43.1 cm³ |
+|                            | `_dual`      | `_triple`              | `_grid`                         |
+| -------------------------- | ------------ | ---------------------- | ------------------------------- |
+| Bolt columns               | 4            | 6                      | **7, uniform**                  |
+| Column spacing             | 14 / 63 / 14 | 14 / 24 / 14 / 24 / 14 | **14 mm throughout**            |
+| Front-face inserts         | 8            | 12                     | 14                              |
+| Mounting positions         | 2 fixed      | 3 fixed                | **6, overlapping at 14 mm**     |
+| Wider bolt spans           | no           | no                     | **yes — 28, 42, 56, 70, 84 mm** |
+| Outer bore spacing         | 77.25 mm     | 76 mm                  | 70 mm                           |
+| **35 mm brackets at once** | 2            | **3**                  | 2                               |
+| Volume                     | 44.5 cm³     | 43.5 cm³               | 43.1 cm³                        |
 
 `_dual` is the original: one station per antenna mount, nothing else. It is
 **bit-identical to the beam already printed**, so it is not a reprint.
@@ -518,8 +492,8 @@ three SO-239 brackets sit side by side with a 3 mm gap, spanning X 15.625 to
 the 35 mm bracket width while 26 mm does not.
 
 `_grid` is a **uniform 14 mm column grid**, not a set of fixed stations. Because
-the pitch equals the antenna mount's own bolt spacing, *every adjacent pair of
-columns is a station* — six positions at 14 mm increments rather than a few fixed
+the pitch equals the antenna mount's own bolt spacing, _every adjacent pair of
+columns is a station_ — six positions at 14 mm increments rather than a few fixed
 ones. It also lets a wider accessory span three, five or all seven columns for a
 28 / 56 / 84 mm bolt base, which the fixed layouts cannot offer at all: good for a
 Le Frite compute box or a DC charge-port plate that wants a broad, stiff footprint.
@@ -529,7 +503,7 @@ a grid while its pitch matches the mount's bolt spacing.
 
 An earlier revision of this layout used four fixed stations at 26 mm, which gave
 columns alternating 14 / 12 mm — the stations were equally spaced but the holes
-were not. Four stations *cannot* be made uniform: that needs a 28 mm pitch, which
+were not. Four stations _cannot_ be made uniform: that needs a 28 mm pitch, which
 overruns the beam's usable bolt span by 1.7 mm at each end and drives the outer
 pockets into its own end inserts. Dropping to a 7-column grid fits with 5.3 mm to
 spare and gives more positions, not fewer.
@@ -551,12 +525,12 @@ model asserts it. `_dual` and `_triple` have ~5.3 mm of material there, `_grid`
 positions apart you go. Two accessories clash if their half-widths sum to more
 than the gap:
 
-| positions apart | gap | two 35 mm items | 35 mm + a 22 mm one | two 22 mm items |
-| --- | --- | --- | --- | --- |
-| 1 | 14 mm | no | no | no |
-| 2 | 28 mm | no | no | **yes** |
-| 3 | 42 mm | **yes** | **yes** | **yes** |
-| 4–5 | 56–70 mm | **yes** | **yes** | **yes** |
+| positions apart | gap      | two 35 mm items | 35 mm + a 22 mm one | two 22 mm items |
+| --------------- | -------- | --------------- | ------------------- | --------------- |
+| 1               | 14 mm    | no              | no                  | no              |
+| 2               | 28 mm    | no              | no                  | **yes**         |
+| 3               | 42 mm    | **yes**         | **yes**             | **yes**         |
+| 4–5             | 56–70 mm | **yes**         | **yes**             | **yes**         |
 
 The narrowest an accessory can physically be is about 22 mm — the 14 mm bolt span
 plus two Ø8.2 counterbores. So in practice:
@@ -617,47 +591,38 @@ rather than merely tight. If a later measurement lands nearer one end of the ran
 This is the second assumption in the project that only a printed part could
 retire — the first was the antenna bracket's sealed counterbores.
 
-|                   | `compute_box_inline`               |
-| ----------------- | ---------------------------------- |
-| Mounts to         | the battery box's four feet, hanging below it |
-| Outer, tray       | 143 × 100 × **39 mm**              |
-| Outer, with cover | 143 × 100 × **47 mm**              |
+|                   | `compute_box_inline`                             |
+| ----------------- | ------------------------------------------------ |
+| Mounts to         | the battery box's four feet, hanging below it    |
+| Outer, tray       | 143 × 100 × **39 mm**                            |
+| Outer, with cover | 143 × 100 × **47 mm**                            |
 | SBC orientation   | flat on the floor, long axis **across** the tray |
-| Converter         | flat on the floor, **behind** the board |
-| Opens             | **upward**, cover off              |
-| Cover             | `compute_box_inline_cover`, 118.1 cm³ |
-| Volume, tray      | 107.8 cm³                          |
+| Converter         | flat on the floor, **behind** the board          |
+| Opens             | **upward**, cover off                            |
+| Cover             | `compute_box_inline_cover`, 118.1 cm³            |
+| Volume, tray      | 107.8 cm³                                        |
 
 #### The tray and its cover
 
-| plan (cover off) | cover |
-| --- | --- |
+| plan (cover off)                                | cover                                             |
+| ----------------------------------------------- | ------------------------------------------------- |
 | ![inline plan](img/compute_box_inline_plan.png) | ![inline cover](img/compute_box_inline_cover.png) |
 
 **It sits at the bottom of the stack and carries no frame load at all.** It hangs
 from the battery box's four Ø16 feet on **4 × M4 × 12** — the same joint the battery
 box used to make upward to the base plate, one level lower. Its cover takes those
-four bolts, counterbored on the *underside* so the head sits inside the box; 4 mm of
+four bolts, counterbored on the _underside_ so the head sits inside the box; 4 mm of
 remaining cover plus 7 mm of engagement keeps it on M4 × 12.
-
-**An earlier revision put the frame's bottom tabs on this tray instead**, with the
-box directly under the frame and the battery below it. That ran the frame's entire
-bottom bracing through four 9 × 16 tab columns standing on 45° wedges rising off the
-tray's **3 mm cavity walls** — against the battery box's 8 mm flange, which is what
-carries them now. Cheap in cavity terms (about 7 cm³, and nothing at the board's
-level) but the wrong load path, so it was abandoned. Under the battery instead, this
-box only has to hold itself up: roughly 0.13 kg, about 4 N over four bolts at the
-README's 3× snatch.
 
 Stack pitch measures **54.99 mm** against the 55 mm budget — 39 mm of tray plus an
 8 mm cover, sitting under the battery box's 8 mm feet:
 
-| band | Z (frame) | height |
-| ---- | --------- | ------ |
-| *(battery box feet above)* | −34.8 … −26.8 | 8 mm |
-| cover | −42.8 … −34.8 | 8 mm |
-| cavity | −77.8 … −42.8 | **35 mm** |
-| floor | −81.8 … −77.8 | 4 mm |
+| band                       | Z (frame)     | height    |
+| -------------------------- | ------------- | --------- |
+| _(battery box feet above)_ | −34.8 … −26.8 | 8 mm      |
+| cover                      | −42.8 … −34.8 | 8 mm      |
+| cavity                     | −77.8 … −42.8 | **35 mm** |
+| floor                      | −81.8 … −77.8 | 4 mm      |
 
 **It has no feet of its own** — it is the bottom of the stack, so the underside is
 flat and sits on the ground. That also means it **prints floor-down with no
@@ -669,11 +634,11 @@ assumed 15 mm of component height) leaves **10.4 mm of headroom**. That number i
 only as good as the 15 mm assumption — see §8.
 
 **Depth is 100 mm, 5.2 mm deeper than the battery box, and that 5.2 mm is what
-makes the box work.** The board lies with its long axis *across* the tray, because
+makes the box work.** The board lies with its long axis _across_ the tray, because
 its connectors are on both 56 mm edges — USB one end, Ethernet/HDMI the other — and
 64 of board plus 20 of clearance at each end is 104 mm against only 88.8 of depth.
 Across the tray it fits in 137. That settles the board, but not the converter: put
-it *beside* the board and it eats 35 mm of the X band, leaving 38 mm to split
+it _beside_ the board and it eats 35 mm of the X band, leaving 38 mm to split
 between the two connector zones — about 19 mm each, which is not enough for a
 right-angle adapter. At 100 mm deep the converter stacks **behind** the board
 instead (56 + 35 = 91 against 94 of interior) and both connector zones open up to
@@ -682,14 +647,14 @@ than 24.8.
 
 Measured positions:
 
-| | X | Y | note |
-| --- | --- | --- | --- |
-| Board | 39.125 … 103.125 | −25.75 … 30.25 | standoffs 58.75 × 49.5, 8 mm tall |
-| Converter | 31.5 … 96.5 | 31.5 … 66.5 | 0.5 mm off the back wall; its lead end faces the grommet |
-| Cover grommet | 99.02 … 111.00 | 43.02 … 54.98 | Ø12, 12 V in from the battery above |
+|               | X                | Y              | note                                                     |
+| ------------- | ---------------- | -------------- | -------------------------------------------------------- |
+| Board         | 39.125 … 103.125 | −25.75 … 30.25 | standoffs 58.75 × 49.5, 8 mm tall                        |
+| Converter     | 31.5 … 96.5      | 31.5 … 66.5    | 0.5 mm off the back wall; its lead end faces the grommet |
+| Cover grommet | 99.02 … 111.00   | 43.02 … 54.98  | Ø12, 12 V in from the battery above                      |
 
 The board is at Y −25.75 rather than hard against the front wall at −27: at −27 the
-standoff pads merged 0.75 mm *into* the wall and the board's edge sat dead flush.
+standoff pads merged 0.75 mm _into_ the wall and the board's edge sat dead flush.
 The pads overhang the board by 0.75 mm at each end, so of the 3 mm of slack in this
 direction 1.5 is theirs; the remaining 1.5 is split 0.5 pad-to-wall, 0.5
 pad-to-converter, 0.5 converter-to-back-wall.
@@ -708,13 +673,13 @@ somewhere to run; body Z −74.8 to −59.8, leaving **17 mm** to the cover.
 mounting holes are in its 65 × 35 face, so bolting that face to a wall puts both 65
 and 35 in the wall plane. 65 cannot go vertical in a 35 mm cavity, so 35 must — and
 the cavity is exactly **35.00 mm**. Zero clearance: it would not go in, let alone
-bolt up. Making it work would need a floor recess for clearance *plus* local pads to
+bolt up. Making it work would need a floor recess for clearance _plus_ local pads to
 give a 3 mm wall enough depth for a 5 mm insert, and on the **side** wall it would
 also sit squarely in the board's right connector zone. A blind pad closes the floor
 for none of that.
 
 **There is no raceway any more, and that is a consequence of the reordering.** The
-channel existed to carry the battery's two leads *past* this module to the radio,
+channel existed to carry the battery's two leads _past_ this module to the radio,
 which only made sense while the box sat between them. With the battery directly
 under the frame, its leads go straight up past its own flange into the bay, and this
 box's 12 V comes **down** a short run from the battery above it. So the side-wall
@@ -793,10 +758,10 @@ hole follows automatically if the radio's depth changes.
 **The Retevis RT-95 no longer fits and has been removed from the design.** The
 frame was originally ported for it, and it fails now on two independent counts:
 
-| | RT-95 needs | frame provides | |
-| --- | --- | --- | --- |
-| standing height | 163 mm | **154.5 mm** — panel bottom Z 25 to the radio's top line at Z 179.5 | **8.5 mm short** |
-| body thickness | 39 mm | **38 mm** clear between the crossbeams | **1 mm interference** |
+|                 | RT-95 needs | frame provides                                                      |                       |
+| --------------- | ----------- | ------------------------------------------------------------------- | --------------------- |
+| standing height | 163 mm      | **154.5 mm** — panel bottom Z 25 to the radio's top line at Z 179.5 | **8.5 mm short**      |
+| body thickness  | 39 mm       | **38 mm** clear between the crossbeams                              | **1 mm interference** |
 
 The height failure is the fatal one, and **no mounting position fixes it** — the
 body is simply taller than the space between the two planes. At the old Z 98 hole
@@ -822,16 +787,16 @@ recesses to worry about.
 
 These are engineering necessities, not preferences. Each is a parameter.
 
-| Change               | From                                                                  | To                                                       | Why                                                                                                                                                                                                                               |
-| -------------------- | --------------------------------------------------------------------- | -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Crossbeam section    | 7 × 4 mm                                                              | **16 × 24 mm**                                           | An M4 heat-set insert needs a Ø5.7 × 9 mm pocket. It physically cannot fit in a 7 × 4 mm beam. This is the direct cost of the M4-bolted requirement.                                                                              |
-| Frame depth          | 60 mm                                                                 | **70 mm**                                                | With four beams instead of two, front beams now exist at the top. At 60 mm deep they would overhang the radio's upward-facing control panel by 12 mm per side. At 70 mm the overhang is **zero** — verified in `img/asm_top.png`. |
-| Panel thickness      | 8.25 mm                                                               | **9.0 mm**                                               | Leaves 5.0 mm under an M4 counterbore and 3.5 mm under the M5 recess (reference: 2.75 mm).                                                                                                                                        |
-| Antenna gusset       | one 8.25 mm rib in the rail plane                                     | **two 5 mm ribs, one per bracket edge**                  | A bolt-on bracket has no rail plane to hide the rib in. Duplicating it onto both edges keeps the bore under the hole clear and makes the bracket symmetric; 5 mm rather than 8 mm leaves a clear central span for the bolts.      |
-| Antenna hole spacing | 101.5 mm                                                              | **70–77.25 mm**                                          | Set by which top-front layout the brackets sit on (§2.11): 77.25 mm on `_dual`, 76 mm on `_triple`, 70 mm on `_grid`.                                                                                                            |
-| Handle thickness     | 8.25 mm                                                               | **9 mm**                                                 | The handle is integral to the side panel, so it is simply the panel's own thickness. No axial insert is needed because it no longer bolts to anything.                                                                            |
-| Handle form          | squared loop, 30 mm proud, 33.75 × 18.5 aperture under an 11.5 mm bar | **arch, 20 mm proud, 40 × 13 aperture under a 7 mm bar** | The built pack showed the squared loops reading as two blocky slabs — hard on the bag it only just fits, and hard on the hand. See §2.6.                                                                                          |
-| Leg standoff         | 45 mm of integral leg                                                 | **a bolt-on module**                                     | That 45 mm of dead space is now where the battery box goes, joining the frame on its own tabs (§2.9). The frame datum `z_frame` sits at 25 — the height the old base plate gave it — which is what makes the unified panel+handle printable (§2.6).                                             |
+| Change               | From                                                                  | To                                                       | Why                                                                                                                                                                                                                                                 |
+| -------------------- | --------------------------------------------------------------------- | -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Crossbeam section    | 7 × 4 mm                                                              | **16 × 24 mm**                                           | An M4 heat-set insert needs a Ø5.7 × 9 mm pocket. It physically cannot fit in a 7 × 4 mm beam. This is the direct cost of the M4-bolted requirement.                                                                                                |
+| Frame depth          | 60 mm                                                                 | **70 mm**                                                | With four beams instead of two, front beams now exist at the top. At 60 mm deep they would overhang the radio's upward-facing control panel by 12 mm per side. At 70 mm the overhang is **zero** — verified in `img/asm_top.png`.                   |
+| Panel thickness      | 8.25 mm                                                               | **9.0 mm**                                               | Leaves 5.0 mm under an M4 counterbore and 3.5 mm under the M5 recess (reference: 2.75 mm).                                                                                                                                                          |
+| Antenna gusset       | one 8.25 mm rib in the rail plane                                     | **two 5 mm ribs, one per bracket edge**                  | A bolt-on bracket has no rail plane to hide the rib in. Duplicating it onto both edges keeps the bore under the hole clear and makes the bracket symmetric; 5 mm rather than 8 mm leaves a clear central span for the bolts.                        |
+| Antenna hole spacing | 101.5 mm                                                              | **70–77.25 mm**                                          | Set by which top-front layout the brackets sit on (§2.11): 77.25 mm on `_dual`, 76 mm on `_triple`, 70 mm on `_grid`.                                                                                                                               |
+| Handle thickness     | 8.25 mm                                                               | **9 mm**                                                 | The handle is integral to the side panel, so it is simply the panel's own thickness. No axial insert is needed because it no longer bolts to anything.                                                                                              |
+| Handle form          | squared loop, 30 mm proud, 33.75 × 18.5 aperture under an 11.5 mm bar | **arch, 20 mm proud, 40 × 13 aperture under a 7 mm bar** | The built pack showed the squared loops reading as two blocky slabs — hard on the bag it only just fits, and hard on the hand. See §2.6.                                                                                                            |
+| Leg standoff         | 45 mm of integral leg                                                 | **a bolt-on module**                                     | That 45 mm of dead space is now where the battery box goes, joining the frame on its own tabs (§2.9). The frame datum `z_frame` sits at 25 — the height the old base plate gave it — which is what makes the unified panel+handle printable (§2.6). |
 
 Unchanged on purpose: inner span 124.25 mm, M5 hole Ø5.000 at the bay centre,
 Ø26.468 × 5.5 recess, Ø12.468 antenna hole, 3.75 mm pad, 25 mm reach, 12.66 mm
@@ -853,18 +818,16 @@ standoffs (pockets **7.5 mm**, for 7 mm inserts), plus two converter pads and si
 cover lugs (pockets **5.0 mm**, for 5 mm inserts). All are Ø4.0 pilot. Note that is **two different insert lengths**, which
 is easy to miss when ordering. Everything structural stays M4.
 
-| Joint                           | Bolt           | Qty                      | Insert lives in                      |
-| ------------------------------- | -------------- | ------------------------ | ------------------------------------ |
-| Side panels → **top** crossbeams | M4 × 12       | **8**                    | crossbeam ends                       |
-| Side panels → **bottom** beams, through the battery box's tabs | **M4 × 20** | **8** | crossbeam ends |
-| Antenna mounts → top-front beam | M4 × 12        | 8                        | top-front beam front face            |
-| **Inline box cover → battery box feet** | **M4 × 12** | **4**                | battery box feet                     |
-| Inline box tray → its cover     | M3 × 10, **horizontal** | 6               | lugs under the cover                 |
-| SO-239 flange → antenna mount   | M3 × 10 + nut  | 4 per mount              | (through-holes; SO-239 variant only) |
-| La Frite → compute box          | M3 × 8         | 4                        | box standoffs                        |
-
-| **Radio → side panels**         | **M5 × 10–12** | **2**                    | the radio's own threaded side holes  |
-|                                 | **M4 total**   | **24 bolts** — 16 × M4 × 12 + **8 × M4 × 20** | frame with battery box, no compute module |
+| Joint                                                          | Bolt                    | Qty         | Insert lives in                      |
+| -------------------------------------------------------------- | ----------------------- | ----------- | ------------------------------------ |
+| Side panels → **top** crossbeams                               | M4 × 12                 | **8**       | crossbeam ends                       |
+| Side panels → **bottom** beams, through the battery box's tabs | **M4 × 20**             | **8**       | crossbeam ends                       |
+| Antenna mounts → top-front beam                                | M4 × 12                 | 8           | top-front beam front face            |
+| **Inline box cover → battery box feet**                        | **M4 × 12**             | **4**       | battery box feet                     |
+| Inline box tray → its cover                                    | M3 × 10, **horizontal** | 6           | lugs under the cover                 |
+| SO-239 flange → antenna mount                                  | M3 × 10 + nut           | 4 per mount | (through-holes; SO-239 variant only) |
+| La Frite → compute box                                         | M3 × 8                  | 4           | box standoffs                        |
+| **Radio → side panels**                                        | **M5 × 10–12**          | **2**       | the radio's own threaded side holes  |
 
 M4 × 12 is correct **everywhere except the eight bottom-row bolts**: 4.0 mm
 counterbore, plus 5.0 mm of remaining panel, plus 7.0 mm of thread engagement,
@@ -883,14 +846,14 @@ and 8.5 mm into the radio.
 
 ## 5. Printing
 
-| Part               | Orientation                       | Notes                                                                                                                         |
-| ------------------ | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `side_panel`       | flat, **inner** face down         | M5 recess and all 8 beam counterbores open upward; only 4 × Ø8.2 bridges                                                      |
-| `crossbeam` ×4     | long axis on the bed, 24 mm tall  | end **and** front-face inserts both come out in-plane                                                                         |
-| `antenna_mount` ×2 | on its back                       | every layer smaller than the one below — no supports; one symmetric part, print two                                           |
-| `compute_box_inline` | **floor down**, open side up    | flat underside — it is the bottom of the stack and has no feet, so nothing overhangs and it needs **no support**               |
-| `compute_box_inline_cover` | **top face down**, lugs up | the six lugs hang below the plate in use, so the right way up they would print as a 143 × 100 ceiling on six blocks. Inverted, the battery-facing face is the bed face and the lugs rise as plain blocks |
-| `battery_box`      | **back wall down**, open front up | floor-down would cantilever both top flanges 19.5 mm along their whole length; on its back they become ribs off the back wall. **Two of the four tabs now need support** — see §8 |
+| Part                       | Orientation                       | Notes                                                                                                                                                                                                    |
+| -------------------------- | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `side_panel`               | flat, **inner** face down         | M5 recess and all 8 beam counterbores open upward; only 4 × Ø8.2 bridges                                                                                                                                 |
+| `crossbeam` ×4             | long axis on the bed, 24 mm tall  | end **and** front-face inserts both come out in-plane                                                                                                                                                    |
+| `antenna_mount` ×2         | on its back                       | every layer smaller than the one below — no supports; one symmetric part, print two                                                                                                                      |
+| `compute_box_inline`       | **floor down**, open side up      | flat underside — it is the bottom of the stack and has no feet, so nothing overhangs and it needs **no support**                                                                                         |
+| `compute_box_inline_cover` | **top face down**, lugs up        | the six lugs hang below the plate in use, so the right way up they would print as a 143 × 100 ceiling on six blocks. Inverted, the battery-facing face is the bed face and the lugs rise as plain blocks |
+| `battery_box`              | **back wall down**, open front up | floor-down would cantilever both top flanges 19.5 mm along their whole length; on its back they become ribs off the back wall. **Two of the four tabs now need support** — see §8                        |
 
 Each `part=` value in the .scad already emits the part in its recommended pose,
 so `stl/*.stl` are ready to slice as-is. **Do not re-orient them** — the poses
@@ -931,11 +894,11 @@ constraint from the lap pads is gone.
    side panel and repeat.
 4. Drop the radio in and fit the two M5 bolts through the panel recesses into
    the radio's side holes.
-5. *(No handle step — the handles are part of the side panels, fitted in step 2.)*
+5. _(No handle step — the handles are part of the side panels, fitted in step 2.)_
    Note the panel now carries **two bolt rows per beam**, eight per panel.
 6. Bolt on the two antenna mounts (8 × M4 × 12), then fit the antenna
    connectors.
-7. *(No separate battery-box step — it went on in step 3.)* Route the pack's lead
+7. _(No separate battery-box step — it went on in step 3.)_ Route the pack's lead
    up past the flange into the bay, slide the pack in from the front and strap it.
    **If fitting `compute_box_inline`, the order inside it matters** (§12): bolt the
    **cover alone** up into the battery box's four feet first (4 × M4 × 12 — the heads
@@ -1091,14 +1054,14 @@ it is and the real changes are buried.
 the compute-box and handle work was a bad measurement, not a bad part, and they
 failed in ways that looked exactly like real defects:
 
-| what was probed | why it read wrong |
-| --- | --- |
-| SBC pad centres | the centre *is* the M3 insert pocket — empty by design |
-| pad walls, as a ring with `.all()` | the ring straddled a slot, so one open point failed the whole test |
-| a point "inside the bar" | box-local coordinates against an STL exported in its print pose |
-| M3 insert spacing | the scan window ran past the beam into the finger opening and averaged two voids |
-| clear interior width | took `min`/`max` of all free points instead of the largest contiguous run, so one ambiguous point exactly on the boundary stretched the span by 3 mm and implied a missing wall |
-| cover rim, top band | probed at Y 157, past the rim's own end at 156.6 |
+| what was probed                    | why it read wrong                                                                                                                                                               |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SBC pad centres                    | the centre _is_ the M3 insert pocket — empty by design                                                                                                                          |
+| pad walls, as a ring with `.all()` | the ring straddled a slot, so one open point failed the whole test                                                                                                              |
+| a point "inside the bar"           | box-local coordinates against an STL exported in its print pose                                                                                                                 |
+| M3 insert spacing                  | the scan window ran past the beam into the finger opening and averaged two voids                                                                                                |
+| clear interior width               | took `min`/`max` of all free points instead of the largest contiguous run, so one ambiguous point exactly on the boundary stretched the span by 3 mm and implied a missing wall |
+| cover rim, top band                | probed at Y 157, past the rim's own end at 156.6                                                                                                                                |
 
 The habits that catch these: probe a **control** you know the answer to in the
 same run, prefer **cross-sections and island counts** over point sampling for
@@ -1123,16 +1086,16 @@ panel under M5 recess = 3.5 mm of material carrying the radio
 Geometry diffed against the previous commit — bounds and volume, not bytes, since
 OpenSCAD re-exports differ byte-wise for identical geometry.
 
-| Part | Why |
-| --- | --- |
-| `crossbeam_bottom_front` | 124.25 → **106.25 mm**; the tab joint (§2.9) |
-| `crossbeam_bottom_back` | 124.25 → **106.25 mm**; the tab joint |
-| `crossbeam_bottom_front_rail` | 124.25 → **106.25 mm**; the tab joint |
-| `battery_box` | gains four tabs and keeps its feet; top face moves to the frame datum |
-| `compute_box_inline` | moves to the bottom of the stack: no feet, no raceway, sealed floor, prints floor-down (§12) |
-| `compute_box_inline_cover` | bolts up into the battery box's feet, gains six lugs for the horizontal tray screws and a Ø12 grommet in place of the raceway |
-| `side_panel` ×2 | the unified panel + handle |
-| `side_panel` ×2 | **model only, no reprint needed** — the RT-95's M5 pair at Z 129−31 was removed (§2.13). Panels already printed carry the extra hole harmlessly; the radio mounts at the Z 129 pair either way. |
+| Part                          | Why                                                                                                                                                                                             |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `crossbeam_bottom_front`      | 124.25 → **106.25 mm**; the tab joint (§2.9)                                                                                                                                                    |
+| `crossbeam_bottom_back`       | 124.25 → **106.25 mm**; the tab joint                                                                                                                                                           |
+| `crossbeam_bottom_front_rail` | 124.25 → **106.25 mm**; the tab joint                                                                                                                                                           |
+| `battery_box`                 | gains four tabs and keeps its feet; top face moves to the frame datum                                                                                                                           |
+| `compute_box_inline`          | moves to the bottom of the stack: no feet, no raceway, sealed floor, prints floor-down (§12)                                                                                                    |
+| `compute_box_inline_cover`    | bolts up into the battery box's feet, gains six lugs for the horizontal tray screws and a Ø12 grommet in place of the raceway                                                                   |
+| `side_panel` ×2               | the unified panel + handle                                                                                                                                                                      |
+| `side_panel` ×2               | **model only, no reprint needed** — the RT-95's M5 pair at Z 129−31 was removed (§2.13). Panels already printed carry the extra hole harmlessly; the radio mounts at the Z 129 pair either way. |
 
 **Nothing else changed** at any point in that sequence — the top beams, both
 antenna mounts and the compute box came back byte-for-byte identical every time,
@@ -1191,17 +1154,17 @@ panel's holes are.
    notch and the floor drop have both already been spent.
 
 8. **The M3 insert pocket diameter is still 4.0 mm and is probably wrong.**
-    `m3_ins_d` was sized for a shorter insert; the SBC standoffs now take a 7 mm
-    insert, and those typically run 4.6–5.0 mm OD. Depth has been corrected to
-    7.5 mm but the diameter has deliberately **not** been guessed — too small
-    splits the boss, too large and the insert spins. Measure the OD before
-    printing. This affects the four SBC standoffs; the converter pads and cover lugs
-    take a different, shorter 5 mm insert and keep 4.0.
+   `m3_ins_d` was sized for a shorter insert; the SBC standoffs now take a 7 mm
+   insert, and those typically run 4.6–5.0 mm OD. Depth has been corrected to
+   7.5 mm but the diameter has deliberately **not** been guessed — too small
+   splits the boss, too large and the insert spins. Measure the OD before
+   printing. This affects the four SBC standoffs; the converter pads and cover lugs
+   take a different, shorter 5 mm insert and keep 4.0.
 
 9. **La Frite port positions along the board edge are not modelled.** The box is
-    sized to the board outline and its M3 pattern; which port sits where along the
-    now-downward edge is unverified, so the 21 mm budget is assumed to apply to
-    all of them equally.
+   sized to the board outline and its M3 pattern; which port sits where along the
+   now-downward edge is unverified, so the 21 mm budget is assumed to apply to
+   all of them equally.
 
 ---
 
@@ -1212,15 +1175,15 @@ panel's holes are.
     The superseded note read:
 
     > **`compute_box_inline`: the buck converter's own 12 V feed has no modelled
-    path.** The raceway is deliberately sealed off from the cavity, so the battery
-    leads running up it never enter the box — but the converter *inside*
-    the box has to be fed from those same leads. Nothing in the model gets them
-    across the raceway's 3 mm wall. That wall is now the channel's **inboard** face
-    at X 114.5–117.5, and the converter ends at X 96.5, so the run is no longer
-    trivially short — 18 mm of cavity separates them. Either drill the left wall
-    and bridge that gap inside the box, or bring 12 V in through the cover's cable
-    opening with the rest of the wiring. **Decide which before you
-    close the box** — the converter's terminals are the least accessible thing in it.
+    > path.** The raceway is deliberately sealed off from the cavity, so the battery
+    > leads running up it never enter the box — but the converter _inside_
+    > the box has to be fed from those same leads. Nothing in the model gets them
+    > across the raceway's 3 mm wall. That wall is now the channel's **inboard** face
+    > at X 114.5–117.5, and the converter ends at X 96.5, so the run is no longer
+    > trivially short — 18 mm of cavity separates them. Either drill the left wall
+    > and bridge that gap inside the box, or bring 12 V in through the cover's cable
+    > opening with the rest of the wiring. **Decide which before you
+    > close the box** — the converter's terminals are the least accessible thing in it.
 
 11. **RESOLVED — `compute_box_inline` moved to the bottom of the stack** (§12). It
     hangs from the battery box's four restored feet on 4 × M4 × 12 and carries no
@@ -1236,7 +1199,6 @@ panel's holes are.
     bed Z to 70 − frame Y, so the build runs back to front: the back-beam tabs land
     on the bed, but the front-beam pair start **54 mm up with 385.4 mm² in
     mid-air**. It cannot be designed out:
-
     - a self-supporting ramp would need 24 mm of run for 24 mm of rise and has only
       16 (the beam's depth) — and must be at full height by frame Y ≈ 10 to carry
       the bolt at Y 8, leaving 6 mm of run: **76° from vertical**;
@@ -1258,7 +1220,7 @@ panel's holes are.
 
 13. **`crossbeam_bottom_front_rail` takes an argument that does nothing.** The
     export passes `front_rows = [16]`, which is not a parameter of `crossbeam()`
-    and is silently ignored — so the beam gets accessory columns on *both* rail
+    and is silently ignored — so the beam gets accessory columns on _both_ rail
     rows, at beam-local Z 6 and 16, not the single row at 16 the comment describes.
     The row at 6 clears the underside inserts by **0.175 mm** of material (axes
     5.875 mm apart, two Ø5.7 pockets), so it is not a clash, but the comment and
@@ -1301,7 +1263,7 @@ re-orient it in the slicer:
   ceiling directly beneath the 3.5 mm ligament that carries the radio's entire
   weight through two M5 bolts. Inner-face-down makes that ligament ordinary solid
   layers and reduces the part to four trivial Ø8.2 mm bridges.
-Five things matter more on this design than the usual quality knobs:
+  Five things matter more on this design than the usual quality knobs:
 
 1. **Perimeters carry the load, not infill.** Every joint on the frame is either
    a bolt through a counterbore or a heat-set insert in a boss, and both react
@@ -1387,28 +1349,28 @@ mode, change the values below, then _Save Print Settings as_
 Setting names are as they appear on each PrusaSlicer Print Settings page.
 Anything not listed keeps the base profile's value.
 
-| Page                  | Setting                    | Value                                   |
-| --------------------- | -------------------------- | --------------------------------------- |
-| Layers and perimeters | Layer height               | **0.20**                                |
-| Layers and perimeters | First layer height         | **0.20**                                |
-| Layers and perimeters | Perimeters                 | **2**                                   |
-| Layers and perimeters | Top solid layers           | **5**                                   |
-| Layers and perimeters | Bottom solid layers        | **5**                                   |
-| Layers and perimeters | Perimeter generator        | Arachne                                 |
-| Layers and perimeters | Detect bridging perimeters | ✔                                       |
-| Layers and perimeters | Seam position              | Aligned                                 |
-| Infill                | Fill density               | **15 %**                                |
-| Infill                | Fill pattern               | Gyroid                                  |
-| Infill                | Top / Bottom fill pattern  | Monotonic                               |
-| Infill                | Combine infill every       | 1                                       |
-| Skirt and brim        | Brim type                  | Outer brim only                         |
-| Skirt and brim        | Brim width                 | **5 mm** (crossbeam plate only, else 0) |
-| Skirt and brim        | Brim separation gap        | 0.1 mm                                  |
+| Page                  | Setting                    | Value                                                          |
+| --------------------- | -------------------------- | -------------------------------------------------------------- |
+| Layers and perimeters | Layer height               | **0.20**                                                       |
+| Layers and perimeters | First layer height         | **0.20**                                                       |
+| Layers and perimeters | Perimeters                 | **2**                                                          |
+| Layers and perimeters | Top solid layers           | **5**                                                          |
+| Layers and perimeters | Bottom solid layers        | **5**                                                          |
+| Layers and perimeters | Perimeter generator        | Arachne                                                        |
+| Layers and perimeters | Detect bridging perimeters | ✔                                                              |
+| Layers and perimeters | Seam position              | Aligned                                                        |
+| Infill                | Fill density               | **15 %**                                                       |
+| Infill                | Fill pattern               | Gyroid                                                         |
+| Infill                | Top / Bottom fill pattern  | Monotonic                                                      |
+| Infill                | Combine infill every       | 1                                                              |
+| Skirt and brim        | Brim type                  | Outer brim only                                                |
+| Skirt and brim        | Brim width                 | **5 mm** (crossbeam plate only, else 0)                        |
+| Skirt and brim        | Brim separation gap        | 0.1 mm                                                         |
 | Support material      | Generate support material  | ✘ unchecked — **except `battery_box`**, see the modifier table |
-| Speed                 | External perimeters        | **25 mm/s**                             |
-| Speed                 | Bridges                    | **25 mm/s**                             |
-| Advanced              | XY size compensation       | **0**                                   |
-| Advanced              | Elephant foot compensation | 0.2 mm                                  |
+| Speed                 | External perimeters        | **25 mm/s**                                                    |
+| Speed                 | Bridges                    | **25 mm/s**                                                    |
+| Advanced              | XY size compensation       | **0**                                                          |
+| Advanced              | Elephant foot compensation | 0.2 mm                                                         |
 
 **Filament Settings — a separate profile from Print Settings.** Temperatures and
 fan live here, not in the Print Settings profile. Start from `Generic PLA`, save
@@ -1480,39 +1442,39 @@ deterministic no matter what the base preset ships with. If you prefer a finer
 finish, `0.15mm STRUCTURAL @MINI` works identically — just leave _Layer height_ at
 0.15 and expect roughly a third more print time.
 
-| Page                  | Setting                       | Value                                   |
-| --------------------- | ----------------------------- | --------------------------------------- |
-| Layers and perimeters | Layer height                  | **0.20**                                |
-| Layers and perimeters | First layer height            | **0.20**                                |
-| Layers and perimeters | Perimeters                    | **4**                                   |
-| Layers and perimeters | Top solid layers              | **5**                                   |
-| Layers and perimeters | Bottom solid layers           | **5**                                   |
-| Layers and perimeters | Perimeter generator           | Arachne                                 |
-| Layers and perimeters | Detect bridging perimeters    | ✔                                       |
-| Layers and perimeters | Thick bridges                 | ✘ unchecked                             |
-| Layers and perimeters | Seam position                 | Aligned                                 |
-| Layers and perimeters | External perimeters first     | ✘ unchecked                             |
-| Infill                | Fill density                  | **40 %**                                |
-| Infill                | Fill pattern                  | Gyroid                                  |
-| Infill                | Top / Bottom fill pattern     | Monotonic                               |
-| Infill                | Combine infill every          | 1                                       |
-| Infill                | Infill/perimeters overlap     | 25 %                                    |
-| Skirt and brim        | Brim type                     | Outer brim only                         |
-| Skirt and brim        | Brim width                    | **5 mm** (crossbeam plate only, else 0) |
-| Skirt and brim        | Brim separation gap           | 0.1 mm                                  |
+| Page                  | Setting                       | Value                                                          |
+| --------------------- | ----------------------------- | -------------------------------------------------------------- |
+| Layers and perimeters | Layer height                  | **0.20**                                                       |
+| Layers and perimeters | First layer height            | **0.20**                                                       |
+| Layers and perimeters | Perimeters                    | **4**                                                          |
+| Layers and perimeters | Top solid layers              | **5**                                                          |
+| Layers and perimeters | Bottom solid layers           | **5**                                                          |
+| Layers and perimeters | Perimeter generator           | Arachne                                                        |
+| Layers and perimeters | Detect bridging perimeters    | ✔                                                              |
+| Layers and perimeters | Thick bridges                 | ✘ unchecked                                                    |
+| Layers and perimeters | Seam position                 | Aligned                                                        |
+| Layers and perimeters | External perimeters first     | ✘ unchecked                                                    |
+| Infill                | Fill density                  | **40 %**                                                       |
+| Infill                | Fill pattern                  | Gyroid                                                         |
+| Infill                | Top / Bottom fill pattern     | Monotonic                                                      |
+| Infill                | Combine infill every          | 1                                                              |
+| Infill                | Infill/perimeters overlap     | 25 %                                                           |
+| Skirt and brim        | Brim type                     | Outer brim only                                                |
+| Skirt and brim        | Brim width                    | **5 mm** (crossbeam plate only, else 0)                        |
+| Skirt and brim        | Brim separation gap           | 0.1 mm                                                         |
 | Support material      | Generate support material     | ✘ unchecked — **except `battery_box`**, see the modifier table |
-| Speed                 | Perimeters                    | **45 mm/s**                             |
-| Speed                 | Small perimeters              | **25 mm/s**                             |
-| Speed                 | External perimeters           | **25 mm/s**                             |
-| Speed                 | Infill                        | 60 mm/s                                 |
-| Speed                 | Solid infill                  | 50 mm/s                                 |
-| Speed                 | Top solid infill              | 30 mm/s                                 |
-| Speed                 | Bridges                       | **25 mm/s**                             |
-| Advanced              | Extrusion width — Default     | 0.45 mm                                 |
-| Advanced              | Extrusion width — First layer | 0.42 mm                                 |
-| Advanced              | Extrusion width — Ext. perim. | 0.42 mm                                 |
-| Advanced              | XY size compensation          | **0**                                   |
-| Advanced              | Elephant foot compensation    | 0.2 mm                                  |
+| Speed                 | Perimeters                    | **45 mm/s**                                                    |
+| Speed                 | Small perimeters              | **25 mm/s**                                                    |
+| Speed                 | External perimeters           | **25 mm/s**                                                    |
+| Speed                 | Infill                        | 60 mm/s                                                        |
+| Speed                 | Solid infill                  | 50 mm/s                                                        |
+| Speed                 | Top solid infill              | 30 mm/s                                                        |
+| Speed                 | Bridges                       | **25 mm/s**                                                    |
+| Advanced              | Extrusion width — Default     | 0.45 mm                                                        |
+| Advanced              | Extrusion width — First layer | 0.42 mm                                                        |
+| Advanced              | Extrusion width — Ext. perim. | 0.42 mm                                                        |
+| Advanced              | XY size compensation          | **0**                                                          |
+| Advanced              | Elephant foot compensation    | 0.2 mm                                                         |
 
 Leaving _XY size compensation_ at 0 is deliberate: it would shift the Ø5.7 insert
 pockets and the Ø4.4 bolt holes together, and those two want opposite corrections.
@@ -1547,10 +1509,10 @@ inter-layer bond at a load-bearing face.
 Two settings are best applied per object rather than globally. Right-click the
 object in the 3D view → _Add settings_.
 
-| Object          | Modifier                                                | Why                                                                                                                                                                                                                            |
-| --------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `side_panel` ×2 | **Height range modifier, 0 → 4 mm, Fill density 100 %** | Guarantees the 3.5 mm ligament under the M5 recess is fully solid. At 0.20 mm that band is ~17 layers, so 5 top + 5 bottom solid layers would otherwise leave ~7 layers of _infill_ inside the one feature carrying the radio. |
-| `crossbeam` ×4  | _Layers and perimeters → Perimeters_ = **5**            | Lets the beams run 5 perimeters on a plate sliced with the global 4, without a second profile.                                                                                                                                 |
+| Object          | Modifier                                                       | Why                                                                                                                                                                                                                                                                                        |
+| --------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `side_panel` ×2 | **Height range modifier, 0 → 4 mm, Fill density 100 %**        | Guarantees the 3.5 mm ligament under the M5 recess is fully solid. At 0.20 mm that band is ~17 layers, so 5 top + 5 bottom solid layers would otherwise leave ~7 layers of _infill_ inside the one feature carrying the radio.                                                             |
+| `crossbeam` ×4  | _Layers and perimeters → Perimeters_ = **5**                   | Lets the beams run 5 perimeters on a plate sliced with the global 4, without a second profile.                                                                                                                                                                                             |
 | `battery_box`   | **Support material = on, _Support on build plate only_ = OFF** | Two things need it: the front tabs start 54 mm up with **385 mm²** in mid-air, and all four Ø16 feet lie on their sides so their undersides begin tangentially (§2.9). Build-plate-only support will not generate for the tabs — the column has to stand on the **back tab**, not the bed. |
 
 The height range modifier is the precise fix and costs almost nothing — 4 mm of a
@@ -1568,15 +1530,15 @@ Five plates cover the frame and battery box. A compute module adds one more plat
 for either front variant, or **two** for the inline box. Footprints verified
 against the bed:
 
-| Plate | Contents                                     | Footprint    | Margin      |
-| ----- | -------------------------------------------- | ------------ | ----------- |
-| 1     | 1 × `side_panel`                             | 175 × 70 mm  | **5** / 110 mm |
-| 2     | 1 × `side_panel` (the second one)            | 175 × 70 mm  | **5** / 110 mm |
-| 3     | 4 × `crossbeam`, stacked in Y, 5 mm brim     | 134 × 122 mm | 46 / 58 mm  |
-| 4     | 2 × `antenna_mount`                          | 35 × 48 mm   | 145 / 132 mm |
-| 5     | `battery_box` (**not optional** — §2.9)      | 143 × 83.8 mm | 37 / 96 mm  |
-| 7a    | `compute_box_inline` (only if you build it)  | 143 × 100 mm | 37 / 80 mm, 39 mm tall |
-| 7b    | `compute_box_inline_cover`                   | 143 × 100 mm | 37 / 80 mm, 18 mm tall (lugs up) |
+| Plate | Contents                                    | Footprint     | Margin                           |
+| ----- | ------------------------------------------- | ------------- | -------------------------------- |
+| 1     | 1 × `side_panel`                            | 175 × 70 mm   | **5** / 110 mm                   |
+| 2     | 1 × `side_panel` (the second one)           | 175 × 70 mm   | **5** / 110 mm                   |
+| 3     | 4 × `crossbeam`, stacked in Y, 5 mm brim    | 134 × 122 mm  | 46 / 58 mm                       |
+| 4     | 2 × `antenna_mount`                         | 35 × 48 mm    | 145 / 132 mm                     |
+| 5     | `battery_box` (**not optional** — §2.9)     | 143 × 83.8 mm | 37 / 96 mm                       |
+| 7a    | `compute_box_inline` (only if you build it) | 143 × 100 mm  | 37 / 80 mm, 39 mm tall           |
+| 7b    | `compute_box_inline_cover`                  | 143 × 100 mm  | 37 / 80 mm, 18 mm tall (lugs up) |
 
 The inline box needs **two plates of its own** — tray and cover are both
 143 × 100, and neither pairing fits (286 mm side by side, 200 mm stacked).
