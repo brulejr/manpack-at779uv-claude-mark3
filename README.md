@@ -2,7 +2,7 @@
 
 > I hope you enjoy this AI-based design effort to build a hiking radio. Please let me know if
 > you discover anything odd. <br/>
-> \- KC1ZDJ, Jon Brule
+> \- [KC1ZDJ](https://www.qrz.com/db/KC1ZDJ)
 
 This project is a 3D-printed internal frame that turns a mobile amateur-radio transceiver into a
 self-contained UHF / VHF man-portable pack. The **AnyTone AT-779UV** bolts into a rigid box
