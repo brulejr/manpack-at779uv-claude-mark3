@@ -1,19 +1,19 @@
 # Modular manpack internal frame — AnyTone AT-779UV
 
-A 3D-printed internal frame that turns a mobile amateur-radio transceiver into a
-self-contained man-portable pack. The **AnyTone AT-779UV** bolts into a rigid box
+This is a 3D-printed internal frame that turns a mobile amateur-radio transceiver into a
+self-contained UHF / VHF man-portable pack. The **AnyTone AT-779UV** bolts into a rigid box
 of two side panels and four crossbeams; a battery box carrying a 12 V LiFePO4 pack
 joins underneath, and an optional compute module hangs below that with a Libre
-Computer La Frite for logging and digital modes. Antenna bulkheads mount on a rail
-across the top front, so the coax terminates at the frame rather than dangling off
-the radio.
+Computer La Frite for logging and digital modes. External connectors such as the antenna, USB,
+and compute power switch mount on a rail across the top front as bulkheads, so the cables
+terminate at the frame rather than dangling off the components.
 
-Nothing is glued and nothing is printed as one piece. The joints are stainless
+Nothing is glued, and nothing is printed as one piece. The joints are stainless
 socket caps into brass heat-set inserts — M4 where the frame carries load, M3 only
 where an off-the-shelf part dictates it — so the stack comes apart for service and
 grows by bolting another module beneath the last one.
 
-**It is built around one bag.** The target is a
+**This frame is built around one bag although the design is flexible.** The target is a
 [Qcute waterproof MOLLE sling pack](https://www.amazon.com/dp/B014XYQI18) — the
 frame's outside dimensions are what that bag will swallow, not what the radio alone
 would need. The fit is tight enough to have driven real design changes: a built
@@ -22,13 +22,13 @@ catching on a bag they only just fitted, so the handles were folded into the sid
 panels instead. That took assembled width from 166.25 mm to **142.25 mm** and
 removed two parts and twelve bolts along the way.
 
-| | |
-| --- | --- |
-| Frame body | 142.25 × 70 × 180 mm |
+|                                       |                       |
+| ------------------------------------- | --------------------- |
+| Frame body                            | 142.25 × 70 × 180 mm  |
 | Assembled, including antenna brackets | 142.25 × 108 × 200 mm |
-| Pack height, radio + battery | 226.8 mm |
-| Pack height, + compute module | 281.8 mm |
-| Radio bay | 124.25 × 38 × 107 mm |
+| Pack height, radio + battery          | 226.8 mm              |
+| Pack height, + compute module         | 281.8 mm              |
+| Radio bay                             | 124.25 × 38 × 107 mm  |
 
 **Everything prints on a Prusa Mini.** The reference design this began from is a
 single 228 mm part that fits no orientation on a 180 × 180 bed. It is decomposed
@@ -36,7 +36,8 @@ here into 14 printable pieces, the largest being the side panel at 175 mm — 5 
 margin, the tightest tolerance in the project. A complete frame with its battery
 box is 11 parts and roughly 451 cm³ of plastic.
 
-Printed in PLA and in service.
+Currently, this frame is printed as a prototype in PLA and in service. Ultimately, it will be
+printed in PETG for durability.
 
 ## Background
 
@@ -376,15 +377,15 @@ share an identical leg, gusset ribs and M4 bolt pattern, so any of them bolts to
 the same inserts in the top-front crossbeam — you can swap connector type later
 without reprinting anything else.
 
-|                       | `antenna_mount_bnc`     | `antenna_mount_so239`                      | `antenna_mount_usb`              |
-| --------------------- | ----------------------- | ------------------------------------------ | -------------------------------- |
-| Connector             | BNC bulkhead            | SO-239 / UHF female, 4-hole flange         | USB bulkhead, Ø23 body           |
-| Bore                  | **Ø12.468 mm** [PORTED] | **Ø15.88 mm** (0.625")                     | **Ø15.5 mm, keyed**              |
-| Anti-rotation         | —                       | the flange screws                          | **1.0 mm flat** on +X, 14.5 a/f  |
-| Flange screws         | —                       | 4 × Ø3.4 on a **17.98 mm** square (0.708") | — (captive on its own nut)       |
-| Forward reach         | 25 mm [PORTED]          | 30 mm                                      | 29 mm                            |
-| Bore setback from tip | 12.66 mm [PORTED]       | 17 mm                                      | 14.5 mm                          |
-| Print size            | 35 × 24 × 33 mm         | 35 × 24 × 38 mm                            | 35 × 24 × 37 mm                  |
+|                       | `antenna_mount_bnc`     | `antenna_mount_so239`                      | `antenna_mount_usb`             |
+| --------------------- | ----------------------- | ------------------------------------------ | ------------------------------- |
+| Connector             | BNC bulkhead            | SO-239 / UHF female, 4-hole flange         | USB bulkhead, Ø23 body          |
+| Bore                  | **Ø12.468 mm** [PORTED] | **Ø15.88 mm** (0.625")                     | **Ø15.5 mm, keyed**             |
+| Anti-rotation         | —                       | the flange screws                          | **1.0 mm flat** on +X, 14.5 a/f |
+| Flange screws         | —                       | 4 × Ø3.4 on a **17.98 mm** square (0.708") | — (captive on its own nut)      |
+| Forward reach         | 25 mm [PORTED]          | 30 mm                                      | 29 mm                           |
+| Bore setback from tip | 12.66 mm [PORTED]       | 17 mm                                      | 14.5 mm                         |
+| Print size            | 35 × 24 × 33 mm         | 35 × 24 × 38 mm                            | 35 × 24 × 37 mm                 |
 
 The BNC variant is the reference connector carried over verbatim — the reference
 STL is itself titled a _BNC bulkhead_ antenna mount, which is what the Ø12.468
