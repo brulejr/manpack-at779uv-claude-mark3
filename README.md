@@ -1,6 +1,10 @@
 # Modular manpack internal frame — AnyTone AT-779UV
 
-This is a 3D-printed internal frame that turns a mobile amateur-radio transceiver into a
+> I hope you enjoy this AI-based design effort to build a hiking radio. Please let me know if
+> you discover anything odd. <br/>
+> \- KC1ZDJ, Jon Brule
+
+This project is a 3D-printed internal frame that turns a mobile amateur-radio transceiver into a
 self-contained UHF / VHF man-portable pack. The **AnyTone AT-779UV** bolts into a rigid box
 of two side panels and four crossbeams; a battery box carrying a 12 V LiFePO4 pack
 joins underneath, and an optional compute module hangs below that with a Libre
