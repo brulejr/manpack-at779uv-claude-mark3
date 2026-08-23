@@ -20,13 +20,13 @@ $fa = 2;
 $fs = 0.4;
 
 /* [Output] */
-part = "assembly"; // [assembly, exploded, side_panel, crossbeam_top_front_dual, crossbeam_top_front_grid, crossbeam_top_back, crossbeam_bottom_front, crossbeam_bottom_front_rail, crossbeam_bottom_back, crossbeam_top_front_triple, compute_box_inline, compute_box_inline_cover, antenna_mount_bnc, antenna_mount_so239, antenna_mount_usb, battery_box]
+part = "assembly"; // [assembly, exploded, side_panel, crossbeam_top_front_dual, crossbeam_top_front_grid, crossbeam_top_back, crossbeam_bottom_front, crossbeam_bottom_front_rail, crossbeam_bottom_back, crossbeam_top_front_triple, compute_box_inline, compute_box_inline_cover, antenna_mount_bnc, antenna_mount_so239, antenna_mount_usb, antenna_mount_switch, battery_box]
 
 // which top-front crossbeam the assembly is built with
 top_front = "grid"; // [grid, triple, dual]
 
 // which connector variant the assembly views fit
-ant_style = "bnc"; // [bnc, so239, usb]
+ant_style = "bnc"; // [bnc, so239, usb, switch]
 
 // lightening / ventilation windows in the side panels
 panel_windows = true;
@@ -143,9 +143,16 @@ ant_rib_t     = 5;     // gusset rib thickness.  Was 8, which swallowed one whol
 ant_bolt_dx   = [ant_bracket_w/2 - rail_bolt_dx, ant_bracket_w/2 + rail_bolt_dx];
 
 // --- variant A: BNC bulkhead (the reference connector) ---
-bnc_bore_d  = 12.468;  // [PORTED]
+bnc_bore_d  = 12.468;  // [PORTED] round across the threaded barrel
 bnc_reach   = 25;      // [PORTED] cantilever forward of the frame front face
 bnc_setback = 12.66;   // [PORTED] bore centre, back from the pad's front tip
+// The barrel is flatted on TWO opposite sides, so the bore is a double-D rather
+// than the round hole the reference STL had.  af here is face to FACE -- the two
+// flats bracket the axis -- so each plane sits af/2 off centre.  az = 0 puts them
+// across the pad's long axis, i.e. facing frame front and back.
+bnc_flat_af  = 11;     // across flats, measured on the connector
+bnc_flat_az  = 0;
+bnc_flat_off = bnc_flat_af / 2;   // 5.5, axis to each flat plane
 
 // --- variant B: SO-239 / UHF female, 4-hole square flange ---
 //  0.625" panel cutout, four 0.138" holes on a 0.708" square (= 0.500" radius).
@@ -171,6 +178,7 @@ usb_body_d  = 23;      // body / shoulder OD: what the pad must actually clear
 usb_flat_dp = 1.0;     // depth of the flat, cut off the bore wall
 usb_flat_af = usb_bore_d - usb_flat_dp;  // 14.5, across flats: flat face to the
                                          //   far WALL of the bore
+usb_flat_off = usb_bore_d / 2 - usb_flat_dp;  // 6.75, axis to the flat plane
 usb_margin  = 3;       // pad material left beyond the body, tip end and leg end
 usb_flat_az = -90;     // which way the flat faces: -90 = +X, the bracket's inboard
                        //   side.  Free choice -- the bracket is placed twice
@@ -180,6 +188,31 @@ usb_flat_az = -90;     // which way the flat faces: -90 = +X, the bracket's inbo
 // which fixes the reach and centres the bore in it.
 usb_reach   = usb_body_d + 2 * usb_margin;   // 29
 usb_setback = usb_reach / 2;                 // 14.5 -> body centred on the pad
+
+// --- variant D: pushbutton power switch, plain round bore ---
+//  A Ø12 panel barrel.  No flats: unlike the USB and BNC bulkheads this one is
+//  not keyed, so the bore is a plain cylinder.  If your switch does have a key,
+//  keyed_bore() already cuts it -- give the variant a flat_off/flat_n like the
+//  others and nothing else changes.
+//
+//  Reach and setback are NOT new numbers.  The finished bore is within 0.032 mm of
+//  the BNC's Ø12.468, so the pad that already carries a BNC bore carries this one
+//  on identical geometry; taking the ported values keeps every switch mount
+//  interchangeable with a BNC mount on the same crossbeam inserts.  What that pad
+//  affords behind the bezel is sw_bezel_max below -- check your switch against it.
+//  Ø12 nominal printed exactly 12 was too tight to fit.  The bore is therefore
+//  barrel + clearance, kept as two numbers so a different switch or a different
+//  printer only moves the one that actually changed.  0.5 sits just above this
+//  model's own convention for a shaft through a printed hole -- m4_clear and
+//  so239_flange_hole are both nominal + 0.4 -- and well short of the 1.0 that
+//  would let the barrel sit 0.5 mm off centre before the nut bites.
+sw_barrel_d = 12;             // the switch barrel, measured
+sw_fit_cl   = 0.5;            // diametral clearance
+sw_bore_d   = sw_barrel_d + sw_fit_cl;   // 12.5
+sw_reach    = bnc_reach;      // 25, ported via the BNC pad
+sw_setback  = bnc_setback;    // 12.66, ditto
+// largest bezel/nut the pad backs without overhanging the tip or fouling the leg
+sw_bezel_max = 2 * min(sw_setback, sw_reach - sw_setback);   // 24.68
 
 // -----------------------------------------------------------------------------
 //  PORTED HANDLE FEATURE
@@ -394,8 +427,10 @@ grip_round = 2;      // edge radius on the arch, through the plate's 9 mm.  2 ra
 BED = 180;
 echo(str("frame body            = ", frame_w, " x ", frame_d, " x ", z_tb1, " mm"));
 echo(str("assembled envelope    = ", frame_w, " x ",
-         frame_d + ant_leg_t + max(bnc_reach, so239_reach, usb_reach), " x ",
+         frame_d + ant_leg_t + max(bnc_reach, so239_reach, usb_reach, sw_reach), " x ",
          handle_z2, " mm  (depth shown for the deeper SO-239 bracket)"));
+echo(str("switch mount          = ", sw_bore_d, " mm bore, pad backs a bezel up to ",
+         sw_bezel_max, " mm"));
 echo(str("radio bay (WxDxH)     = ", radio_w, " x ", frame_d - 2 * beam_d,
          " x ", bay_h, " mm"));
 echo(str("radio clearance  side = ", (frame_d - 2 * beam_d - radio_h) / 2,
@@ -433,6 +468,14 @@ assert(ant_bolt_dx[0] - m4_cb_d/2 >= ant_rib_t &&
 // at or past the centre it would sever the bore, at the wall there is no flat.
 assert(usb_flat_af > usb_bore_d / 2 && usb_flat_af < usb_bore_d,
        "USB flat lies outside the bore");
+// BNC double-D: the flats must bite the bore without severing it, and must leave
+// enough chord that the threaded barrel still passes.
+assert(bnc_flat_af > 0 && bnc_flat_af < bnc_bore_d,
+       "BNC flats lie outside the bore");
+// every connector bore has to sit in the clear span between the gusset ribs
+assert(max(bnc_bore_d, so239_bore_d, usb_bore_d, sw_bore_d)
+           < ant_bracket_w - 2 * ant_rib_t,
+       "a connector bore is wider than the clear span between the gusset ribs");
 // the body has to sit on the pad, not hang off its tip or foul the leg
 assert(usb_setback - usb_body_d / 2 >= usb_margin &&
        usb_reach - usb_setback - usb_body_d / 2 >= usb_margin,
@@ -707,27 +750,41 @@ module panel_profile() {
 //  Local frame: X 0..ant_bracket_w (0 = outboard edge), Y -(leg+reach)..0,
 //               Z 0..beam_h (0 = the top-front beam's underside).
 // =============================================================================
-//  Connector bore.  af = 0 gives a plain round hole; af > 0 gives a round hole
-//  with one flat, keyed against rotation.  af is measured ACROSS FLATS -- from
-//  the flat face straight across to the far wall -- so the flat plane sits
-//  (af - d/2) off centre.
+//  Connector bore, optionally flatted so the connector cannot spin when a plug is
+//  twisted in.  n = 0 is a plain round hole, 1 a D, 2 a double-D.
 //
-//  az rotates which way the flat faces: 0 = +Y (toward the bracket leg), 90 = -X,
-//  -90 = +X.  Orientation is free here because the bracket is placed twice
-//  UNMIRRORED, so whichever way the flat points, both mounts key their connector
-//  identically.  The pad is symmetric about the bore in X, and the flat only ever
-//  removes bore, never pad, so no azimuth brings it nearer a gusset rib.
-module keyed_bore(d, af, h, az = 0) {
-    if (af <= 0) cylinder(d = d, h = h);
-    else intersection() {
+//  `off` is the distance from the bore AXIS to each flat plane.  That is the one
+//  convention both cases share: "across flats" means face-to-far-wall for a single
+//  flat but face-to-face for a pair, so each variant derives `off` from whichever
+//  it actually measured.  Collapsing them onto one `af` argument is how you end up
+//  cutting a 1 mm flat where you meant 5.5 mm.
+//
+//  az rotates the flats: 0 puts them across Y (frame front and back), 90 across X.
+//  Orientation is free because the bracket is placed twice UNMIRRORED, so whichever
+//  way the flats point, both mounts key their connector identically.  Flats only
+//  ever remove bore, never pad, so no azimuth brings one nearer a gusset rib.
+module keyed_bore(d, h, off = 0, n = 0, az = 0) {
+    if (n <= 0)
         cylinder(d = d, h = h);
-        rotate([0, 0, az])
-            translate([-d, -d, -1]) cube([2 * d, d + af - d / 2, h + 2]);
-    }
+    else if (n == 1)
+        intersection() {
+            cylinder(d = d, h = h);
+            rotate([0, 0, az])
+                translate([-d, -d, -1]) cube([2 * d, d + off, h + 2]);
+        }
+    else
+        // A centred slab, NOT two half-spaces: `intersection() { for (...) }`
+        // unions its loop bodies in OpenSCAD, and the union of two opposite
+        // half-spaces is everything -- the flats would silently vanish.
+        intersection() {
+            cylinder(d = d, h = h);
+            rotate([0, 0, az])
+                translate([-d, -off, -1]) cube([2 * d, 2 * off, h + 2]);
+        }
 }
 
 module antenna_mount(bore_d, reach, setback, flange_p = 0, flange_d = 0,
-                     flat_af = 0, flat_az = 0) {
+                     flat_off = 0, flat_n = 0, flat_az = 0) {
     pad_z0 = beam_h - ant_pad_t;        // 20.25
     tip_y  = -(ant_leg_t + reach);
     bore_y = tip_y + setback;
@@ -756,7 +813,7 @@ module antenna_mount(bore_d, reach, setback, flange_p = 0, flange_d = 0,
         }
         // connector bore, keyed if the variant calls for it
         translate([bore_x, bore_y, pad_z0 - 1])
-            keyed_bore(bore_d, flat_af, ant_pad_t + 2, flat_az);
+            keyed_bore(bore_d, ant_pad_t + 2, flat_off, flat_n, flat_az);
         // SO-239 only: four flange screw holes on a square pattern
         if (flange_p > 0)
             for (dx = [-flange_p/2, flange_p/2], dy = [-flange_p/2, flange_p/2])
@@ -771,7 +828,8 @@ module antenna_mount(bore_d, reach, setback, flange_p = 0, flange_d = 0,
 }
 
 module antenna_mount_bnc() {
-    antenna_mount(bnc_bore_d, bnc_reach, bnc_setback);
+    antenna_mount(bnc_bore_d, bnc_reach, bnc_setback,
+                  flat_off = bnc_flat_off, flat_n = 2, flat_az = bnc_flat_az);
 }
 
 module antenna_mount_so239() {
@@ -779,15 +837,20 @@ module antenna_mount_so239() {
                   so239_flange_p, so239_flange_hole);
 }
 
+module antenna_mount_switch() {
+    antenna_mount(sw_bore_d, sw_reach, sw_setback);
+}
+
 module antenna_mount_usb() {
     antenna_mount(usb_bore_d, usb_reach, usb_setback,
-                  flat_af = usb_flat_af, flat_az = usb_flat_az);
+                  flat_off = usb_flat_off, flat_n = 1, flat_az = usb_flat_az);
 }
 
 // the variant drawn in the assembly views
 module antenna_mount_fitted() {
     if (ant_style == "so239") antenna_mount_so239();
     else if (ant_style == "usb") antenna_mount_usb();
+    else if (ant_style == "switch") antenna_mount_switch();
     else antenna_mount_bnc();
 }
 
@@ -1438,6 +1501,7 @@ else if (part == "crossbeam_bottom_back")
 else if (part == "antenna_mount_bnc")   rotate([-90, 0, 0]) antenna_mount_bnc();
 else if (part == "antenna_mount_so239") rotate([-90, 0, 0]) antenna_mount_so239();
 else if (part == "antenna_mount_usb")   rotate([-90, 0, 0]) antenna_mount_usb();
+else if (part == "antenna_mount_switch") rotate([-90, 0, 0]) antenna_mount_switch();
 
 // upside down: flat top face on the bed, feet upward, and every counterbore and
 // insert mouth opening upward -- no supports, no bridges

@@ -36,7 +36,7 @@ removed two parts and twelve bolts along the way.
 
 **Everything prints on a Prusa Mini.** The reference design this began from is a
 single 228 mm part that fits no orientation on a 180 × 180 bed. It is decomposed
-here into 14 printable pieces, the largest being the side panel at 175 mm — 5 mm of
+here into 15 printable pieces, the largest being the side panel at 175 mm — 5 mm of
 margin, the tightest tolerance in the project. A complete frame with its battery
 box is 11 parts and roughly 451 cm³ of plastic.
 
@@ -48,7 +48,7 @@ printed in PETG for durability.
 This is a clean-room decomposition of the single-piece reference STL from
 [RT-95 Manpack Rails and BNC bulkhead antenna mount](https://makerworld.com/en/models/1117937-rt-95-manpack-rails-and-bnc-bulkhead-antenna-mount?from=search#profileId-1115768) with the following notable changes:
 
-- Separated into printable modules — **14 STLs**, counting alternates — each of
+- Separated into printable modules — **15 STLs**, counting alternates — each of
   which fits a Prusa Mini (180 × 180 mm bed).
 - Every module-to-module joint uses stainless M4 socket-cap bolts into brass heat-set inserts.
   M3 appears only where an off-the-shelf part dictates it: the SBC and covers in
@@ -123,6 +123,7 @@ Two measurements drove real design decisions and are worth calling out:
 | 7a  | `antenna_mount_bnc`           | 2\*                 | 35 × 24 × 33         | 10.9 cm³  | —        |
 | 7b  | `antenna_mount_so239`         | 2\*                 | 35 × 24 × 38         | 11.6 cm³  | —        |
 | 7c  | `antenna_mount_usb`           | 2\*                 | 35 × 24 × 37         | 11.6 cm³  | —        |
+| 7d  | `antenna_mount_switch`        | 1\*                 | 35 × 24 × 33         | 10.9 cm³  | —        |
 | 10  | `battery_box`                 | **1, not optional** | 143 × 83.8 × 94.8    | 116.8 cm³ | 4 + tabs |
 | 12a | `compute_box_inline`          | 1\*\*\*             | 143 × 100 × 39       | 107.8 cm³ | 4 + 2 M3 |
 | 12b | `compute_box_inline_cover`    | 1\*\*\*             | 143 × 100 × 18       | 118.1 cm³ | 6 M3     |
@@ -136,9 +137,18 @@ rather than by a part of its own.
 \*\* Parts 2a–2c are alternatives — the three top-front layouts (§2.11). Print one.
 `_dual` is the original and is bit-identical to it, so an existing beam still fits.
 
-\* Parts 7a–7c are alternatives — print **two of whichever connector you use**, not
-a mixture. They share an identical leg, rib and bolt pattern, so they are
-interchangeable on the same crossbeam without touching anything else.
+\* Parts 7a–7d are the same bracket with different bores, sharing an identical leg,
+rib and bolt pattern, so they are interchangeable on the same crossbeam without
+touching anything else. Print **two of whichever connector you use**, not a
+mixture — except 7d, the switch mount, of which you want one.
+
+Note that a switch mount **plus** two antenna mounts needs the `_triple` top-front
+beam (§2.11). Bracket centres on `_grid` fall every 14 mm and a bracket is 35 mm
+wide, so two of them must sit at least three columns apart and the layout has room
+for **only two brackets**; the gap between the two antenna mounts is exactly
+35.00 mm, but no bolt column lands where a third would have to go. `_triple` pitches
+its three stations at 38 mm, which clears 35 mm with 3 mm to spare. On `_grid` or
+`_dual` the switch mount replaces one antenna mount.
 
 \*\*\* Part 12a is the only compute module, and it is optional. 12b is its cover and
 is not optional if you fit the box.
@@ -169,14 +179,15 @@ the bottom joint (§2.9). Everything else is opt-in.
 | ----------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Top-front beam    | `_dual` / `_triple` / `_grid` | `_dual` if you only want two antenna mounts and already own the printed beam — it is bit-identical. `_grid` if you want the accessory rail. `_triple` for three stations. |
 | Bottom-front beam | plain / `_rail`               | **The plain one.** `_rail` has no user now that the front compute boxes are gone; it is kept only for a future front accessory.                                           |
-| Antenna mounts ×2 | `_bnc` / `_so239` / `_usb`    | Two of whichever connector you use — never one of each. Same leg and bolt pattern, so you can swap later. `_usb` is a keyed Ø15 bulkhead rather than an antenna.          |
+| Antenna mounts ×2 | `_bnc` / `_so239` / `_usb`    | Two of whichever connector you use — never one of each. Same leg and bolt pattern, so you can swap later. `_usb` is a keyed Ø15.5 bulkhead rather than an antenna.        |
+| Switch mount      | `_switch` / none              | One, optional. A Ø12 pushbutton on the same bracket. Needs the `_triple` beam to coexist with two antenna mounts; on `_grid` or `_dual` it replaces one.                   |
 | Compute module    | `_inline` / none              | One option. **`_inline` hangs under the battery box** on its four feet and needs nothing else changed. Most builds need none of it.                                       |
 
 Largest part is the side panel at 175 mm — **5 mm of bed margin**, the tightest
 in the project. All meshes verified
 watertight, single-shell, and bed-legal.
 
-Solid volume is 742 cm³ for one of each of the fourteen part files. A full
+Solid volume is 753 cm³ for one of each of the fifteen part files. A full
 **11-piece** build (BNC mounts, battery box, no compute module) is **451 cm³** with
 the grid beam, 451 with the triple, 452 with the dual. Add **226 cm³** for the
 inline compute module — it hangs below the battery box and changes nothing else in
@@ -370,30 +381,44 @@ span and _grows_ to 8.25 mm into the shoulders.
 | stress, one-handed 6× drop-catch | 7.06 MPa | **3.47 MPa**  |
 | safety factor (PLA)              | 7.1      | **14.4**      |
 
-### 7 — `antenna_mount_bnc` / `_so239` / `_usb`
+### 7 — `antenna_mount_bnc` / `_so239` / `_usb` / `_switch`
 
-| BNC                                             | SO-239                                              | USB                                             |
-| ----------------------------------------------- | --------------------------------------------------- | ----------------------------------------------- |
-| ![antenna_mount_bnc](img/antenna_mount_bnc.png) | ![antenna_mount_so239](img/antenna_mount_so239.png) | ![antenna_mount_usb](img/antenna_mount_usb.png) |
+| BNC                                             | SO-239                                              | USB                                             | Switch                                                |
+| ----------------------------------------------- | --------------------------------------------------- | ----------------------------------------------- | ----------------------------------------------------- |
+| ![antenna_mount_bnc](img/antenna_mount_bnc.png) | ![antenna_mount_so239](img/antenna_mount_so239.png) | ![antenna_mount_usb](img/antenna_mount_usb.png) | ![antenna_mount_switch](img/antenna_mount_switch.png) |
 
-The reference ear, made modular and offered in three bulkhead variants. All three
+The reference ear, made modular and now carrying four different bores. All four
 share an identical leg, gusset ribs and M4 bolt pattern, so any of them bolts to
-the same inserts in the top-front crossbeam — you can swap connector type later
-without reprinting anything else.
+the same inserts in the top-front crossbeam — you can swap type later without
+reprinting anything else. Only the bore and the pad's length differ.
 
-|                       | `antenna_mount_bnc`     | `antenna_mount_so239`                      | `antenna_mount_usb`             |
-| --------------------- | ----------------------- | ------------------------------------------ | ------------------------------- |
-| Connector             | BNC bulkhead            | SO-239 / UHF female, 4-hole flange         | USB bulkhead, Ø23 body          |
-| Bore                  | **Ø12.468 mm** [PORTED] | **Ø15.88 mm** (0.625")                     | **Ø15.5 mm, keyed**             |
-| Anti-rotation         | —                       | the flange screws                          | **1.0 mm flat** on +X, 14.5 a/f |
-| Flange screws         | —                       | 4 × Ø3.4 on a **17.98 mm** square (0.708") | — (captive on its own nut)      |
-| Forward reach         | 25 mm [PORTED]          | 30 mm                                      | 29 mm                           |
-| Bore setback from tip | 12.66 mm [PORTED]       | 17 mm                                      | 14.5 mm                         |
-| Print size            | 35 × 24 × 33 mm         | 35 × 24 × 38 mm                            | 35 × 24 × 37 mm                 |
+| Variant   | Connector                | Bore                | Anti-rotation                            | Reach          | Setback           | Print size   |
+| --------- | ------------------------ | ------------------- | ---------------------------------------- | -------------- | ----------------- | ------------ |
+| `_bnc`    | BNC bulkhead             | **Ø12.468**, keyed  | two flats, **11 mm a/f**, front and back | 25 [PORTED]    | 12.66 [PORTED]    | 35 × 24 × 33 |
+| `_so239`  | SO-239 / UHF female      | **Ø15.88** (0.625") | its four Ø3.4 flange screws, 17.98 sq    | 30             | 17                | 35 × 24 × 38 |
+| `_usb`    | USB bulkhead, Ø23 body   | **Ø15.5**, keyed    | one **1.0 mm flat** on +X (14.5 a/f)     | 29             | 14.5              | 35 × 24 × 37 |
+| `_switch` | pushbutton power switch  | **Ø12.5**, round    | none — the barrel is unkeyed             | 25             | 12.66             | 35 × 24 × 33 |
 
-The BNC variant is the reference connector carried over verbatim — the reference
-STL is itself titled a _BNC bulkhead_ antenna mount, which is what the Ø12.468
-bore is for. The SO-239 variant reaches 30 mm rather than 25 mm and sets its bore
+How each connector is held: the SO-239 bolts through its own flange, the USB
+bulkhead is captive on its own nut behind a Ø23 body, and the switch is a plain
+Ø12 barrel on a nut. The pad backs a switch bezel up to **24.68 mm** before it
+would overhang the pad tip or foul the bracket leg — `sw_bezel_max` in the model,
+and worth checking against your switch, since bezels vary far more than barrels.
+
+The BNC variant takes the reference connector — the reference STL is itself titled
+a _BNC bulkhead_ antenna mount, which is what the Ø12.468 bore is for — but the
+bore is **no longer the plain round hole the reference had.** The barrel is flatted
+on two opposite sides, so the hole is a double-D: Ø12.468 across the threaded part,
+**11 mm across the flats**, which sit front and back across the pad's long axis.
+Each flat plane is therefore 5.5 mm off the axis, leaving a 5.87 mm flat face. The
+reach and setback are still the ported values.
+
+> **This changes a part you may already have printed.** The flats add 0.02 cm³ and
+> nothing else moves — leg, ribs, bolt pattern and outside shape are untouched — but
+> an existing BNC mount has a round hole and will let the connector spin. Reprint
+> the two BNC mounts; nothing else in the build is affected.
+
+The SO-239 variant reaches 30 mm rather than 25 mm and sets its bore
 17 mm back from the tip; both were needed so the rear pair of flange screws clears
 the bracket's own leg and the front pair keeps material at the pad tip.
 
@@ -407,6 +432,13 @@ bore**. The flat is a feature of the connector, so `usb_flat_dp` — its **depth
 independent literals that drift apart the moment the bore changes, which is
 exactly what happened when the bore was corrected from 15 to 15.5 mm.
 
+`keyed_bore()` cuts all of these, and it takes the offset from the bore **axis** to
+each flat plane rather than an across-flats figure. That is deliberate: "across
+flats" means face-to-far-wall for a single flat but face-to-face for a pair, so one
+shared `af` argument would silently cut a 1 mm flat where 5.5 mm was meant. Each
+variant converts its own measurement — `bore_d/2 - flat_dp` for the USB's single
+flat, `af/2` for the BNC's pair.
+
 Its reach and setback are not free choices. The Ø23 body has to clear the pad's
 front tip and the bracket leg by `usb_margin` at both ends, which fixes the reach
 at `usb_body_d + 2 × usb_margin` = 29 mm and centres the bore in it at 14.5 mm.
@@ -419,7 +451,30 @@ azimuth keys both mounts identically. The pad is symmetric about the bore in X,
 and the flat only ever removes bore — never pad — so no azimuth brings it nearer a
 gusset rib. The bore's nearest edge stays 4.75 mm clear of the rib either way.
 
-**All three variants are one part printed twice, never a mirrored pair.** An
+The switch variant carries a **Ø12 pushbutton power switch** — a panel control
+rather than a connector, but the same bracket, so it bolts to the rail alongside
+the antennas and the coax and the switch wiring all terminate at the frame. Its
+bore is plain round: unlike the BNC and USB bulkheads this barrel is not keyed. If
+yours is, `keyed_bore()` already cuts flats — give the variant a `flat_off` and
+`flat_n` like the others and nothing else changes.
+
+The **bore is Ø12.5, not Ø12**: printed at exactly nominal the barrel would not go
+in. It is written as `sw_barrel_d + sw_fit_cl` so the measured barrel and the fit
+allowance stay separable — a different switch or a different printer moves only
+the one that actually changed. The 0.5 mm sits just above this model's own
+convention for a shaft through a printed hole (`m4_clear` and `so239_flange_hole`
+are both nominal + 0.4) and well short of 1.0, which would let the barrel sit
+0.5 mm off centre before the nut bites. Err small: opening a printed hole with a
+reamer takes seconds, an oversized one is a reprint.
+
+Its reach and setback are **not new numbers**: the finished bore lands within
+0.032 mm of the BNC's Ø12.468, so the pad that already carries a BNC bore carries
+this one on identical geometry, and taking the ported values keeps a switch mount
+interchangeable with a BNC mount on the same inserts. That is also why it prints
+to the same 35 × 24 × 33 mm as the BNC variant, leaving 6.41 mm of pad to the tip
+and 6.09 mm to the leg.
+
+**Every variant is one part, never a mirrored pair.** An
 earlier revision needed a handed left/right pair because the bolt columns were
 offset to dodge the crossbeam's end-insert pockets. Insetting the whole bracket
 6 mm from the panel inner face solves that instead, which lets the bolts sit
@@ -431,7 +486,10 @@ to both stations with the flat pointing the same way in the frame.
 Verified: bore clear below each pad for the connector body, all four flange-screw
 nut positions clear, and zero enclosed voids in any of the three. The USB bore
 measures 15.50 mm across the round axis and 14.50 mm across the flat, with the
-flat on the +X side and 4.75 mm of clearance from the bore to the nearest rib.
+flat on the +X side and 4.75 mm of clearance from the bore to the nearest rib. The
+BNC bore measures 12.468 mm round and 11.00 mm across its two flats, spanning the
+pad's Y axis 14.84…25.84 in print pose. The switch bore measures 12.50 mm on both
+axes, centred exactly where the BNC bore sits.
 
 ### 9 — the bottom joint: tabs, not a plate
 
