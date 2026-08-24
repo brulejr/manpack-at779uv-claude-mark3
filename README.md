@@ -36,7 +36,7 @@ removed two parts and twelve bolts along the way.
 
 **Everything prints on a Prusa Mini.** The reference design this began from is a
 single 228 mm part that fits no orientation on a 180 × 180 bed. It is decomposed
-here into 15 printable pieces, the largest being the side panel at 175 mm — 5 mm of
+here into 16 printable pieces, the largest being the side panel at 175 mm — 5 mm of
 margin, the tightest tolerance in the project. A complete frame with its battery
 box is 11 parts and roughly 451 cm³ of plastic.
 
@@ -48,7 +48,7 @@ printed in PETG for durability.
 This is a clean-room decomposition of the single-piece reference STL from
 [RT-95 Manpack Rails and BNC bulkhead antenna mount](https://makerworld.com/en/models/1117937-rt-95-manpack-rails-and-bnc-bulkhead-antenna-mount?from=search#profileId-1115768) with the following notable changes:
 
-- Separated into printable modules — **15 STLs**, counting alternates — each of
+- Separated into printable modules — **16 STLs**, counting alternates — each of
   which fits a Prusa Mini (180 × 180 mm bed).
 - Every module-to-module joint uses stainless M4 socket-cap bolts into brass heat-set inserts.
   M3 appears only where an off-the-shelf part dictates it: the SBC and covers in
@@ -60,7 +60,7 @@ This is a clean-room decomposition of the single-piece reference STL from
   (§2.9) — no base plate, no feet, and it is a structural member rather than an
   accessory.
 
-| frame + battery box          | with `compute_box_inline` in the stack      |
+| frame + battery box          | with `compute_box_inline_lafrite` in the stack      |
 | ---------------------------- | ------------------------------------------- |
 | ![assembly](img/asm_iso.png) | ![assembly, inline box](img/asm_inline.png) |
 
@@ -125,8 +125,9 @@ Two measurements drove real design decisions and are worth calling out:
 | 7c  | `antenna_mount_usb`           | 2\*                 | 35 × 24 × 37         | 11.6 cm³  | —        |
 | 7d  | `antenna_mount_switch`        | 1\*                 | 35 × 24 × 33         | 10.9 cm³  | —        |
 | 10  | `battery_box`                 | **1, not optional** | 143 × 83.8 × 94.8    | 116.8 cm³ | 4 + tabs |
-| 12a | `compute_box_inline`          | 1\*\*\*             | 143 × 100 × 39       | 107.8 cm³ | 4 + 2 M3 |
-| 12b | `compute_box_inline_cover`    | 1\*\*\*             | 143 × 100 × 18       | 118.1 cm³ | 6 M3     |
+| 12a | `compute_box_inline_lafrite`  | 1\*\*\*             | 143 × 100 × 39       | 107.8 cm³ | 4 + 2 M3 |
+| 12b | `compute_box_inline_sweetpotato` | 1\*\*\*          | 143 × 100 × 39       | 108.0 cm³ | 4 + 2 M3 |
+| 12c | `compute_box_inline_cover`    | 1\*\*\*             | 143 × 100 × 18       | 118.1 cm³ | 6 M3     |
 
 Numbers track the §2 subsections below, so 6, 8 and 9 are absent as _parts_: §2.6
 is the handle, now part of the side panel; §2.8 folded into §2.7 when the antenna
@@ -150,8 +151,11 @@ for **only two brackets**; the gap between the two antenna mounts is exactly
 its three stations at 38 mm, which clears 35 mm with 3 mm to spare. On `_grid` or
 `_dual` the switch mount replaces one antenna mount.
 
-\*\*\* Part 12a is the only compute module, and it is optional. 12b is its cover and
-is not optional if you fit the box.
+\*\*\* The compute module is optional. 12a and 12b are **alternative trays** — one
+per board, print whichever matches yours — and 12c is the cover, which is not
+optional if you fit either. The two trays share an identical shell, cavity and
+tray-to-cover screw pattern, so **one cover fits both**; only the internal
+furniture differs.
 
 **The battery box is now a structural member, not an accessory.** Its tabs are
 what join the bottom crossbeams to the side panels (§2.9); without it the beams
@@ -159,7 +163,7 @@ stop 9 mm short of each panel and the frame has no bottom bracing. It cannot be
 left off, and it cannot be removed in the field without opening the frame up.
 
 It is also **the only thing that carries frame load.** Everything else in the stack
-hangs beneath it on its four Ø16 feet, `compute_box_inline` included — so the whole
+hangs beneath it on its four Ø16 feet, `compute_box_inline_lafrite` included — so the whole
 bottom bracing stays inside this box's 8 mm flange rather than running through any
 module below it.
 
@@ -181,13 +185,13 @@ the bottom joint (§2.9). Everything else is opt-in.
 | Bottom-front beam | plain / `_rail`               | **The plain one.** `_rail` has no user now that the front compute boxes are gone; it is kept only for a future front accessory.                                           |
 | Antenna mounts ×2 | `_bnc` / `_so239` / `_usb`    | Two of whichever connector you use — never one of each. Same leg and bolt pattern, so you can swap later. `_usb` is a keyed Ø15.5 bulkhead rather than an antenna.        |
 | Switch mount      | `_switch` / none              | One, optional. A Ø12 pushbutton on the same bracket. Needs the `_triple` beam to coexist with two antenna mounts; on `_grid` or `_dual` it replaces one.                   |
-| Compute module    | `_inline` / none              | One option. **`_inline` hangs under the battery box** on its four feet and needs nothing else changed. Most builds need none of it.                                       |
+| Compute module    | `_lafrite` / `_sweetpotato` / none | Optional, and hangs under the battery box needing nothing else changed. Pick the tray for your board — La Frite (64 × 56, M3) or Sweet Potato (85 × 56, M2.5). Same cover either way. |
 
 Largest part is the side panel at 175 mm — **5 mm of bed margin**, the tightest
 in the project. All meshes verified
 watertight, single-shell, and bed-legal.
 
-Solid volume is 753 cm³ for one of each of the fifteen part files. A full
+Solid volume is 861 cm³ for one of each of the sixteen part files. A full
 **11-piece** build (BNC mounts, battery box, no compute module) is **451 cm³** with
 the grid beam, 451 with the triple, 452 with the dual. Add **226 cm³** for the
 inline compute module — it hangs below the battery box and changes nothing else in
@@ -580,7 +584,7 @@ the 13.5 mm clear zone in front of the pack and stops it sliding out.
 **It presents the same interface on its underside that it consumes on top.** Four
 Ø16 × 8 mm feet with M4 inserts sit at the same X 14 / 128.25, Y 12 / 58, so a
 further module bolts under the battery frame on the same pattern the frame itself
-once used upward — `compute_box_inline` hangs from exactly these four. Verified by
+once used upward — `compute_box_inline_lafrite` hangs from exactly these four. Verified by
 stacking a second copy at the 59.8 mm pitch with zero interference and all four
 bolts clean. Cables reach a module below
 through the floor windows, so no extra pass-through was needed.
@@ -684,13 +688,13 @@ with; it also moves the antenna brackets to that layout's outer stations.
 
 ---
 
-### 12 — `compute_box_inline`
+### 12 — `compute_box_inline_lafrite` / `_sweetpotato`
 
-![inline](img/compute_box_inline.png)
+![inline](img/compute_box_inline_lafrite.png)
 
 > **Both front-mounted compute boxes have been deleted** — the deep
 > `compute_box_front` and the flatter `compute_box_front_slim`, with their covers,
-> modules, exports, STLs and renders. `compute_box_inline`, which hangs under the
+> modules, exports, STLs and renders. `compute_box_inline_lafrite`, which hangs under the
 > battery box, is the only compute module left. History up to `f622eba`.
 
 Carries a **Libre Computer La Frite** (AML-S805X-AC, 64 × 56 mm, M3 mounting on
@@ -725,7 +729,7 @@ rather than merely tight. If a later measurement lands nearer one end of the ran
 This is the second assumption in the project that only a printed part could
 retire — the first was the antenna bracket's sealed counterbores.
 
-|                   | `compute_box_inline`                             |
+|                   | `compute_box_inline_lafrite`                             |
 | ----------------- | ------------------------------------------------ |
 | Mounts to         | the battery box's four feet, hanging below it    |
 | Outer, tray       | 143 × 100 × **39 mm**                            |
@@ -740,7 +744,7 @@ retire — the first was the antenna bracket's sealed counterbores.
 
 | plan (cover off)                                | cover                                             |
 | ----------------------------------------------- | ------------------------------------------------- |
-| ![inline plan](img/compute_box_inline_plan.png) | ![inline cover](img/compute_box_inline_cover.png) |
+| ![inline plan](img/compute_box_inline_lafrite_plan.png) | ![inline cover](img/compute_box_inline_cover.png) |
 
 **It sits at the bottom of the stack and carries no frame load at all.** It hangs
 from the battery box's four Ø16 feet on **4 × M4 × 12** — the same joint the battery
@@ -879,6 +883,75 @@ arriving in mid-air, which was the base plate's old failure mode reintroduced.
 Dropping the feet — which the reordering does anyway, since this is the bottom of
 the stack — retires it completely.
 
+#### 12b — the Sweet Potato tray
+
+| tray | plan (cover off) |
+| ---- | ---------------- |
+| ![sweetpotato](img/compute_box_inline_sweetpotato.png) | ![sweetpotato plan](img/compute_box_inline_sweetpotato_plan.png) |
+
+A second tray for the **Libre Computer Sweet Potato** (AML-S905X-CC-V2), which is
+Raspberry Pi 3 form factor: **85 × 56 mm**, mounting holes on a **58 × 49 mm**
+rectangle set 3.5 mm in from the near end and both sides.
+
+**The shell is identical and that is the point.** Same outside, same cavity, same
+six horizontal M3s in the same places, so `compute_box_inline_cover` fits either
+tray and a cover you have already printed still serves. Only the furniture inside
+differs. Verified by probing all six cover-screw axes in both trays.
+
+Two things about the hole pattern are worth stating, because one of them is a trap:
+
+- It is **the same rectangle the La Frite uses** — this model carries that as
+  58.75 × 49.5, corrected against the printed part — so the standoff design
+  carries straight over. The board outline is what changes, 85 long against 64.
+- The rectangle is **not centred on the board.** It sits 3.5 mm from the near end
+  but 23.5 from the far one, because the USB/Ethernet bank occupies that end.
+  Deriving the far hole as _board length minus the inset_ puts it **78 mm** from
+  its partner instead of 58. The pattern has to be laid out from the near corner,
+  and an assert now checks it against the board outline.
+
+The board takes **M2.5**, not the La Frite's M3 — Ø2.7 holes are the Pi standard
+for this form factor. That is the one piece of new hardware this tray needs. The
+converter is unchanged and still M3: same part, same tabs.
+
+**Corner placement.** The board goes hard into the back-left corner, 1 mm off each
+wall — the Ø8 pads overhang it by 4 − 3.5 = 0.5, so the pads themselves keep 0.5
+of clearance. That puts the two connectorless faces, the plain end and the GPIO
+edge, against the walls and leaves both connector faces looking into open cavity:
+
+|                      | X                | Y            | note                                                       |
+| -------------------- | ---------------- | ------------ | ---------------------------------------------------------- |
+| Board                | 3.625 … 88.625   | 10.0 … 66.0  | standoffs 58 × 49, 8 mm tall, M2.5                          |
+| Converter            | 74.125 … 139.125 | −26.5 … 8.5  | flat along the front wall, 65 mm across X; blind M3 pads as on 12a |
+| USB / Ethernet zone  | 88.625 → 139.625 | 10 … 66      | **51 mm**, clear for the whole bank                          |
+| Power / HDMI / audio | full width       | −27 → 10     | **37 mm** for the first 70.5 mm, then 1.5 mm for the last 14.5 |
+
+**Why the converter lies along the front wall.** It has to intrude on one of the two
+connector zones — 65 × 35 does not fit the 51 × 37 corner where they meet, in either
+orientation — and this is the cheaper intrusion. Laid flat it leaves the USB and
+Ethernet bank its **full 51 mm** across the whole end; stood on end against the right
+wall instead, that column pinched to **15.5 mm**, barely enough to seat a USB-A plug.
+
+What it costs is the last **14.5 mm** of the front edge, which drops to 1.5 mm. That
+stretch is board-local X 70.5 … 85 — the part of the edge sitting under the USB
+stacks, which on this form factor carries no connector, since power, HDMI and audio
+all sit inboard of local X 60. The first 70.5 mm keeps its full 37 mm. It also crosses
+one cover-lug Y band instead of two.
+
+The real cost is the **12 V run**. The shared cover fixes the grommet at (105, 49), so
+the feed now travels 40.5 mm to the converter rather than 10.5, crossing the open USB
+column — worth a tie-down. Note the port positions along the front edge are inferred
+from the Pi 3B+ layout, not measured: the Sweet Potato swaps micro-USB for USB-C and
+no drawing for it was findable, so **check that last 14.5 mm against your own board**
+before printing.
+
+> **Two assumptions to check before printing.** The M2.5 insert figures
+> (`m25_ins_d` 3.2 for a 3.5 mm OD insert, `m25_ins_h` 5.0) follow the same rules as
+> the M3 and M4 sets, but M2.5 inserts vary more between suppliers than M3 does.
+> And the cover lugs reach 25 mm above the floor, so anything on the board or the
+> converter taller than that will foul them — the USB stack at roughly 15.5 mm above
+> a board sitting 9.6 mm up has about 10 mm to spare, but that is a calculation, not
+> a measurement.
+
 ### Radio mount position — and why the RT-95 was dropped
 
 The mount is **one M5 hole per side at Z 129**, derived from the frame top rather
@@ -961,7 +1034,8 @@ is easy to miss when ordering. Everything structural stays M4.
 | Inline box tray → its cover                                    | M3 × 10, **horizontal** | 6           | lugs under the cover                 |
 | SO-239 flange → antenna mount                                  | M3 × 10 + nut           | 4 per mount | (through-holes; SO-239 variant only) |
 | USB bulkhead → antenna mount                                   | its own captive nut     | 1 per mount | (keyed bore; USB variant only)       |
-| La Frite → compute box                                         | M3 × 8                  | 4           | box standoffs                        |
+| La Frite → compute box (12a)                                   | M3 × 8                  | 4           | box standoffs                        |
+| Sweet Potato → compute box (12b)                               | **M2.5 × 8**            | 4           | box standoffs                        |
 | **Radio → side panels**                                        | **M5 × 10–12**          | **2**       | the radio's own threaded side holes  |
 
 M4 × 12 is correct **everywhere except the eight bottom-row bolts**: 4.0 mm
@@ -986,7 +1060,7 @@ and 8.5 mm into the radio.
 | `side_panel`               | flat, **inner** face down         | M5 recess and all 8 beam counterbores open upward; only 4 × Ø8.2 bridges                                                                                                                                 |
 | `crossbeam` ×4             | long axis on the bed, 24 mm tall  | end **and** front-face inserts both come out in-plane                                                                                                                                                    |
 | `antenna_mount` ×2         | on its back                       | every layer smaller than the one below — no supports; one symmetric part, print two                                                                                                                      |
-| `compute_box_inline`       | **floor down**, open side up      | flat underside — it is the bottom of the stack and has no feet, so nothing overhangs and it needs **no support**                                                                                         |
+| `compute_box_inline_lafrite`       | **floor down**, open side up      | flat underside — it is the bottom of the stack and has no feet, so nothing overhangs and it needs **no support**                                                                                         |
 | `compute_box_inline_cover` | **top face down**, lugs up        | the six lugs hang below the plate in use, so the right way up they would print as a 143 × 100 ceiling on six blocks. Inverted, the battery-facing face is the bed face and the lugs rise as plain blocks |
 | `battery_box`              | **back wall down**, open front up | floor-down would cantilever both top flanges 19.5 mm along their whole length; on its back they become ribs off the back wall. **Two of the four tabs now need support** — see §8                        |
 
@@ -1019,7 +1093,7 @@ constraint from the lap pads is gone.
    If you fit the `_rail` bottom beam, that carries the same 14 in its front face.
    **The battery box's tabs take no inserts** — they are plain through-holes and the
    threads are all in the beam ends — but the box does need **4 × M4 in its feet**
-   if `compute_box_inline` hangs below it.
+   if `compute_box_inline_lafrite` hangs below it.
 2. Bolt the two **top** crossbeams to one side panel (8 × M4 × 12, heads on the
    **outside**).
 3. **The bottom beams and the battery box go on together.** Stand the box's four
@@ -1035,7 +1109,7 @@ constraint from the lap pads is gone.
    connectors.
 7. _(No separate battery-box step — it went on in step 3.)_ Route the pack's lead
    up past the flange into the bay, slide the pack in from the front and strap it.
-   **If fitting `compute_box_inline`, the order inside it matters** (§12): bolt the
+   **If fitting `compute_box_inline_lafrite`, the order inside it matters** (§12): bolt the
    **cover alone** up into the battery box's four feet first (4 × M4 × 12 — the heads
    are on its underside and nothing is under it yet), then populate the tray, lift it
    up to the cover, and run the **six M3 in horizontally from outside** the side
@@ -1112,7 +1186,7 @@ Not just rendered — checked:
   reprinting.
 - Compute boxes: SBC envelope (64 × 56 board + 22 mm of connectors) traced clear
   of the walls and top flanges, single-shell with zero enclosed voids.
-- `compute_box_inline`: tray 142.98 × 99.98 × 38.98 / 107.76 cm³, cover
+- `compute_box_inline_lafrite`: tray 142.98 × 99.98 × 38.98 / 107.76 cm³, cover
   142.98 × 99.98 × 17.99 / 118.10 cm³, both watertight and single-shell; stack pitch
   measures **54.99 mm** against the 55 mm budget, under the battery box's 8 mm feet.
   Cavity sectioned at 35.00 mm, and at **136.98 mm** wide against a nominal 137.00 —
@@ -1228,7 +1302,7 @@ OpenSCAD re-exports differ byte-wise for identical geometry.
 | `crossbeam_bottom_back`       | 124.25 → **106.25 mm**; the tab joint                                                                                                                                                           |
 | `crossbeam_bottom_front_rail` | 124.25 → **106.25 mm**; the tab joint                                                                                                                                                           |
 | `battery_box`                 | gains four tabs and keeps its feet; top face moves to the frame datum                                                                                                                           |
-| `compute_box_inline`          | moves to the bottom of the stack: no feet, no raceway, sealed floor, prints floor-down (§12)                                                                                                    |
+| `compute_box_inline_lafrite`          | moves to the bottom of the stack: no feet, no raceway, sealed floor, prints floor-down (§12)                                                                                                    |
 | `compute_box_inline_cover`    | bolts up into the battery box's feet, gains six lugs for the horizontal tray screws and a Ø12 grommet in place of the raceway                                                                   |
 | `side_panel` ×2               | the unified panel + handle                                                                                                                                                                      |
 | `side_panel` ×2               | **model only, no reprint needed** — the RT-95's M5 pair at Z 129−31 was removed (§2.13). Panels already printed carry the extra hole harmlessly; the radio mounts at the Z 129 pair either way. |
@@ -1310,7 +1384,7 @@ panel's holes are.
     board (§12). The old raceway that made this awkward is gone with the reordering.
     The superseded note read:
 
-    > **`compute_box_inline`: the buck converter's own 12 V feed has no modelled
+    > **`compute_box_inline_lafrite`: the buck converter's own 12 V feed has no modelled
     > path.** The raceway is deliberately sealed off from the cavity, so the battery
     > leads running up it never enter the box — but the converter _inside_
     > the box has to be fed from those same leads. Nothing in the model gets them
@@ -1321,7 +1395,7 @@ panel's holes are.
     > opening with the rest of the wiring. **Decide which before you
     > close the box** — the converter's terminals are the least accessible thing in it.
 
-11. **RESOLVED — `compute_box_inline` moved to the bottom of the stack** (§12). It
+11. **RESOLVED — `compute_box_inline_lafrite` moved to the bottom of the stack** (§12). It
     hangs from the battery box's four restored feet on 4 × M4 × 12 and carries no
     frame load at all, so the bottom bracing stays inside the battery box's 8 mm
     flange. An intermediate revision put the frame's tabs on this tray instead; that
@@ -1363,11 +1437,11 @@ panel's holes are.
     the code disagree and one of them is wrong. Not touched here — it would change
     a printed beam.
 
-14. **RESOLVED — `compute_box_inline`'s tray-to-cover joint is six M3 driven
+14. **RESOLVED — `compute_box_inline_lafrite`'s tray-to-cover joint is six M3 driven
     horizontally** from outside, into lugs under the cover. Vertical screws
     deadlocked against the four M4 that hold the cover to the battery box (§12).
 
-15. **RESOLVED — `compute_box_inline` prints floor-down with no support.** Being the
+15. **RESOLVED — `compute_box_inline_lafrite` prints floor-down with no support.** Being the
     bottom of the stack it has no feet, so the underside is flat; swept at 0.4 mm the
     only area gains are the first 2 mm of `rbox` rounding. `battery_box` is now the
     only part on the frame needing support — and it needs a little more of it, since
@@ -1673,7 +1747,7 @@ against the bed:
 | 3     | 4 × `crossbeam`, stacked in Y, 5 mm brim    | 134 × 122 mm  | 46 / 58 mm                       |
 | 4     | 2 × `antenna_mount`                         | 35 × 48 mm    | 145 / 132 mm                     |
 | 5     | `battery_box` (**not optional** — §2.9)     | 143 × 83.8 mm | 37 / 96 mm                       |
-| 7a    | `compute_box_inline` (only if you build it) | 143 × 100 mm  | 37 / 80 mm, 39 mm tall           |
+| 7a    | `compute_box_inline_lafrite` (only if you build it) | 143 × 100 mm  | 37 / 80 mm, 39 mm tall           |
 | 7b    | `compute_box_inline_cover`                  | 143 × 100 mm  | 37 / 80 mm, 18 mm tall (lugs up) |
 
 The inline box needs **two plates of its own** — tray and cover are both

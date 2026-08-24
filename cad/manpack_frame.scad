@@ -20,10 +20,13 @@ $fa = 2;
 $fs = 0.4;
 
 /* [Output] */
-part = "assembly"; // [assembly, exploded, side_panel, crossbeam_top_front_dual, crossbeam_top_front_grid, crossbeam_top_back, crossbeam_bottom_front, crossbeam_bottom_front_rail, crossbeam_bottom_back, crossbeam_top_front_triple, compute_box_inline, compute_box_inline_cover, antenna_mount_bnc, antenna_mount_so239, antenna_mount_usb, antenna_mount_switch, battery_box]
+part = "assembly"; // [assembly, exploded, side_panel, crossbeam_top_front_dual, crossbeam_top_front_grid, crossbeam_top_back, crossbeam_bottom_front, crossbeam_bottom_front_rail, crossbeam_bottom_back, crossbeam_top_front_triple, compute_box_inline_lafrite, compute_box_inline_sweetpotato, compute_box_inline_cover, antenna_mount_bnc, antenna_mount_so239, antenna_mount_usb, antenna_mount_switch, battery_box]
 
 // which top-front crossbeam the assembly is built with
 top_front = "grid"; // [grid, triple, dual]
+
+// which compute tray the assembly views are built with
+compute = "lafrite"; // [lafrite, sweetpotato]
 
 // which connector variant the assembly views fit
 ant_style = "bnc"; // [bnc, so239, usb, switch]
@@ -37,7 +40,7 @@ show_radio = true;
 // draw the bolt-on battery frame in the assembly views
 show_battery_box = true;
 
-// assembly views: swap base_plate for compute_box_inline + its cover.  They are
+// assembly views: swap base_plate for compute_box_inline_lafrite + its cover.  They are
 // alternatives -- the inline box's cover does the plate's job -- so this is a
 // choice, not an addition.  It drops everything below it by 30 mm.
 show_inline_box = false;
@@ -429,8 +432,6 @@ echo(str("frame body            = ", frame_w, " x ", frame_d, " x ", z_tb1, " mm
 echo(str("assembled envelope    = ", frame_w, " x ",
          frame_d + ant_leg_t + max(bnc_reach, so239_reach, usb_reach, sw_reach), " x ",
          handle_z2, " mm  (depth shown for the deeper SO-239 bracket)"));
-echo(str("switch mount          = ", sw_bore_d, " mm bore, pad backs a bezel up to ",
-         sw_bezel_max, " mm"));
 echo(str("radio bay (WxDxH)     = ", radio_w, " x ", frame_d - 2 * beam_d,
          " x ", bay_h, " mm"));
 echo(str("radio clearance  side = ", (frame_d - 2 * beam_d - radio_h) / 2,
@@ -670,7 +671,7 @@ module crossbeam(front_cols = [], base_face = false,
                 rotate([-90, 0, 0]) m4_insert();
 
         // `base_face` is retained as a parameter but nothing passes it now.  The
-        // base plate is gone, and compute_box_inline hangs off the battery box
+        // base plate is gone, and compute_box_inline_lafrite hangs off the battery box
         // rather than bolting up into these beams, so the four underside inserts
         // they used to carry have no user left.
         if (base_face)
@@ -935,7 +936,7 @@ module battery_box() {
                 translate([fx, bb_y0, bb_z1 - box_boss])
                     rbox(box_wall + flange_w, bb_out_y, box_boss, 1.5);
             // Stacking feet: the same four the base plate used to present, at the
-            // same X/Y, so compute_box_inline hangs under this box on exactly the
+            // same X/Y, so compute_box_inline_lafrite hangs under this box on exactly the
             // joint the box itself used to make upward.  Restored because the
             // compute module now lives BELOW the battery rather than above it --
             // that keeps the frame's bottom bracing entirely inside this box's
@@ -1005,6 +1006,15 @@ echo(str("bottom beam span      = ", bb_span, " mm (was ", radio_w,
          "); the frame does not close without the battery box"));
 echo(str("battery cavity        = ", bb_cav_x, " x ", bb_cav_y, " x ", bb_cav_z,
          " mm  for a ", batt_x, " x ", batt_y, " x ", batt_z, " mm pack lying flat"));
+echo(str("switch mount          = ", sw_bore_d, " mm bore, pad backs a bezel up to ",
+         sw_bezel_max, " mm"));
+echo(str("sweet potato tray     = board ", cmi_sp_board[2], " x ", cmi_sp_board[3],
+         " in the back-left corner; USB column ",
+         cmi_in_x1 - (cmi_sp_board[0] + cmi_sp_board[2]),
+         " mm clear for the whole bank; front strip ",
+         cmi_sp_board[1] - cmi_in_y0, " mm for ",
+         cmi_sp_conv[0] - cmi_sp_board[0], " mm, then ",
+         cmi_sp_board[1] - (cmi_sp_conv[1] + cmi_sp_conv[3]), " mm"));
 assert(bb_out_x <= BED && bb_tot_z <= BED && bb_out_y <= BED,
        "battery frame does not fit the print bed in its print pose");
 assert(bb_cav_x >= batt_x && bb_cav_z >= batt_z, "cavity smaller than the pack");
@@ -1053,6 +1063,13 @@ sbc_ins_h = 7.5;     // M3 pocket depth: the inserts are 7 mm long, plus 0.5 mm 
 m3_ins_d  = 4.0;     // M3 heat-set insert pilot
 m3_ins_h  = 5.0;
 m3_clear  = 3.4;     // M3 clearance hole for the generic grid
+// M2.5, for Raspberry-Pi-pattern boards whose mounting holes are only Ø2.7.
+// Same rules as the M3/M4 sets above: pilot = insert OD - 0.3, pocket = insert
+// length + 1.0 of relief, clearance = nominal + 0.4.
+// CHECK THESE AGAINST YOUR OWN INSERTS -- M2.5 inserts vary more than M3 does.
+m25_ins_d = 3.2;     // M2.5 heat-set insert pilot (3.5 mm OD)
+m25_ins_h = 5.0;     // ... pocket depth (4.0 insert + 1.0 relief)
+m25_clear = 2.9;     // M2.5 clearance hole
 
 // --- cable-tie mounts for the two FRONT boxes ---
 //  A PAIR of slots with a ligament between them, not a single slot.  A single
@@ -1184,12 +1201,12 @@ m3_clear  = 3.4;     // M3 clearance hole for the generic grid
 // mid-air failure the base plate had -- and a closed front would become a
 // 142 x 49 ceiling in the back-down pose.  Open front doubles as the port
 // access: the SBC sits with its connector edge facing out of it.
-// (compute_box_inline is redefined below -- see PART 11a)
+// (compute_box_inline_lafrite is redefined below -- see PART 11a)
 
 
 
 // =============================================================================
-//  PART 11a -- compute_box_inline + compute_box_inline_cover
+//  PART 11a -- compute_box_inline_lafrite + compute_box_inline_cover
 // -----------------------------------------------------------------------------
 //  A stack module carrying the La Frite and its converter, on the battery box's
 //  footprint.  It sits at the BOTTOM of the stack, hanging from the battery box's
@@ -1251,17 +1268,17 @@ cmi_z0   = cmi_z1 - 35 - cmi_floor;    // -22, underside of the floor
 //  INTO it and the board's edge was dead flush.  The pads overhang the board by
 //  0.75 each end, so of the 3 mm of slack in this direction 1.5 is theirs; the
 //  rest is split 0.5 pad-to-wall, 0.5 pad-to-converter, 0.5 converter-to-back.
-cmi_sbc  = [39.125, -25.75, 64, 56];   // La Frite  x0 y0 w d
-cmi_stand = sbc_stand_hi;              // 8
+cmi_lf_sbc  = [39.125, -25.75, 64, 56];   // La Frite  x0 y0 w d
+cmi_lf_stand = sbc_stand_hi;              // 8
 //  In the pocket behind the board, 0.5 mm off the back wall (inner face Y 67).
 //  It used to be 0.5 mm off the raceway wall too, back when the raceway was a notch
 //  in the back wall beside it; the raceway has since moved inboard and right, so
 //  there is now 16.75 mm of free cavity to the converter's right (X 96.5 to the
 //  shaft wall at 113.25).  Left where it is -- nothing else needs that space and
 //  the position is already printed.
-cmi_conv = [31.5, 31.5, 65, 35];       // converter, flat, behind the board
-cmi_conv_dy = 54;                      // its tab holes, 54 apart along its length
-cmi_conv_dx = 13.5;                    //   and 13.5 in from one edge
+cmi_lf_conv = [31.5, 31.5, 65, 35];       // converter, flat, behind the board
+cmi_lf_conv_dy = 54;                      // its tab holes, 54 apart along its length
+cmi_lf_conv_dx = 13.5;                    //   and 13.5 in from one edge
 //  It used to be held by two M3 straight THROUGH the floor.  With this box at the
 //  bottom of the stack that floor is the ground face, and two Ø3.4 holes in it are
 //  an ingress path, so the hold-down is now blind: two pads with insert pockets that
@@ -1297,9 +1314,9 @@ assert(cmi_floor + cmi_conv_pad_h - m3_ins_h >= 1.5,
 //  Sited just clear of the converter's lead end at X 96.5 and centred on its Y band,
 //  so the feed drops straight onto the terminals instead of crossing the board.
 cmi_grom    = 12;                      // Ø12 grommet, a stock size
-cmi_grom_x  = cmi_conv[0] + cmi_conv[2] + cmi_grom/2 + 2.5;   // 105, clear of the converter
-cmi_grom_y  = cmi_conv[1] + cmi_conv[3]/2;                    // 49, on its centreline
-assert(cmi_grom_x - cmi_grom/2 > cmi_conv[0] + cmi_conv[2],
+cmi_grom_x  = cmi_lf_conv[0] + cmi_lf_conv[2] + cmi_grom/2 + 2.5;   // 105, clear of the converter
+cmi_grom_y  = cmi_lf_conv[1] + cmi_lf_conv[3]/2;                    // 49, on its centreline
+assert(cmi_grom_x - cmi_grom/2 > cmi_lf_conv[0] + cmi_lf_conv[2],
        "cover grommet overlaps the converter");
 assert(min([for (x = foot_x, y = foot_y) sqrt(pow(x - cmi_grom_x, 2)
                                             + pow(y - cmi_grom_y, 2))])
@@ -1324,6 +1341,66 @@ assert(min([for (x = foot_x, y = foot_y) sqrt(pow(x - cmi_grom_x, 2)
 //  Lug Y positions dodge the M4 counterbores' Y bands (7.9..16.1 and 53.9..62.1) so
 //  the lugs can be a full 10 mm deep without crowding them, and they sit in the top
 //  10 mm of the cavity -- headroom above the board, not beside it.
+//  ---------------------------------------------------------------------------
+//  PART 11b furniture -- Libre Computer SWEET POTATO (AML-S905X-CC-V2)
+//  ---------------------------------------------------------------------------
+//  Raspberry Pi 3 form factor: 85 x 56, mounting holes on a 58 x 49 rectangle
+//  set 3.5 mm in from EVERY edge.  Two consequences worth stating.
+//
+//  First, that is the same pattern the La Frite uses (this model had it as
+//  58.75 x 49.5, corrected against the printed part), so the standoff geometry
+//  carries straight over.  Only the board OUTLINE changes -- 85 long against 64.
+//
+//  Second, unlike the La Frite the hole rectangle is NOT centred on the board:
+//  3.5 from one end but 23.5 from the other, because the USB/Ethernet bank eats
+//  that end.  So the standoffs are placed off the board's own edges, not off its
+//  centre, or they land 10 mm out.
+//
+//  CORNER PLACEMENT.  The board goes hard into the BACK-LEFT corner, which puts
+//  its two connectorless faces -- the plain end and the GPIO edge -- against the
+//  walls and leaves both connector faces looking into open cavity:
+//
+//      USB / Ethernet end  ->  +X, into a 51 mm clear column
+//      power / HDMI / audio ->  -Y, into a 37 mm clear strip running the full
+//                               width of the box, unobstructed end to end
+//
+//  1.0 mm off each wall: the Ø8 pads overhang the board by 4 - 3.5 = 0.5, so
+//  that leaves the pads themselves 0.5 clear of the wall.
+cmi_in_x0 = cmi_x0 + cmi_wall;            // 2.625, cavity inner faces
+cmi_in_x1 = cmi_x0 + cmi_w - cmi_wall;    // 139.625
+cmi_in_y0 = cmi_y0 + cmi_wall;            // -27
+cmi_in_y1 = cmi_y0 + cmi_d - cmi_wall;    // 67
+cmi_sp_gap     = 1.0;
+//  The rectangle is 58 x 49 and sits 3.5 in from the near end and BOTH sides --
+//  which leaves 85 - 3.5 - 58 = 23.5 to the far end, where the USB/Ethernet bank
+//  is.  Deriving the far hole as "board length minus the inset" would put it at
+//  78 apart instead of 58; the pattern must be laid out from the near corner.
+cmi_sp_hole_in = 3.5;                     // inset at the near end and both sides
+cmi_sp_hx      = 58;                      // hole rectangle, centre to centre
+cmi_sp_hy      = 49;
+cmi_sp_board   = [cmi_in_x0 + cmi_sp_gap,
+                  cmi_in_y1 - cmi_sp_gap - 56, 85, 56];   // x0 y0 w d
+cmi_sp_stand   = sbc_stand_hi;            // 8, same as the La Frite
+//  Converter laid FLAT ALONG THE FRONT WALL, 65 across X, in the corner opposite
+//  the board.  It has to intrude on one of the two connector zones -- 65 x 35
+//  does not fit the 51 x 37 corner where they meet, in either orientation -- and
+//  this is the cheaper intrusion:
+//
+//    - the USB / Ethernet column keeps its FULL 51 mm for the whole bank, where
+//      standing the converter on end left only 15.5 mm at the narrowing;
+//    - what it costs is the last 14.5 mm of the front edge, which drops to 1.5.
+//      That stretch is board-local X 70.5..85, the part of the edge under the USB
+//      stacks, which on this form factor carries no connector -- power, HDMI and
+//      audio all sit inboard of local X 60.  The first 70.5 mm keeps its 37 mm;
+//    - and it crosses one cover-lug Y band instead of two.
+//
+//  The cost is the 12 V run: the shared cover's grommet is fixed at (105, 49), so
+//  the feed now travels 40.5 mm to the converter instead of 10.5, crossing the
+//  open USB column.  Worth a tie-down, not worth 35 mm of USB clearance.
+cmi_sp_conv    = [cmi_in_x1 - 0.5 - 65, cmi_in_y0 + 0.5, 65, 35];
+cmi_sp_conv_dy = cmi_lf_conv_dy;          // 54, the same converter
+cmi_sp_conv_dx = cmi_lf_conv_dx;          // 13.5
+
 cmi_lug     = [10, 12, 10];            // X into the cavity, Y long, Z below the cover
 cmi_lug_ys  = [-20, 25, 45];
 cmi_lug_ax  = cmi_z1 - 5;              // screw axis, 5 mm below the cover's underside
@@ -1331,6 +1408,34 @@ cmi_lug_ax  = cmi_z1 - 5;              // screw axis, 5 mm below the cover's und
 cmi_lug_w   = [[cmi_x0 + cmi_wall, 1], [cmi_x0 + cmi_w - cmi_wall, -1]];
 assert(cmi_lug[0] >= m3_ins_h + 2,
        "cover lug too shallow to back an M3 insert");
+// The Sweet Potato hole rectangle must sit inside its board with the inset it
+// claims at the near end and sides, and whatever is left over at the USB end.
+assert(cmi_sp_hole_in + cmi_sp_hx < cmi_sp_board[2] &&
+       cmi_sp_hole_in + cmi_sp_hy == cmi_sp_board[3] - cmi_sp_hole_in,
+       "Sweet Potato hole pattern does not match its board outline");
+// board and converter must both sit inside the cavity, and not in each other
+assert(cmi_sp_board[0] >= cmi_in_x0 && cmi_sp_board[1] >= cmi_in_y0 &&
+       cmi_sp_board[0] + cmi_sp_board[2] <= cmi_in_x1 &&
+       cmi_sp_board[1] + cmi_sp_board[3] <= cmi_in_y1,
+       "Sweet Potato board does not fit the cavity");
+// Proper 2D separation: the rectangles may share an X band or a Y band but must
+// not overlap in both.  Testing X alone passed the old right-wall placement and
+// would have rejected this one for no reason.
+assert(cmi_sp_conv[0] + cmi_sp_conv[2] <= cmi_sp_board[0] ||
+       cmi_sp_conv[0] >= cmi_sp_board[0] + cmi_sp_board[2] ||
+       cmi_sp_conv[1] + cmi_sp_conv[3] <= cmi_sp_board[1] ||
+       cmi_sp_conv[1] >= cmi_sp_board[1] + cmi_sp_board[3],
+       "Sweet Potato converter overlaps the board");
+assert(cmi_sp_conv[0] >= cmi_in_x0 && cmi_sp_conv[1] >= cmi_in_y0 &&
+       cmi_sp_conv[0] + cmi_sp_conv[2] <= cmi_in_x1 &&
+       cmi_sp_conv[1] + cmi_sp_conv[3] <= cmi_in_y1,
+       "Sweet Potato converter does not fit the cavity");
+// the shared cover's grommet has to land on free floor in THIS layout too
+assert(cmi_grom_x - cmi_grom/2 > cmi_sp_board[0] + cmi_sp_board[2] ||
+       cmi_grom_y - cmi_grom/2 > cmi_sp_board[1] + cmi_sp_board[3],
+       "cover grommet sits over the Sweet Potato board");
+assert(cmi_grom_y - cmi_grom/2 > cmi_sp_conv[1] + cmi_sp_conv[3],
+       "cover grommet sits over the Sweet Potato converter");
 
 module compute_box_inline_cover() {
     // lugs for the tray's horizontal M3s, sunk 1 mm into the plate so they union
@@ -1359,7 +1464,7 @@ module compute_box_inline_cover() {
     }
 }
 
-module compute_box_inline() {
+module compute_box_inline_lafrite() {
     difference() {
         translate([cmi_x0, cmi_y0, cmi_z0])
             rbox(cmi_w, cmi_d, cmi_z1 - cmi_z0, 2);
@@ -1373,9 +1478,9 @@ module compute_box_inline() {
         // difference, so its own local cut can only reach the pad -- the 2 mm that
         // belongs in the floor has to come out here or the pocket ends up 3 mm deep
         // against a 5 mm insert.
-        for (dx = [0, cmi_conv_dy])
-            translate([cmi_conv[0] + (cmi_conv[2] - cmi_conv_dy)/2 + dx,
-                       cmi_conv[1] + cmi_conv_dx,
+        for (dx = [0, cmi_lf_conv_dy])
+            translate([cmi_lf_conv[0] + (cmi_lf_conv[2] - cmi_lf_conv_dy)/2 + dx,
+                       cmi_lf_conv[1] + cmi_lf_conv_dx,
                        cmi_z0 + cmi_floor + cmi_conv_pad_h - m3_ins_h])
                 cylinder(d = m3_ins_d, h = m3_ins_h + 0.01);
         // Plain cavity -- no raceway block to keep out of it any more, so the whole
@@ -1387,9 +1492,9 @@ module compute_box_inline() {
     }
     // Converter hold-down: blind pads, so nothing pierces the ground face.  Added
     // after the cavity is cut or it would eat them.
-    for (dx = [0, cmi_conv_dy])
-        translate([cmi_conv[0] + (cmi_conv[2] - cmi_conv_dy)/2 + dx,
-                   cmi_conv[1] + cmi_conv_dx, cmi_z0 + cmi_floor])
+    for (dx = [0, cmi_lf_conv_dy])
+        translate([cmi_lf_conv[0] + (cmi_lf_conv[2] - cmi_lf_conv_dy)/2 + dx,
+                   cmi_lf_conv[1] + cmi_lf_conv_dx, cmi_z0 + cmi_floor])
             difference() {
                 cylinder(d = cmi_conv_pad_d, h = cmi_conv_pad_h);
                 translate([0, 0, cmi_conv_pad_h - m3_ins_h])
@@ -1398,13 +1503,68 @@ module compute_box_inline() {
 
     // SBC standoffs -- 58.75 across X, 49.5 in Y, following the board
     for (dx = [-sbc_hx/2, sbc_hx/2], dy = [-sbc_hy/2, sbc_hy/2])
-        translate([cmi_sbc[0] + cmi_sbc[2]/2 + dx, cmi_sbc[1] + cmi_sbc[3]/2 + dy,
+        translate([cmi_lf_sbc[0] + cmi_lf_sbc[2]/2 + dx, cmi_lf_sbc[1] + cmi_lf_sbc[3]/2 + dy,
                    cmi_z0 + cmi_floor - 1])
             difference() {
-                cylinder(d = 8, h = cmi_stand + 1);
-                translate([0, 0, cmi_stand + 1 - sbc_ins_h])
+                cylinder(d = 8, h = cmi_lf_stand + 1);
+                translate([0, 0, cmi_lf_stand + 1 - sbc_ins_h])
                     cylinder(d = m3_ins_d, h = sbc_ins_h + 0.1);
             }
+}
+
+//  Same shell, same cavity, same six horizontal M3s into the same cover lugs --
+//  compute_box_inline_cover fits either tray unchanged.  Only the furniture
+//  differs: standoffs on the board's own edges rather than its centre, M2.5
+//  instead of M3, and the converter turned 90 deg into the opposite corner.
+module compute_box_inline_sweetpotato() {
+    difference() {
+        translate([cmi_x0, cmi_y0, cmi_z0])
+            rbox(cmi_w, cmi_d, cmi_z1 - cmi_z0, 2);
+        // tray -> cover screws, driven from OUTSIDE: identical to the La Frite
+        // tray, which is what lets one cover serve both
+        for (w = cmi_lug_w, y = cmi_lug_ys)
+            translate([w[0] - w[1] * (cmi_wall + 1), y, cmi_lug_ax])
+                rotate([0, w[1] * 90, 0])
+                    cylinder(d = m3_clear, h = cmi_wall + 2);
+        // lower half of each converter insert pocket -- the pads run along Y here
+        for (dx = [0, cmi_sp_conv_dy])
+            translate([cmi_sp_conv[0] + (cmi_sp_conv[2] - cmi_sp_conv_dy)/2 + dx,
+                       cmi_sp_conv[1] + cmi_sp_conv_dx,
+                       cmi_z0 + cmi_floor + cmi_conv_pad_h - m3_ins_h])
+                cylinder(d = m3_ins_d, h = m3_ins_h + 0.01);
+        translate([cmi_x0 + cmi_wall, cmi_y0 + cmi_wall, cmi_z0 + cmi_floor])
+            rbox(cmi_w - 2*cmi_wall, cmi_d - 2*cmi_wall,
+                 cmi_z1 - cmi_z0 - cmi_floor + 1, 1.5);
+    }
+    // converter hold-down: blind pads, ground face stays sealed.  Still M3 --
+    // it is the same converter with the same tabs; only the BOARD is M2.5.
+    for (dx = [0, cmi_sp_conv_dy])
+        translate([cmi_sp_conv[0] + (cmi_sp_conv[2] - cmi_sp_conv_dy)/2 + dx,
+                   cmi_sp_conv[1] + cmi_sp_conv_dx,
+                   cmi_z0 + cmi_floor])
+            difference() {
+                cylinder(d = cmi_conv_pad_d, h = cmi_conv_pad_h);
+                translate([0, 0, cmi_conv_pad_h - m3_ins_h])
+                    cylinder(d = m3_ins_d, h = m3_ins_h + 0.01);
+            }
+    // standoffs off the board's EDGES, not its centre -- the hole rectangle is
+    // 3.5 from one end and 23.5 from the other
+    for (hx = [cmi_sp_board[0] + cmi_sp_hole_in,
+               cmi_sp_board[0] + cmi_sp_hole_in + cmi_sp_hx],
+         hy = [cmi_sp_board[1] + cmi_sp_hole_in,
+               cmi_sp_board[1] + cmi_sp_hole_in + cmi_sp_hy])
+        translate([hx, hy, cmi_z0 + cmi_floor - 1])
+            difference() {
+                cylinder(d = 8, h = cmi_sp_stand + 1);
+                translate([0, 0, cmi_sp_stand + 1 - m25_ins_h])
+                    cylinder(d = m25_ins_d, h = m25_ins_h + 0.1);
+            }
+}
+
+// which compute tray the assembly views are built with
+module compute_box_inline_fitted() {
+    if (compute == "sweetpotato") compute_box_inline_sweetpotato();
+    else compute_box_inline_lafrite();
 }
 
 // =============================================================================
@@ -1439,7 +1599,7 @@ module frame(ex = 0) {
     // the compute module hangs off the battery box's feet, at the bottom of the stack
     if (show_inline_box) {
         color("#8a8f98") translate([0, 0, -3 * ex]) compute_box_inline_cover();
-        color("#8a8f98") translate([0, 0, -4 * ex]) compute_box_inline();
+        color("#8a8f98") translate([0, 0, -4 * ex]) compute_box_inline_fitted();
     }
 
     if (show_radio) radio_proxy();
@@ -1526,8 +1686,10 @@ else if (part == "antenna_mount_switch") rotate([-90, 0, 0]) antenna_mount_switc
 // the part then prints straight onto the bed, the battery box bolts flat against
 // it, and the stack loses 8 mm of height.  Not done yet -- it costs cavity space
 // at the four foot positions.
-else if (part == "compute_box_inline")
-    translate([-cmi_x0, -cmi_y0, -cmi_z0]) compute_box_inline();
+else if (part == "compute_box_inline_lafrite")
+    translate([-cmi_x0, -cmi_y0, -cmi_z0]) compute_box_inline_lafrite();
+else if (part == "compute_box_inline_sweetpotato")
+    translate([-cmi_x0, -cmi_y0, -cmi_z0]) compute_box_inline_sweetpotato();
 // Cover: flat, bolt counterbores opening upward.
 // TOP FACE DOWN.  The lugs hang below the plate in use, so with the plate the right
 // way up they would print as a 143 x 100 ceiling standing on six blocks.  Inverted,
