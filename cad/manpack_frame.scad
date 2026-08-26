@@ -20,7 +20,7 @@ $fa = 2;
 $fs = 0.4;
 
 /* [Output] */
-part = "assembly"; // [assembly, exploded, side_panel, crossbeam_top_front_dual, crossbeam_top_front_grid, crossbeam_top_back, crossbeam_bottom_front, crossbeam_bottom_front_rail, crossbeam_bottom_back, crossbeam_top_front_triple, compute_box_inline_lafrite, compute_box_inline_sweetpotato, compute_box_inline_cover, antenna_mount_bnc, antenna_mount_so239, antenna_mount_usb, antenna_mount_switch, battery_box]
+part = "assembly"; // [assembly, exploded, side_panel, side_panel_notch, crossbeam_top_front_dual, crossbeam_top_front_grid, crossbeam_top_back, crossbeam_bottom_front, crossbeam_bottom_front_rail, crossbeam_bottom_back, crossbeam_top_front_triple, compute_box_inline_lafrite, compute_box_inline_sweetpotato, compute_box_inline_cover, antenna_mount_bnc, antenna_mount_so239, antenna_mount_usb, antenna_mount_switch, battery_box]
 
 // which top-front crossbeam the assembly is built with
 top_front = "grid"; // [grid, triple, dual]
@@ -395,6 +395,9 @@ tab_x     = [panel_t, frame_w - panel_t - tab_t];   // 9, 124.25
 bb_span   = radio_w - 2 * tab_t;              // 106.25, shortened bottom beam
 bb_beam_x = panel_t + tab_t;                  // 18, where that beam now starts
 assert(bb_span > 0, "tabs are wider than the frame's clear span");
+// the flanking tie slots must land in solid wall, clear of the cut-out
+assert(ch_tie_dy - tie_w/2 >= ch_w/2 + 1.0,
+       "tie slots overlap the cable cut-out");
 
 base_bolt_x = [35, frame_w - 35];             // 35, 107.25
 foot_x      = [14, frame_w - 14];             // 14, 128.25
@@ -410,13 +413,58 @@ foot_y      = [12, frame_d - 12];             // 12, 58
 //  and bottom.  Nothing stops it going this low: Y 16..54 is the gap BETWEEN the
 //  two bottom crossbeams, and the beam bolts sit at Y 8 / 62 with 3.9 mm of
 //  material between their counterbores and the window edge.
-win_a = [16, 32, 54, 74];    // y0 z0 y1 z1
+//  win_a is defined with the cable channel below -- its back edge follows the
+//  channel lane, so the two cannot drift apart.
 //  win_b is GONE.  The grip aperture now runs down to Z 150 in its place, so the
 //  band of panel that used to sit above the top crossbeam screws -- tying the
 //  front and back legs together -- is removed.  The arch does that job.
 //  The screws never constrained this: they sit at Y 8 / 62 and the aperture spans
 //  Y 18..52, so the two do not overlap at all.
 grip_floor = 150;
+// -----------------------------------------------------------------------------
+//  CABLE CHANNEL   side panel -> battery box -> compute cover
+// -----------------------------------------------------------------------------
+//  A shallow groove carrying the compute module's harness -- 12 V and USB in a
+//  braided sleeve -- from the base of the side panel DOWNWARD: battery box, then
+//  compute box cover.  OUTSIDE, which is forced rather than preferred: the radio
+//  fills the bay to 124.25 against its own 124, so there is no inner-face room at
+//  radio height, and the battery box's interior is the pack cavity.
+//
+//  THE SIDE PANEL GETS NO GROOVE.  It already has a ventilation window across its
+//  bottom, and the harness drops through that; cutting a channel into the panel as
+//  well would be work for nothing, and it would mean a second panel part.  The
+//  panel is therefore untouched.  What the channel does have to do is line up with
+//  the clear space that window leaves -- hence the centreline, and an assert.
+//
+//  On the centreline the groove also clears both crossbeam bolt columns by a wide
+//  margin: they sit at Y 8 and Y 62, so 7 mm at Y 31.5..38.5 has 19.4 mm to each.
+ch_w    = 7;
+ch_y    = frame_d / 2;    // 35, dead centre
+//  BOTH the battery box and the cover are cut CLEAN THROUGH rather than grooved.
+//  A groove never had the depth to hold a sleeved harness -- 2.5 mm of a 4 mm wall
+//  left it standing 4.5 proud -- and both parts are openings anyway: the box wall
+//  is windowed a few mm below, and the cover is the compute box's lid.  Cut through,
+//  the harness beds into the full section and the slot is its own cable entry, so no
+//  separate round hole is needed at the end of the run.
+//  WIRE TIES: pairs of slots straddling the groove, cut straight through.  The
+//  battery box is already ventilated, so a through slot gives up nothing, and its
+//  stations sit in the two solid bands its end-wall window leaves rather than
+//  across the window itself.
+//  The cover's existing Ø12 grommet sits at Y 49, off the centreline, so a centred
+//  channel cannot reach it.  The run therefore ends at its own entry on the
+//  centreline, well clear of both trays' furniture and of the existing grommet.
+ch_cov_x = 120;
+tie_w  = 2.0;      // slot across the run
+tie_l  = 5.0;      // slot along the run
+//  With the channel cut through there is no groove floor for a slot to bear on, so
+//  the ties FLANK the opening, in the solid material either side of it.
+ch_tie_dy = ch_w/2 + 1.5 + tie_w/2;   // 6.0
+ch_tie_cover = [125];      // inboard of the cover lugs, which start at X 129.625
+
+win_a = [16, 32, 54, 74];    // y0 z0 y1 z1  -- the ORIGINAL panel keeps this
+//  Tie station centred in the notch, between the panel's base and the window.
+ch_tie_notch_z = panel_z0 + (win_a[1] - panel_z0 - tie_l) / 2;   // 26
+
 grip_round = 2;      // edge radius on the arch, through the plate's 9 mm.  2 rather
                      //   than the old handle's 2.5, because the bar is 9 mm thick
                      //   now instead of 12 -- this still leaves 5 mm of flat.
@@ -485,6 +533,24 @@ assert(usb_body_d <= ant_bracket_w,
        "USB bulkhead body is wider than the antenna bracket pad");
 // panel_h is only the plate portion now; the part that has to fit the bed is the
 // panel PLUS the integral handle, panel_z0 up to handle_z2.
+// On the centreline the channel runs BETWEEN the two crossbeam bolt columns and
+// stops short of the M5 radio recess, which is centred on this same line.
+assert(ch_y - ch_w/2 > beam_cy_f + m4_cb_d/2 &&
+       ch_y + ch_w/2 < beam_cy_b - m4_cb_d/2,
+       "cable channel fouls a crossbeam bolt column");
+// the harness drops through the panel's own window, so the groove has to line up
+// with the clear space that window leaves
+assert(ch_y - ch_w/2 >= win_a[0] && ch_y + ch_w/2 <= win_a[2],
+       "cable notch does not line up with the panel window above it");
+assert(win_a[1] > panel_z0,
+       "panel window starts at or below the panel base -- no notch to cut");
+// the notch's flanking tie slots must land in solid panel, clear of both bolt
+// columns, and sit between the panel's base and the window above it
+assert(ch_y - ch_tie_dy - tie_w/2 > beam_cy_f + m4_cb_d/2 &&
+       ch_y + ch_tie_dy + tie_w/2 < beam_cy_b - m4_cb_d/2,
+       "notch tie slots foul a crossbeam bolt column");
+assert(ch_tie_notch_z > panel_z0 && ch_tie_notch_z + tie_l <= win_a[1],
+       "notch tie slots do not fit between the panel base and the window");
 assert(panel_print_h <= BED && frame_d <= BED,
        str("unified side panel is ", panel_print_h, " mm, bed is ", BED));
 assert(radio_w <= BED, "crossbeam span exceeds the print bed");
@@ -575,7 +641,7 @@ module round2d(r) {
 //  heat-set inserts -- every insert lives in the mating part.
 //  Local frame = assembly frame for the LEFT panel; outer face at X = 0.
 // =============================================================================
-module side_panel() {
+module side_panel(notch = false) {
     difference() {
         union() {
             // OUTER face and the whole perimeter rounded, INNER face left dead
@@ -630,6 +696,25 @@ module side_panel() {
         // --- crossbeam bolts: heads recessed in the OUTER face ---
         for (y = [beam_cy_f, beam_cy_b], z = concat(bb_z, tb_z))
             translate([0, y, z]) rotate([0, 90, 0]) m4_bolt_hole(panel_t);
+
+        // --- cable notch, variant only ---
+        // The panel's bottom edge lands at Z 25, dead on the battery box's top
+        // face, and the panel reaches out to X 142.25 -- which is right across the
+        // top of the box's groove at X 140.125..142.625.  So the panel CAPS that
+        // groove.  This notch opens the 7 mm between the window's bottom edge and
+        // the panel's base, cut clean through, so the harness comes down inside the
+        // frame, out through the window, and straight on into the groove without
+        // ever standing proud of the panel.
+        if (notch) {
+            translate([-1, ch_y - ch_w/2, panel_z0 - 1])
+                cube([panel_t + 2, ch_w, win_a[1] - panel_z0 + 2]);
+            // Wire-tie slots FLANKING the notch, on the same 6 mm offset the
+            // battery box uses.  The notch is a through cut like the box's, so
+            // there is no floor for a slot inside it to bear against.
+            for (dy = [-ch_tie_dy, ch_tie_dy])
+                translate([-1, ch_y + dy - tie_w/2, ch_tie_notch_z])
+                    cube([panel_t + 2, tie_w, tie_l]);
+        }
 
         // --- lightening / ventilation windows ---
         if (panel_windows)
@@ -741,6 +826,11 @@ module panel_profile() {
 
 
 
+
+//  The notched variant.  Identical in every other respect -- same profile, handle,
+//  bolt pattern and radio mount -- so it drops into either side of the frame.  Only
+//  ONE is needed, on the side the channel runs down.
+module side_panel_notch() { side_panel(notch = true); }
 
 // =============================================================================
 //  PART 4 -- antenna_mount  (x2, identical; placed twice, NOT mirrored)
@@ -914,6 +1004,10 @@ bb_z0    = bb_z1 - bb_out_z;                     // -26.8, underside of the floo
 bb_cz1   = bb_z1 - (box_boss + 1);               // 16,    cavity ceiling
 bb_cz0   = bb_cz1 - bb_cav_z;                    // -47.8, cavity floor
 bb_bat_y1= bb_y0 + bb_out_y - box_wall;          // 66, pack seats against the back
+// Tie stations sit in the two solid bands the end-wall window leaves, not across
+// the window itself: it spans Z -14.8..5.0, so the bands are -26.8..-14.8 below
+// and 5.0..25 above.
+ch_tie_box = [bb_z0 + 2, bb_z0 + bb_out_z - box_boss - win_inset + 3];   // -24.8, 7.9
 bb_tot_z = bb_out_z + foot_h;                    // 59.8, including the feet
 // Side strips of floor left solid to carry the stacking feet, and the clear
 // band between the two foot zones where a window can still go.
@@ -975,7 +1069,19 @@ module battery_box() {
                       37.1, bb_out_y - 18, box_floor + 2);
         for (sx = [5, 119.25])
             win_thruZ(sx, 27, bb_z0 - 1, 18, 16, box_floor + 2);
-        // end wall windows, kept below the top flange
+        // Cable channel, RIGHT end wall only -- one side is all the harness needs,
+        // and cutting both would give up ventilation twice over for nothing.
+        // Cut clean THROUGH the wall, not grooved into it.
+        translate([bb_x0 + bb_out_x - box_wall - 1, ch_y - ch_w/2, bb_z0 - 1])
+            cube([box_wall + 2, ch_w, bb_out_z + 2]);
+        // Tie slots FLANK the opening: with the wall cut through there is no groove
+        // floor left for a slot inside it to bear against.
+        for (z = ch_tie_box, dy = [-ch_tie_dy, ch_tie_dy])
+            translate([bb_x0 + bb_out_x - box_wall - 1, ch_y + dy - tie_w/2, z])
+                cube([box_wall + 2, tie_w, tie_l]);
+        // end wall windows, kept below the top flange -- both unchanged.  The
+        // groove simply opens into this window where the two cross; the harness
+        // spans that stretch, held by the tie stations either side of it.
         for (wx = [bb_x0 - 1, bb_x0 + bb_out_x - box_wall - 1])
             win_thruX(wx, bb_y0 + win_inset + strap_zone, bb_z0 + win_inset,
                       box_wall + 2, bb_out_y - 2*win_inset - strap_zone,
@@ -1069,7 +1175,6 @@ m3_clear  = 3.4;     // M3 clearance hole for the generic grid
 // CHECK THESE AGAINST YOUR OWN INSERTS -- M2.5 inserts vary more than M3 does.
 m25_ins_d = 3.2;     // M2.5 heat-set insert pilot (3.5 mm OD)
 m25_ins_h = 5.0;     // ... pocket depth (4.0 insert + 1.0 relief)
-m25_clear = 2.9;     // M2.5 clearance hole
 
 // --- cable-tie mounts for the two FRONT boxes ---
 //  A PAIR of slots with a ligament between them, not a single slot.  A single
@@ -1313,15 +1418,6 @@ assert(cmi_floor + cmi_conv_pad_h - m3_ins_h >= 1.5,
 //  Same Ø12 grommet the front box's power entry uses, so nothing new to source.
 //  Sited just clear of the converter's lead end at X 96.5 and centred on its Y band,
 //  so the feed drops straight onto the terminals instead of crossing the board.
-cmi_grom    = 12;                      // Ø12 grommet, a stock size
-cmi_grom_x  = cmi_lf_conv[0] + cmi_lf_conv[2] + cmi_grom/2 + 2.5;   // 105, clear of the converter
-cmi_grom_y  = cmi_lf_conv[1] + cmi_lf_conv[3]/2;                    // 49, on its centreline
-assert(cmi_grom_x - cmi_grom/2 > cmi_lf_conv[0] + cmi_lf_conv[2],
-       "cover grommet overlaps the converter");
-assert(min([for (x = foot_x, y = foot_y) sqrt(pow(x - cmi_grom_x, 2)
-                                            + pow(y - cmi_grom_y, 2))])
-       > cmi_grom/2 + m4_cb_d/2,
-       "cover grommet fouls a stacking bolt");
 //  TRAY -> COVER: six M3 driven HORIZONTALLY, from outside, through the tray's side
 //  walls into lugs hanging off the cover's underside.
 //
@@ -1408,6 +1504,11 @@ cmi_lug_ax  = cmi_z1 - 5;              // screw axis, 5 mm below the cover's und
 cmi_lug_w   = [[cmi_x0 + cmi_wall, 1], [cmi_x0 + cmi_w - cmi_wall, -1]];
 assert(cmi_lug[0] >= m3_ins_h + 2,
        "cover lug too shallow to back an M3 insert");
+// cable channel: depth against each part's own section, and the cover groove has
+// to actually reach the grommet it terminates at
+// the cover's tie slots must clear the lugs
+assert(max(ch_tie_cover) + tie_l/2 < cmi_x0 + cmi_w - cmi_wall - cmi_lug[0],
+       "cover tie slot runs into a cover lug");
 // The Sweet Potato hole rectangle must sit inside its board with the inset it
 // claims at the near end and sides, and whatever is left over at the USB end.
 assert(cmi_sp_hole_in + cmi_sp_hx < cmi_sp_board[2] &&
@@ -1430,13 +1531,13 @@ assert(cmi_sp_conv[0] >= cmi_in_x0 && cmi_sp_conv[1] >= cmi_in_y0 &&
        cmi_sp_conv[0] + cmi_sp_conv[2] <= cmi_in_x1 &&
        cmi_sp_conv[1] + cmi_sp_conv[3] <= cmi_in_y1,
        "Sweet Potato converter does not fit the cavity");
-// the shared cover's grommet has to land on free floor in THIS layout too
-assert(cmi_grom_x - cmi_grom/2 > cmi_sp_board[0] + cmi_sp_board[2] ||
-       cmi_grom_y - cmi_grom/2 > cmi_sp_board[1] + cmi_sp_board[3],
-       "cover grommet sits over the Sweet Potato board");
-assert(cmi_grom_y - cmi_grom/2 > cmi_sp_conv[1] + cmi_sp_conv[3],
-       "cover grommet sits over the Sweet Potato converter");
+// the cover's cable slot has to land on free floor in THIS layout too
+assert(ch_cov_x > cmi_sp_board[0] + cmi_sp_board[2],
+       "cover cable slot sits over the Sweet Potato board");
 
+//  The cover takes the harness the last 32 mm: a groove across its top face from
+//  the side edge inboard to the Ø12 grommet it already has, so the run ends where
+//  the 12 V entry already is rather than cutting a second hole.
 module compute_box_inline_cover() {
     // lugs for the tray's horizontal M3s, sunk 1 mm into the plate so they union
     // with it rather than meeting it on a plane
@@ -1456,11 +1557,15 @@ module compute_box_inline_cover() {
         // and 4 + 7 keeps it on M4 x 12.
         for (x = foot_x, y = foot_y)
             translate([x, y, cmi_z1]) m4_bolt_hole(cmi_cov_t);
-        // 12 V entry: a single grommeted hole, replacing the old side-wall raceway.
-        // The feed comes down from the battery directly above.
-        translate([cmi_grom_x, cmi_grom_y, cmi_z1 - 1])
-            cylinder(d = cmi_grom, h = cmi_cov_t + 2);
-
+        // Cable channel on the centreline, in from the RIGHT edge, cut through the
+        // full thickness -- so the slot IS the cable entry.  The Ø12 grommet that
+        // used to bring 12 V down separately is GONE: the harness in this slot
+        // carries power as well, so a second opening earned nothing.
+        translate([ch_cov_x, ch_y - ch_w/2, cmi_z1 - 1])
+            cube([cmi_x0 + cmi_w + 1 - ch_cov_x, ch_w, cmi_cov_t + 2]);
+        for (x = ch_tie_cover, dy = [-ch_tie_dy, ch_tie_dy])
+            translate([x - tie_l/2, ch_y + dy - tie_w/2, cmi_z1 - 1])
+                cube([tie_l, tie_w, cmi_cov_t + 2]);
     }
 }
 
@@ -1578,7 +1683,8 @@ module radio_proxy() {
 
 module frame(ex = 0) {
     color("#7f9dc0") translate([-ex, 0, 0]) side_panel();
-    color("#7f9dc0") translate([frame_w + ex, 0, 0]) mirror([1, 0, 0]) side_panel();
+    // the notched panel goes on the RIGHT, over the battery box groove
+    color("#7f9dc0") translate([frame_w + ex, 0, 0]) mirror([1, 0, 0]) side_panel_notch();
 
     color("#c9a227") translate([bb_beam_x, beam_y_f, z_bb0 - ex])
         crossbeam(rows = bb_rows, span = bb_span, x0 = bb_beam_x);
@@ -1625,6 +1731,9 @@ else if (part == "exploded") frame(26);
 else if (part == "side_panel")
     translate([0, 0, panel_t]) rotate([0, 90, 0])
         translate([0, 0, -panel_z0]) side_panel();
+else if (part == "side_panel_notch")
+    translate([0, 0, panel_t]) rotate([0, 90, 0])
+        translate([0, 0, -panel_z0]) side_panel_notch();
 
 // long axis on the bed, 24 mm tall: end and front-face inserts are both in-plane
 else if (part == "crossbeam_top_front_dual")   crossbeam(front_cols = dual_cols);

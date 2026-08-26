@@ -36,9 +36,9 @@ removed two parts and twelve bolts along the way.
 
 **Everything prints on a Prusa Mini.** The reference design this began from is a
 single 228 mm part that fits no orientation on a 180 × 180 bed. It is decomposed
-here into 16 printable pieces, the largest being the side panel at 175 mm — 5 mm of
+here into 17 printable pieces, the largest being the side panel at 175 mm — 5 mm of
 margin, the tightest tolerance in the project. A complete frame with its battery
-box is 11 parts and roughly 451 cm³ of plastic.
+box is 11 parts and roughly 450 cm³ of plastic.
 
 Currently, this frame is printed as a prototype in PLA and in service. Ultimately, it will be
 printed in PETG for durability.
@@ -48,7 +48,7 @@ printed in PETG for durability.
 This is a clean-room decomposition of the single-piece reference STL from
 [RT-95 Manpack Rails and BNC bulkhead antenna mount](https://makerworld.com/en/models/1117937-rt-95-manpack-rails-and-bnc-bulkhead-antenna-mount?from=search#profileId-1115768) with the following notable changes:
 
-- Separated into printable modules — **16 STLs**, counting alternates — each of
+- Separated into printable modules — **17 STLs**, counting alternates — each of
   which fits a Prusa Mini (180 × 180 mm bed).
 - Every module-to-module joint uses stainless M4 socket-cap bolts into brass heat-set inserts.
   M3 appears only where an off-the-shelf part dictates it: the SBC and covers in
@@ -112,7 +112,8 @@ Two measurements drove real design decisions and are worth calling out:
 
 | #   | Part                          | Qty                 | Print size (mm)      | Solid vol | Inserts  |
 | --- | ----------------------------- | ------------------- | -------------------- | --------- | -------- |
-| 1   | `side_panel`                  | 2                   | 175 × 70 × 9         | 71.8 cm³  | —        |
+| 1a  | `side_panel`                  | 1 or 2\*\*\*\*\*      | 175 × 70 × 9         | 71.8 cm³  | —        |
+| 1b  | `side_panel_notch`            | 0 or 1\*\*\*\*\*      | 175 × 70 × 9         | 71.2 cm³  | —        |
 | 2a  | `crossbeam_top_front_dual`    | 1\*\*               | 124.25 × 16 × 24     | 44.5 cm³  | 12       |
 | 2b  | `crossbeam_top_front_triple`  | 1\*\*               | 124.25 × 16 × 24     | 43.5 cm³  | 16       |
 | 2c  | `crossbeam_top_front_grid`    | 1\*\*               | 124.25 × 16 × 24     | 43.1 cm³  | 18       |
@@ -124,10 +125,10 @@ Two measurements drove real design decisions and are worth calling out:
 | 7b  | `antenna_mount_so239`         | 2\*                 | 35 × 24 × 38         | 11.6 cm³  | —        |
 | 7c  | `antenna_mount_usb`           | 2\*                 | 35 × 24 × 37         | 11.6 cm³  | —        |
 | 7d  | `antenna_mount_switch`        | 1\*                 | 35 × 24 × 33         | 10.9 cm³  | —        |
-| 10  | `battery_box`                 | **1, not optional** | 143 × 83.8 × 94.8    | 116.8 cm³ | 4 + tabs |
+| 10  | `battery_box`                 | **1, not optional** | 143 × 83.8 × 94.8    | 115.6 cm³ | 4 + tabs |
 | 12a | `compute_box_inline_lafrite`  | 1\*\*\*             | 143 × 100 × 39       | 107.8 cm³ | 4 + 2 M3 |
 | 12b | `compute_box_inline_sweetpotato` | 1\*\*\*          | 143 × 100 × 39       | 108.0 cm³ | 4 + 2 M3 |
-| 12c | `compute_box_inline_cover`    | 1\*\*\*             | 143 × 100 × 18       | 118.1 cm³ | 6 M3     |
+| 12c | `compute_box_inline_cover`    | 1\*\*\*             | 143 × 100 × 18       | 117.6 cm³ | 6 M3     |
 
 Numbers track the §2 subsections below, so 6, 8 and 9 are absent as _parts_: §2.6
 is the handle, now part of the side panel; §2.8 folded into §2.7 when the antenna
@@ -150,6 +151,10 @@ for **only two brackets**; the gap between the two antenna mounts is exactly
 35.00 mm, but no bolt column lands where a third would have to go. `_triple` pitches
 its three stations at 38 mm, which clears 35 mm with 3 mm to spare. On `_grid` or
 `_dual` the switch mount replaces one antenna mount.
+
+\*\*\*\*\* Two panels per frame. Two plain ones if you are not fitting the compute
+module; **one plain and one `_notch`** if you are. They are otherwise the same part,
+so the notched one goes on whichever side you run the harness down.
 
 \*\*\* The compute module is optional. 12a and 12b are **alternative trays** — one
 per board, print whichever matches yours — and 12c is the cover, which is not
@@ -191,9 +196,9 @@ Largest part is the side panel at 175 mm — **5 mm of bed margin**, the tightes
 in the project. All meshes verified
 watertight, single-shell, and bed-legal.
 
-Solid volume is 861 cm³ for one of each of the sixteen part files. A full
-**11-piece** build (BNC mounts, battery box, no compute module) is **451 cm³** with
-the grid beam, 451 with the triple, 452 with the dual. Add **226 cm³** for the
+Solid volume is 930 cm³ for one of each of the seventeen part files. A full
+**11-piece** build (BNC mounts, battery box, no compute module) is **450 cm³** with
+the grid beam, 450 with the triple, 451 with the dual. Add **225 cm³** for the
 inline compute module — it hangs below the battery box and changes nothing else in
 the build.
 
@@ -530,6 +535,79 @@ reprinting for this.
 > **`base_plate` has been deleted** — module, export, STL and render. Its history
 > is in the git log up to `d18de92` if the old arrangement is ever wanted.
 
+### 9.1 — the cable channel
+
+![notched panel](img/side_panel_notch.png)
+
+A 7 mm cable run carrying the compute module's harness — 12 V and USB in a braided
+sleeve — from the **base of the side panel downward**: battery box, then compute box
+cover, on the **right** side and on the **centreline**. It is cut **clean through**
+every section it crosses rather than grooved into any of them. Outside is forced rather than
+preferred: the radio fills the bay to 124.25 mm against its own 124, so there is no
+inner-face room at radio height, and the battery box's interior is the pack cavity.
+
+**The side panel needs a notch, but not a groove.** Its bottom edge lands at Z 25,
+dead on the battery box's top face, and it reaches out to X 142.25 — right across the
+top of the box's groove at X 140.125…142.625. So the panel **caps that groove**, and
+the harness cannot simply drop through the window and carry on down.
+
+`side_panel_notch` opens the 7 mm between the window's bottom edge (Z 32) and the
+panel's base (Z 25), cut clean through on the channel centreline. The harness comes
+down inside the frame, out through the window, through the notch and straight into
+the groove without ever standing proud of the panel. That is the only difference:
+`side_panel` itself is untouched and remains bit-identical to what it always was, so
+a panel you have already printed still serves as the other one.
+
+The centreline is what makes this work with the window that is already there — an
+assert checks the notch lines up with it — and it also puts the groove 19.4 mm from
+each crossbeam bolt column.
+
+**Both are cut clean through, not grooved.** A groove never had the depth to hold a
+sleeved harness — 2.5 mm of the battery box's 4 mm wall left the bundle standing
+4.5 mm proud, and there was nothing to thicken into, since the pack sits 1.5 mm off
+the inside and the box at 143 mm is already the widest thing in the bag. Cut through,
+the harness beds into the full section:
+
+| | section | cut |
+| --- | --- | --- |
+| `battery_box` right end wall | 4.0 | **through** |
+| `compute_box_inline_cover` | 8.0 | **through** |
+
+Neither gives anything up by being an opening: that wall is already windowed a few
+millimetres below, and the cover is the compute box's lid. It also means **the slot
+is its own cable entry** — no separate round hole is needed where the run ends.
+
+**The battery box is grooved on the RIGHT wall only** — one side is all the harness
+needs. Both end-wall windows are left exactly as they were: the groove simply opens
+into the right-hand one where the two cross, and the harness spans that stretch held
+by the tie stations either side. Those stations sit in the two solid bands the window
+leaves, at Z −24.8 and Z 7.9, rather than across the opening.
+
+**The cover's slot runs in from the right edge** to X 120 and stops there; being a
+through cut, that is where the harness drops into the box. The **Ø12 grommet is gone**
+— it existed only to bring 12 V down separately, and the harness in this slot carries
+power as well, so a second opening earned nothing. Its asserts and parameters went
+with it.
+
+**Wire ties FLANK the openings** rather than sitting inside them: every section here
+is cut through, so there is no groove floor for a slot to bear against. The slots sit
+6 mm off the centreline in the solid material either side, 2 × 5 mm each:
+
+| | stations |
+| --- | --- |
+| `side_panel_notch` | one, Z 26…31 — centred between the panel base and the window |
+| `battery_box` | two, Z −24.8 and Z 7.9 — in the solid bands its window leaves |
+| `compute_box_inline_cover` | one, X 125 — inboard of the cover lugs at X 129.625 |
+
+On the panel the slots land at Y 28…30 and 40…42, clear of both crossbeam bolt
+columns, and leave **1.0 mm** of material to the panel's base below and to the window
+above. That is thin, but it is in-plane material on a part that prints flat — roughly
+9 mm² of section per ligament — not a layer-adhesion joint.
+
+> **This changes two already-printed parts** — the battery box and the cover — and
+> adds one new print, the notched panel. Plain `side_panel` is unaffected, so the
+> panels you have stay valid; you need one notched one. No fastener moves.
+
 ### 10 — `battery_box`
 
 ![battery_box](img/battery_box.png)
@@ -596,7 +674,7 @@ both the "nothing behind the wearer" rule and the print pose's bed datum. Left
 unramped they cost about 18 mm² of unsupported area each, which is what any
 horizontal boss costs. The floor windows were reshaped around all four pads.
 
-Windowing still nearly halves it: 116.8 cm³ — tabs and feet included — against
+Windowing still nearly halves it: 115.6 cm³ — tabs and feet included — against
 ~190 cm³ for the equivalent closed box.
 
 ### 11 — the top-front crossbeam: three layouts
@@ -709,7 +787,7 @@ There is **no M3 hole grid**. An earlier revision had one at 10 mm pitch; it nev
 earned its place, and the cavity is big enough that loose devices are better
 zip-tied than bolted to whichever hole happens to line up. Ventilation is
 whatever the openings give: the cover is solid, so the box breathes only through
-its grommet and the gap around the leads. That is fine for an idling SBC in a
+the cable slot and the gap around the leads. That is fine for an idling SBC in a
 padded bag and should be revisited if anything warm goes in.
 
 **The mounting pattern is now measured, not published — and the published figure
@@ -737,7 +815,7 @@ retire — the first was the antenna bracket's sealed counterbores.
 | SBC orientation   | flat on the floor, long axis **across** the tray |
 | Converter         | flat on the floor, **behind** the board          |
 | Opens             | **upward**, cover off                            |
-| Cover             | `compute_box_inline_cover`, 118.1 cm³            |
+| Cover             | `compute_box_inline_cover`, 117.6 cm³            |
 | Volume, tray      | 107.8 cm³                                        |
 
 #### The tray and its cover
@@ -788,8 +866,8 @@ Measured positions:
 |               | X                | Y              | note                                                     |
 | ------------- | ---------------- | -------------- | -------------------------------------------------------- |
 | Board         | 39.125 … 103.125 | −25.75 … 30.25 | standoffs 58.75 × 49.5, 8 mm tall                        |
-| Converter     | 31.5 … 96.5      | 31.5 … 66.5    | 0.5 mm off the back wall; its lead end faces the grommet |
-| Cover grommet | 99.02 … 111.00   | 43.02 … 54.98  | Ø12, 12 V in from the battery above                      |
+| Converter     | 31.5 … 96.5      | 31.5 … 66.5    | 0.5 mm off the back wall; its lead end faces the cable slot |
+| Cover slot    | 120 … 143        | 31.5 … 38.5    | 7 mm, cut through; power and USB in from the frame above    |
 
 The board is at Y −25.75 rather than hard against the front wall at −27: at −27 the
 standoff pads merged 0.75 mm _into_ the wall and the board's edge sat dead flush.
@@ -825,8 +903,9 @@ channel is gone — along with the four attempts it took to place it — and the
 interior is plain: cavity width measures **136.98 mm** against the nominal 137.00,
 where the raceway block used to take 19 cm³ out of it.
 
-What replaces it is a **single Ø12 grommeted entry in the cover** — a stock grommet
-size. It measures X 99.02–111.00, Y 43.02–54.98,
+What replaced it was a single Ø12 grommeted entry in the cover, and that in turn has
+been replaced by the **cable slot** (§9.1), which carries power and USB together and
+needs no separate hole. The grommet measured X 99.02–111.00, Y 43.02–54.98,
 sited 2.50 mm clear of the converter's lead end at X 96.5 and centred on its Y band,
 so the feed drops straight onto the terminals instead of crossing the board. Both
 the converter clearance and the distance to the nearest stacking bolt are asserted
@@ -937,9 +1016,9 @@ stacks, which on this form factor carries no connector, since power, HDMI and au
 all sit inboard of local X 60. The first 70.5 mm keeps its full 37 mm. It also crosses
 one cover-lug Y band instead of two.
 
-The real cost is the **12 V run**. The shared cover fixes the grommet at (105, 49), so
-the feed now travels 40.5 mm to the converter rather than 10.5, crossing the open USB
-column — worth a tie-down. Note the port positions along the front edge are inferred
+The 12 V now arrives through the cover's cable slot at X 120…143 on the centreline,
+so the feed reaches the converter across the open USB column — worth a tie-down. Note
+the port positions along the front edge are inferred
 from the Pi 3B+ layout, not measured: the Sweet Potato swaps micro-USB for USB-C and
 no drawing for it was findable, so **check that last 14.5 mm against your own board**
 before printing.
@@ -1113,7 +1192,7 @@ constraint from the lap pads is gone.
    **cover alone** up into the battery box's four feet first (4 × M4 × 12 — the heads
    are on its underside and nothing is under it yet), then populate the tray, lift it
    up to the cover, and run the **six M3 in horizontally from outside** the side
-   walls. Pass the 12 V down through the cover's Ø12 grommet. Doing it the other way
+   walls. Pass the harness down through the cover's cable slot. Doing it the other way
    round traps one set of heads or the other.
 
 ---
@@ -1187,14 +1266,16 @@ Not just rendered — checked:
 - Compute boxes: SBC envelope (64 × 56 board + 22 mm of connectors) traced clear
   of the walls and top flanges, single-shell with zero enclosed voids.
 - `compute_box_inline_lafrite`: tray 142.98 × 99.98 × 38.98 / 107.76 cm³, cover
-  142.98 × 99.98 × 17.99 / 118.10 cm³, both watertight and single-shell; stack pitch
+  142.98 × 99.98 × 17.99 / 117.59 cm³ (118.10 before the cable slot went in and the
+  grommet came out), both watertight and single-shell; stack pitch
   measures **54.99 mm** against the 55 mm budget, under the battery box's 8 mm feet.
   Cavity sectioned at 35.00 mm, and at **136.98 mm** wide against a nominal 137.00 —
   the raceway block that used to take 19 cm³ out of it is gone.
-- Battery box after restoring its feet: 116.77 cm³, all four foot rings 24/24 solid
+- Battery box after restoring its feet: 116.77 cm³, now 115.64 with the cable
+  cut-out; all four foot rings 24/24 solid
   with inserts open downward; the cover's four M4 confirmed open through into them.
-  Cover grommet traces Ø12 at X 99.02–111.00, Y 43.02–54.98, 2.50 mm clear of the
-  converter.
+  The cover's Ø12 grommet traced at X 99.02–111.00, Y 43.02–54.98 before it was
+  removed in favour of the cable slot.
 - Tray-to-cover lugs: six traced at **10.00 × 11.98 mm**, full height 17.98 mm (10 of
   lug plus the 8 mm plate), pockets **5.00 mm** deep from the wall face with 5.00 mm of
   backing. Matching clearance holes confirmed through both tray side walls at all six
@@ -1303,7 +1384,7 @@ OpenSCAD re-exports differ byte-wise for identical geometry.
 | `crossbeam_bottom_front_rail` | 124.25 → **106.25 mm**; the tab joint                                                                                                                                                           |
 | `battery_box`                 | gains four tabs and keeps its feet; top face moves to the frame datum                                                                                                                           |
 | `compute_box_inline_lafrite`          | moves to the bottom of the stack: no feet, no raceway, sealed floor, prints floor-down (§12)                                                                                                    |
-| `compute_box_inline_cover`    | bolts up into the battery box's feet, gains six lugs for the horizontal tray screws and a Ø12 grommet in place of the raceway                                                                   |
+| `compute_box_inline_cover`    | bolts up into the battery box's feet, gains six lugs for the horizontal tray screws and a through cable slot in place of the raceway                                                          |
 | `side_panel` ×2               | the unified panel + handle                                                                                                                                                                      |
 | `side_panel` ×2               | **model only, no reprint needed** — the RT-95's M5 pair at Z 129−31 was removed (§2.13). Panels already printed carry the extra hole harmlessly; the radio mounts at the Z 129 pair either way. |
 
@@ -1378,10 +1459,10 @@ panel's holes are.
 
 ---
 
-10. **RESOLVED — the buck converter's 12 V feed comes down through the cover**: a
-    Ø12 grommeted hole at X 99.02–111.00, Y 43.02–54.98, sited 2.50 mm clear of the
-    converter's lead end so the feed lands on its terminals without crossing the
-    board (§12). The old raceway that made this awkward is gone with the reordering.
+10. **RESOLVED — the buck converter's 12 V feed comes down through the cover**: it
+    arrives in the **cable slot** at X 120…143 on the centreline (§9.1), alongside
+    the USB, and the Ø12 grommet that used to carry it separately has been removed.
+    The old raceway that made this awkward is gone with the reordering.
     The superseded note read:
 
     > **`compute_box_inline_lafrite`: the buck converter's own 12 V feed has no modelled
