@@ -5,23 +5,19 @@ project, built around a Libre Computer Sweet Potato. This covers the SBC
 itself — hardware selection, OS bring-up, networking, and the application
 stack it runs — as a companion to the frame's own README.
 
-## Overview
+# Overview
 
 This compute module turns the manpack from a radio-only rig into a field
-computing platform with WiFi access and add-on applications.
+computing platform with WiFi access housing add-on applications.
 
 WiFi can serve either as
 
 - a client (joining an existing network)
-- as its own access point (for a phone/tablet to connect to directly in the field)
+- as its own access point (for a phone/tablet to connect to directly in the field w/ no direct Internet connection)
 
-It hangs beneath the frame's battery box in the `compute_box_inline_sweetpotato` tray.
+It hangs beneath the frame's battery box in the `compute_box_inline_sweetpotato` tray and is switched on independently of the radio.
 
-Reliability, power efficiency, and robustness under field conditions —
-unattended reboots, no monitor/keyboard available, intermittent power — drive
-most of the design decisions documented here, more than raw performance.
-
-## Hardware
+# Hardware
 
 |                   |                                                                                                                                                                                  |
 | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -32,21 +28,9 @@ most of the design decisions documented here, more than raw performance.
 | Interface name    | `wlan0`, pinned via a systemd `.link` file so the name survives across dongle replug/enumeration order                                                                           |
 | Physical mounting | Sits in the `compute_box_inline_sweetpotato` tray, hanging under the frame's battery box; a separate 3D-printed eMMC retention bracket secures the eMMC module against vibration |
 
-**Why the Sweet Potato over other boards considered:** its USB-C power, a
-vibration-mounted eMMC module with a standoff, and a PoE header made it the
-strongest Libre Computer option evaluated for this use case.
+# Operating System Setup (including Docker)
 
-Other contenders include:
-
-- The Libre Computer La Frite (used on an earlier/parallel manpack build) was a solid choice; however, its opposite-end connector layout led to less efficicient space utilitzation than the Sweet Potato, which is more like a Raspberry Pi layout.
-- The Orange Pi was ruled out as the weakest candidate here due to microSD-only storage, split GPIO headers, and inconsistent documentation.
-- The Radxa Cubie A5E (T527, industrial-rated) looked promising but was judged too immature in software support for current field deployment — worth revisiting as that ecosystem matures.
-- The BeagleBone Black remains a candidate specifically if precise signal timing via PRU real-time
-  microcontrollers ever becomes a requirement, though it needs custom wiring due to non-RPi-compatible headers.
-
-## Operating System Setup (including Docker)
-
-### Base image
+## Base image
 
 Libre Computer's EDK2-based UEFI abstraction layer means a single generic
 arm64 Debian image works across all their supported boards — there's no
@@ -60,7 +44,7 @@ board-specific image to track down. Images are sourced from
 > toggle. This is also the relevant recovery path if the board ever becomes
 > unbootable and the eMMC needs to be accessed from another machine.
 
-### Bring-up issues resolved
+## Bring-up issues resolved
 
 These came up during initial commissioning and are documented here so they
 don't get re-diagnosed from scratch on a rebuild:
@@ -74,7 +58,7 @@ don't get re-diagnosed from scratch on a rebuild:
   causing `udev` rename conflicts — resolved; see the networking section
   below for why `.link` files are used deliberately despite this history
 
-### Networking
+## Networking
 
 WiFi is configured via `systemd-networkd` + `wpa_supplicant`, with
 `wpa_supplicant@wlan0.service` enabled for persistence across reboots. See
@@ -87,7 +71,7 @@ practice when a boot hangs before a getty spawns), and consistent network
 manager selection across interfaces so `systemd-networkd` isn't fighting
 another tool for control of a link.
 
-### Docker
+## Docker
 
 Docker Engine is the base layer for future containerized services (see
 [Applications](#applications-overview-and-sections) below). Standard install
@@ -189,7 +173,57 @@ changing mode without disturbing your current session (e.g. over SSH on the
 link you're about to switch away from), and confirm with `status` after the
 reboot.
 
-### Design
+# Applications Overview and Sections
+
+> **This section is a placeholder.** The applications below are planned or
+> in early stages; details need to be filled in as each is actually built
+> out and confirmed running on this board. Candidate list, carried over from
+> the broader manpack project's software stack planning:
+
+## WebSDR
+
+_TBD_
+
+## Logging
+
+_TBD_ Candidates under consideration for this compute module include:
+
+- **Direwolf** — APRS iGate/digipeater, KISS TNC
+- **Pat** — Winlink email over ARDOP/VARA FM
+- **fldigi** / **flrig** — digital modes and rig control
+- GPS track logging
+- Squelch-triggered voice recording
+- Contact logging
+
+## Other
+
+_TBD — reserve this space for anything that doesn't fit WebSDR/Logging
+(e.g. a tablet-facing web UI, a status dashboard, etc.)._
+
+# Hardware Design
+
+Reliability, power efficiency, and robustness under field conditions —
+unattended reboots, no monitor/keyboard available, intermittent power — drive
+most of the design decisions documented here, more than raw performance.
+
+## Why the Libre Computer Sweet Potato?
+
+This SBC has many notable features including:
+
+- its Raspberry Pi form factor
+- its USB-C power
+- a vibration-mounted eMMC module with a standoff
+- a PoE header
+
+Other contenders include:
+
+- The Libre Computer La Frite (used on an earlier/parallel manpack build) was a solid choice; however, its opposite-end connector layout led to less efficicient space utilitzation than the Sweet Potato, which is more like a Raspberry Pi layout.
+- The Orange Pi was ruled out as the weakest candidate here due to microSD-only storage, split GPIO headers, and inconsistent documentation.
+- The Radxa Cubie A5E (T527, industrial-rated) looked promising but was judged too immature in software support for current field deployment — worth revisiting as that ecosystem matures.
+- The BeagleBone Black remains a candidate specifically if precise signal timing via PRU real-time
+  microcontrollers ever becomes a requirement, though it needs custom wiring due to non-RPi-compatible headers.
+
+# Software Design
 
 **Why staging exists:** switching directly to AP mode over an SSH session
 connected via WiFi client mode kills your own connection mid-command.
@@ -247,30 +281,3 @@ true kernel-level driver deadlock.
 surviving an ordinary subsequent reboot. **Wants more test cycles before
 fully trusting in the field:** `stage ap` + reboot — failed repeatedly before
 the ordering fix above; has passed at least one clean test since.
-
-## Applications Overview and Sections
-
-> **This section is a placeholder.** The applications below are planned or
-> in early stages; details need to be filled in as each is actually built
-> out and confirmed running on this board. Candidate list, carried over from
-> the broader manpack project's software stack planning:
-
-### WebSDR
-
-_TBD._
-
-### Logging
-
-_TBD._ Candidates under consideration for this compute module include:
-
-- **Direwolf** — APRS iGate/digipeater, KISS TNC
-- **Pat** — Winlink email over ARDOP/VARA FM
-- **fldigi** / **flrig** — digital modes and rig control
-- GPS track logging
-- Squelch-triggered voice recording
-- Contact logging
-
-### Other
-
-_TBD — reserve this space for anything that doesn't fit WebSDR/Logging
-(e.g. a tablet-facing web UI, a status dashboard, etc.)._
