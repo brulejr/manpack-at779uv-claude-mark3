@@ -22,6 +22,7 @@ It hangs beneath the frame's battery box in the `compute_box_inline_sweetpotato`
 |                   |                                                                                                                                                                                  |
 | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Board             | Libre Computer Sweet Potato, AML-S905X-CC-V2                                                                                                                                     |
+| Storage           | Libre Computer 128GB eMMC 5.x Module, LC-EMMC-5X-128GB                                                                                                                           |
 | OS                | Debian 12 (bookworm), arm64                                                                                                                                                      |
 | WiFi adapter      | Realtek RTL8188CUS, USB ID `0bda:8176`                                                                                                                                           |
 | WiFi driver       | `rtl8192cu` — **in-tree**, ships with the kernel package, no DKMS/out-of-tree module to maintain                                                                                 |
@@ -29,8 +30,6 @@ It hangs beneath the frame's battery box in the `compute_box_inline_sweetpotato`
 | Physical mounting | Sits in the `compute_box_inline_sweetpotato` tray, hanging under the frame's battery box; a separate 3D-printed eMMC retention bracket secures the eMMC module against vibration |
 
 # Operating System Setup (including Docker)
-
-## Base image
 
 Libre Computer's EDK2-based UEFI abstraction layer means a single generic
 arm64 Debian image works across all their supported boards — there's no
@@ -44,19 +43,95 @@ board-specific image to track down. Images are sourced from
 > toggle. This is also the relevant recovery path if the board ever becomes
 > unbootable and the eMMC needs to be accessed from another machine.
 
-## Bring-up issues resolved
+## Install base operating system
 
-These came up during initial commissioning and are documented here so they
-don't get re-diagnosed from scratch on a rebuild:
+Attach eMMC module to back of La Frite SBC. There is no retaining clip.
 
-- HDMI EDID artifacts during early boot
-- A read-only USB filesystem boot failure
-- Hostname configuration
-- An SSH service failure traced to a config file typo
-- Harmless `update-initramfs` firmware warnings (cosmetic, no action needed)
-- Ethernet was temporarily lost to a MAC address mismatch in a `.link` file
-  causing `udev` rename conflicts — resolved; see the networking section
-  below for why `.link` files are used deliberately despite this history
+Download the **debian-12-base-arm64+arm64.img** image from https://distro.libre.computer/ci/debian/12/
+
+Write the image to a USB Stick
+
+```bash
+xzcat /home/brulejr/Downloads/debian-12-base-arm64+arm64.img.xz | dd of=/dev/sdc bs=4M status=progress conv=fsync
+```
+
+Copy the **debian-12-base-arm64+arm64.img** image to the USB stick
+
+```bash
+cp /home/brulejr/Downloads/debian-12-base-arm64+arm64.img.xz /run/media/brulejr/root/root
+```
+
+Ensure that the **eMMC** / **NORM** switch is in the **NORM** position.
+
+Boot from the USB stick.
+
+Default credentials are **root / root**. Change credentials upon login.
+
+Write image to eMMC
+
+```bash
+dd if=/dev/sda of=/dev/mmcblk0
+```
+
+Remove the USB stick. Reboot the SBC. Be sure to plug in the Ethernet cable.
+
+## Update system
+
+Apply updates.
+
+```bash
+apt update
+apt upgrade -y
+```
+
+## Rename the machine
+
+```bash
+sudo hostnamectl set-hostname manpack01
+```
+
+## Setup common aliases
+
+```bash
+cat > /etc/profile.d/aliases.sh <<EOM
+alias cp='cp -i'
+alias ll='ls -laF'
+alias ltr='ls -altr'
+alias rm='rm -i'
+EOM
+```
+
+## Setup SSH service
+
+Install SSH service
+
+```bash
+apt install -y openssh-server
+systemctl enable --now ssh
+```
+
+Add system user
+
+```bash
+adduser sysadm
+adduser sysadm sudo
+```
+
+Tighten up the ssh configuration by setting the following in `/etc/ssh/sshd_config`
+
+```
+PermitRootLogin no
+PubkeyAuthentication yes
+PasswordAuthentication no
+```
+
+Transfer the ssh key to the new machine
+
+```bash
+ssh-copy-id sysadm@<sweet-potato-ip>
+```
+
+Reboot for SSH settings to take effect.
 
 ## Networking
 
@@ -281,3 +356,17 @@ true kernel-level driver deadlock.
 surviving an ordinary subsequent reboot. **Wants more test cycles before
 fully trusting in the field:** `stage ap` + reboot — failed repeatedly before
 the ordering fix above; has passed at least one clean test since.
+
+### Bring-up issues resolved
+
+These came up during initial commissioning and are documented here so they
+don't get re-diagnosed from scratch on a rebuild:
+
+- HDMI EDID artifacts during early boot
+- A read-only USB filesystem boot failure
+- Hostname configuration
+- An SSH service failure traced to a config file typo
+- Harmless `update-initramfs` firmware warnings (cosmetic, no action needed)
+- Ethernet was temporarily lost to a MAC address mismatch in a `.link` file
+  causing `udev` rename conflicts — resolved; see the networking section
+  below for why `.link` files are used deliberately despite this history
