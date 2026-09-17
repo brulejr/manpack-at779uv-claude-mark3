@@ -73,7 +73,9 @@ Write image to eMMC
 dd if=/dev/sda of=/dev/mmcblk0
 ```
 
-Remove the USB stick. Reboot the SBC. Be sure to plug in the Ethernet cable.
+Remove the USB stick, and reboot the SBC.
+
+> Be sure to plug in the Ethernet cable.
 
 ## Update system
 
@@ -133,20 +135,7 @@ ssh-copy-id sysadm@<sweet-potato-ip>
 
 Reboot for SSH settings to take effect.
 
-## Networking
-
-WiFi is configured via `systemd-networkd` + `wpa_supplicant`, with
-`wpa_supplicant@wlan0.service` enabled for persistence across reboots. See
-[WiFi Mode Switching](#wifi-mode-switching) below for the full client/AP
-switching mechanism built on top of this baseline.
-
-Field-reliability posture: key-based SSH auth, serial console treated as the
-primary recovery interface (not just HDMI/keyboard — this has mattered in
-practice when a boot hangs before a getty spawns), and consistent network
-manager selection across interfaces so `systemd-networkd` isn't fighting
-another tool for control of a link.
-
-## Docker
+## Setup Docker
 
 Docker Engine is the base layer for future containerized services (see
 [Applications](#applications-overview-and-sections) below). Standard install
@@ -182,7 +171,20 @@ installed above and is the intended way to run the application stack in
 one compose file per service, or one combined stack file, TBD as that section
 fills in.
 
-## WiFi Mode Switching
+## Setup WiFi Networking
+
+WiFi is configured via `systemd-networkd` + `wpa_supplicant`, with
+`wpa_supplicant@wlan0.service` enabled for persistence across reboots. See
+[WiFi Mode Switching](#wifi-mode-switching) below for the full client/AP
+switching mechanism built on top of this baseline.
+
+Field-reliability posture: key-based SSH auth, serial console treated as the
+primary recovery interface (not just HDMI/keyboard — this has mattered in
+practice when a boot hangs before a getty spawns), and consistent network
+manager selection across interfaces so `systemd-networkd` isn't fighting
+another tool for control of a link.
+
+## Setup WiFi Mode Switching
 
 `wifi-mode.sh` switches the board between WiFi **client** mode (joins an
 existing network) and **AP** mode (broadcasts its own network for a
